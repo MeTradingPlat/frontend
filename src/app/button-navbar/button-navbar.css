@@ -1,0 +1,30 @@
+.navbar-button {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  width: 100%;
+  height: auto;
+}
+
+.navbar-button .body-md {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.navbar-button i {
+  font-size: 30px;
+  color: var(--text-primary);
+}
+
+.navbar-button:hover {
+  background-color: var(--btn-hover);
+}
+
+.navbar-button.selected {
+  background-color: var(--btn-selected);
+}

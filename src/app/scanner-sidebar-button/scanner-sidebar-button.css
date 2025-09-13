@@ -1,0 +1,34 @@
+.scanner-sidebar-button {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: var(--panel);
+  cursor: pointer;
+  gap: 5px; /* Space between icon and text */
+  width: 100%; /* Fill parent width */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.scanner-sidebar-button:hover {
+  background-color: var(--btn-hover);
+}
+
+.scanner-sidebar-button.selected {
+  background-color: var(--btn-selected);
+}
+
+.scanner-sidebar-button i {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-primary);
+}
+
+.scanner-sidebar-button .body-sm {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-sm-12);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-primary);
+  margin: 0;
+}

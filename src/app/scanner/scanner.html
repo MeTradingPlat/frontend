@@ -1,0 +1,15 @@
+<app-second-navbar
+[title]="title"
+[items]="navItems"
+></app-second-navbar>
+<div class="content">
+  @for (scanner of filteredScanners(); track scanner.idScanner) {
+    <app-scanner-info
+      [title]="scanner.title"
+      [estado]="scanner.estado"
+      [idScanner]="scanner.idScanner"
+    ></app-scanner-info>
+  } @empty {
+    <p i18n>No hay escáneres para mostrar.</p>
+  }
+</div>

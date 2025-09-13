@@ -1,0 +1,30 @@
+<div class="scanner-info-card">
+  <div class="scanner-info-content">
+    <div class="scanner-info-header">
+      <h2 class="scanner-info-title">{{title}}</h2>
+      <div class="scanner-info-icons">
+        @if (estado === EnumEstadoEscaner.INICIADO) {
+          <i class="bi bi-stop-fill"></i>
+        } @else {
+          <i class="bi bi-play-fill"></i>
+        }
+        <i class="bi bi-gear-fill"></i>
+      </div>
+    </div>
+    <div class="scanner-info-content-area">
+      <div class="scanner-info-sidebar-container">
+        @for (item of sidebarItems; track item.buttonText) {
+          <app-scanner-sidebar-button
+            [iconClass]="item.iconClass"
+            [buttonText]="item.buttonText"
+            [isSelected]="selectedSidebarItem === item.buttonText"
+            (buttonClicked)="onSidebarButtonClick(item.buttonText)"
+          ></app-scanner-sidebar-button>
+        }
+      </div>
+      <div class="scanner-info-details-container">
+        <!-- Info content will go here -->
+      </div>
+    </div>
+  </div>
+</div>

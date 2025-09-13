@@ -1,0 +1,17 @@
+.app-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column; /* Stack children vertically to allow second-navbar to take full width */
+  flex: 1; /* Permite que el área de contenido ocupe el espacio restante */
+}
+
+.main-content {
+  flex: 1;
+  padding: 0px;
+}
+

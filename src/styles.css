@@ -1,0 +1,7 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Importa los módulos de estilos */
+@import './styles/_typography.css';
+@import './styles/_base.css';
+@import './styles/_themes.css';
+@import './styles/_components.css';

@@ -1,0 +1,18 @@
+<div class="main-navbar">
+  <div class="up-navbar">
+    <div class="logo" routerLink="/">
+      <p class="h1">LOGO</p>
+    </div>
+    <div class="items">
+      @for (item of navItems; track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" #rla="routerLinkActive">
+          <app-button-navbar
+            [isSelected]="rla.isActive"
+            [iconClass]="item.iconClass"
+            [buttonText]="item.buttonText"
+          ></app-button-navbar>
+        </a>
+      }
+    </div>
+  </div>
+</div>

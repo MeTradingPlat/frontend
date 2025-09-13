@@ -1,0 +1,35 @@
+.second-navbar {
+    background-color: var(--panel);
+    box-sizing: border-box;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    height: 90px;
+    display: flex; /* Use flexbox for layout */
+    align-items: center; /* Vertically center items */
+    justify-content: space-between; /* Distribute items with space between them */
+}
+
+.back-button {
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    align-content: center;
+}
+
+.i{
+    font-size: 30px;
+}
+
+.second-navbar h2 {
+    flex-grow: 1; /* Allow the title to take up available space */
+    text-align: left; /* Align the text to the left within the expanded space */
+    color: var(--text-primary); /* Set text color to primary */
+}
+
+.button-wrapper {
+    display: flex;
+    flex-shrink: 0; /* Prevent the button wrapper from expanding */
+}

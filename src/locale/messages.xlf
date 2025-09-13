@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="es-CO" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="3834066578204438253" datatype="html">
+        <source>Escáneres</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main-navbar/main-navbar.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner/scanner.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="248162934856830193" datatype="html">
+        <source>Noticias</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/main-navbar/main-navbar.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner-info/scanner-info.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2531312935079531417" datatype="html">
+        <source>Señales</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner-info/scanner-info.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner-info/scanner-info.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="934309240721705101" datatype="html">
+        <source>Activos</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner-info/scanner-info.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1824343322741992092" datatype="html">
+        <source>Registro</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner-info/scanner-info.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7532911879405106084" datatype="html">
+        <source>Filtros</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner-info/scanner-info.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7495520622838654041" datatype="html">
+        <source>No hay escáneres para mostrar.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner/scanner.html</context>
+          <context context-type="linenumber">13,15</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7868651453066060158" datatype="html">
+        <source>Archivados</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner/scanner.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7776873252561096935" datatype="html">
+        <source>Nuevo</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/scanner/scanner.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8931266436302445711" datatype="html">
+        <source>Editando escáner con id:</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.html</context>
+          <context context-type="linenumber">10,11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5492847349172853430" datatype="html">
+        <source>Creando nuevo escáner</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.html</context>
+          <context context-type="linenumber">12,14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6206857901432438479" datatype="html">
+        <source>Escáner: <x id="PH" equiv-text="this.scannerId"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7426668065275544292" datatype="html">
+        <source>Atrás</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="9077577477688980439" datatype="html">
+        <source>Archivar</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7099780434896458019" datatype="html">
+        <source>Borrar</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1786992308145307954" datatype="html">
+        <source>Nuevo Escáner</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1372173599787735409" datatype="html">
+        <source>Guardar</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/set-up-scanner/set-up-scanner.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

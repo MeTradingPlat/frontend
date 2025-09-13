@@ -1,0 +1,20 @@
+<div class="second-navbar">
+    <div class="back-button">
+        @if (backPath != '') {
+            <a [routerLink]="backPath" (click)="onButtonClick('Atrás')">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+        }
+    </div>
+    <h2 class="h2">{{title}}</h2>
+    @for (item of items; track item.buttonText) {
+        <div class="button-wrapper">
+          <a [routerLink]="item.path" (click)="onButtonClick(item.buttonText)">
+            <app-button-navbar
+              [iconClass]="item.iconClass"
+              [buttonText]="item.buttonText"
+            ></app-button-navbar>
+          </a>
+        </div>
+      }
+</div>

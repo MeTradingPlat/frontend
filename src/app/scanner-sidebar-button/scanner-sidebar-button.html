@@ -1,0 +1,8 @@
+<div
+  class="scanner-sidebar-button"
+  [ngClass]="{ 'selected': isSelected }"
+  (click)="onClick()"
+>
+  <i [class]="iconClass"></i>
+  <span class="body-sm">{{ buttonText }}</span>
+</div>

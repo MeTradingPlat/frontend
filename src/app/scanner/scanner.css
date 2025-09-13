@@ -1,0 +1,8 @@
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centered horizontally */
+    align-items: flex-start; /* Aligned to the top */
+    padding: 15px;
+    gap: 15px;
+}

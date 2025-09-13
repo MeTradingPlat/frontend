@@ -1,0 +1,120 @@
+/* ===============================
+   _typography.css
+   Sistema tipográfico basado en variables
+   Fuente: Manrope
+   Letter-spacing: 0.5%
+   =============================== */
+
+/* Importación (si usas Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ===============================
+     Familia y espaciado global
+     =============================== */
+  --font-family: 'Manrope', sans-serif;
+  --letter-spacing-default: 0.005em; /* 0.5% */
+
+  /* ===============================
+     Tamaños de fuente
+     =============================== */
+  --font-size-h1-32: 32px;   /* Main Heading */
+  --font-size-h2-24: 24px;   /* Secondary Heading */
+  --font-size-h3-20: 20px;   /* Tertiary Heading */
+  --font-size-body-lg-16: 16px; /* Main Text grande */
+  --font-size-body-md-14: 14px; /* Secondary Text */
+  --font-size-body-sm-12: 12px; /* Main/Aux text */
+  --font-size-body-xs-8: 8px;  /* Secondary pequeño */
+  --font-size-number-18: 18px;  /* Números */
+
+  /* ===============================
+     Pesos de fuente
+     =============================== */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ===============================
+     Altura de línea (recomendación)
+     =============================== */
+  --line-height-tight: 1.2;  /* títulos compactos */
+  --line-height-normal: 1.4; /* texto normal */
+  --line-height-loose: 1.6;  /* párrafos largos */
+}
+
+/* ===============================
+   Estilos aplicados (ejemplo)
+   =============================== */
+.h1 {
+  font-family: var(--font-family);
+  font-size: var(--font-size-h1-32);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.h2 {
+  font-family: var(--font-family);
+  font-size: var(--font-size-h2-24);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.h3 {
+  font-family: var(--font-family);
+  font-size: var(--font-size-h3-20);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.body-lg {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-lg-16);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.body-md {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-md-14);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.body-sm {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-sm-12);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.body-xs {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-xs-8);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.aux-text {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-sm-12);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-default);
+}
+
+.number {
+  font-family: var(--font-family);
+  font-size: var(--font-size-number-18);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-default);
+}
