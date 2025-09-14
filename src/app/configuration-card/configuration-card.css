@@ -1,17 +1,11 @@
 :host, .configuration-card {
-  display: block;
+  display: flex; /* Change to flex to allow children to fill height */
+  flex-direction: column;
   box-sizing: border-box;
   width: 100%;
-  max-width: 400px;
-  /* permitir que el padre controle el tamaño mediante flex;
-     usar fallback si el card es usado fuera de un flex container */
+  /* Let the parent container control the size via flex properties */
   flex: 1 1 320px;
-  min-width: 345px;
   border-radius: 10px;
-  /* The following properties are kept from the original .configuration-card */
-  /* display: flex; */ /* This will be overridden by display: block from :host */
-  flex-direction: column;
-  align-items: flex-start;
   background-color: var(--panel);
   overflow: hidden; /* Ensures border-radius applies to children */
 }
@@ -45,7 +39,11 @@
   padding: 20px 40px; /* superior/inferior 20, lados 40 */
   width: 100%;
   box-sizing: border-box; /* Include padding in the element's total width */
-  height: auto; /* hug */
-  align-items: stretch; /* align top center - horizontally center, vertically top */
-  justify-content: flex-start; /* align top center - horizontally center, vertically top */
+  flex-grow: 1; /* Allow content to fill available space */
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+}
+
+.filter-card .card-content {
+  justify-content: flex-start; /* Align content to the top for filter cards */
 }

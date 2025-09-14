@@ -35,13 +35,11 @@ export class SetUpScanner implements OnInit {
     private readonly router: Router
   ) {}
 
-  get configurationCardTypes(): EnumConfigurationCard[] {
-    return Object.keys(EnumConfigurationCard) // Use EnumConfigurationCard directly
-      .filter(key => !isNaN(Number(key)))
-      .map(key => Number(key) as EnumConfigurationCard);
-  }
+  regularCardTypes: EnumConfigurationCard[] = [];
+  filterCardType?: EnumConfigurationCard;
 
   ngOnInit(): void {
+    this.setupCardTypes();
     // Observa cambios de navegación
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
@@ -53,6 +51,16 @@ export class SetUpScanner implements OnInit {
     // Inicialización inicial
     this.initializeView();
   }
+
+  private setupCardTypes(): void {
+    const allTypes = Object.keys(EnumConfigurationCard)
+      .filter(key => !isNaN(Number(key)))
+      .map(key => Number(key) as EnumConfigurationCard);
+
+    this.regularCardTypes = allTypes.filter(type => type !== EnumConfigurationCard.FILTERS);
+    this.filterCardType = allTypes.find(type => type === EnumConfigurationCard.FILTERS);
+  }
+
 
   private initializeView(): void {
     this.scannerId = this.route.snapshot.paramMap.get('id');

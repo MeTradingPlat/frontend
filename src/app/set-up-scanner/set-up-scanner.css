@@ -1,25 +1,39 @@
 .set-up-scanner-content {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px; /* espacio entre cards */
-  align-items: stretch;
-  box-sizing: border-box;
+  flex-direction: column; /* Main axis is vertical */
+  gap: 16px;
   padding: 20px;
-  border-radius: 10px;
 }
 
-/* Selector genérico para cada card dentro del grid. */
-.set-up-scanner-content > * {
-  flex: 1 1 320px; /* grow | shrink | base width */
-  min-width: 345px; /* ancho mínimo por card */
-  max-width: 400px;  /* nunca exceder el ancho del contenedor */
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: stretch;
+  justify-content: center; /* Center cards horizontally */
+}
+
+.cards-container > * {
+  flex: 1 1 320px;
+  min-width: 345px;
+  max-width: 400px;
   box-sizing: border-box;
+}
+
+.filter-card-container {
+  display: flex;
+  justify-content: center; /* Center the filter card horizontally */
   width: 100%;
 }
 
-/* Pequeñas pantallas: cada card ocupa 100% */
+.filter-card-container > * {
+  width: 100%;
+  max-width: 1240px; /* Allow filter card to be wider */
+}
+
+/* Responsive adjustments */
 @media (max-width: 600px) {
-  .set-up-scanner-content > * {
+  .cards-container > * {
     flex-basis: 100%;
     min-width: 0;
   }

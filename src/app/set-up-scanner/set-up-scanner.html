@@ -6,9 +6,15 @@
 ></app-second-navbar>
 
 <div class="set-up-scanner-content">
-  @for (cardType of configurationCardTypes; track cardType) {
-    <app-configuration-card
-      [cardType]="cardType"
-    ></app-configuration-card>
+  <div class="cards-container">
+    @for (cardType of regularCardTypes; track cardType) {
+      <app-configuration-card [cardType]="cardType"></app-configuration-card>
+    }
+  </div>
+
+  @if (filterCardType !== undefined) {
+    <div class="filter-card-container">
+      <app-configuration-card [cardType]="filterCardType"></app-configuration-card>
+    </div>
   }
 </div>
