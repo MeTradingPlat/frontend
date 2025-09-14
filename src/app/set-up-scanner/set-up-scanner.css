@@ -1,3 +1,26 @@
 .set-up-scanner-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px; /* espacio entre cards */
+  align-items: stretch;
+  box-sizing: border-box;
   padding: 20px;
+  border-radius: 10px;
+}
+
+/* Selector genérico para cada card dentro del grid. */
+.set-up-scanner-content > * {
+  flex: 1 1 320px; /* grow | shrink | base width */
+  min-width: 345px; /* ancho mínimo por card */
+  max-width: 400px;  /* nunca exceder el ancho del contenedor */
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Pequeñas pantallas: cada card ocupa 100% */
+@media (max-width: 600px) {
+  .set-up-scanner-content > * {
+    flex-basis: 100%;
+    min-width: 0;
+  }
 }

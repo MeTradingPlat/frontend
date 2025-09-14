@@ -1,14 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SecondNavbar } from "../second-navbar/second-navbar";
-import { ScannerInfo } from "../scanner-info/scanner-info";
+import { ScannerInfo, EnumEstadoEscaner } from "../scanner-info/scanner-info"; // Import EnumEstadoEscaner
 import { Router } from '@angular/router';
-
-enum EnumEstadoEscaner {
-    ARCHIVADO = 'ARCHIVADO',
-    INICIADO = 'INICIADO',
-    DETENIDO = 'DETENIDO',
-}
 
 interface ScannerItem {
   idScanner: number;

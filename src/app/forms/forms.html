@@ -1,0 +1,70 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="form-container"
+  [class.form-horizontal]="isHorizontal"
+>
+  @for (field of formFields; track field.key) {
+    <div class="form-group">
+      <label [for]="field.key" class="form-label">{{ field.label }}</label>
+
+      @switch (field.type) {
+        @case (CONTROL_TYPE.TEXT) {
+          <input
+            type="text"
+            [id]="field.key"
+            [formControlName]="field.key"
+            class="form-control"
+            [placeholder]="field.placeholder || ''"
+          />
+        }
+        @case (CONTROL_TYPE.TEXTAREA) {
+          <textarea
+            [id]="field.key"
+            [formControlName]="field.key"
+            class="form-control"
+            [placeholder]="field.placeholder || ''"
+          ></textarea>
+        }
+        @case (CONTROL_TYPE.SELECT) {
+          <select
+            [id]="field.key"
+            [formControlName]="field.key"
+            class="form-control"
+          >
+            @for (option of field.options; track option.key) {
+              <option [value]="option.key">{{ option.value }}</option>
+            }
+          </select>
+        }
+        @case (CONTROL_TYPE.TIME) {
+          <input
+            type="time"
+            [id]="field.key"
+            [formControlName]="field.key"
+            class="form-control"
+          />
+        }
+        @case (CONTROL_TYPE.CHECKBOX_GROUP) {
+          <div class="checkbox-group">
+            @for (option of field.options; track option.key) {
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  [id]="field.key + '-' + option.key"
+                  [formControlName]="field.key"
+                  class="form-check-input"
+                  [value]="option.key"
+                  [checked]="option.checked"
+                />
+                <label class="form-check-label" [for]="field.key + '-' + option.key">
+                  {{ option.value }}
+                </label>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+</form>

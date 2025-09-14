@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScannerSidebarButton } from '../scanner-sidebar-button/scanner-sidebar-button';
 
-enum EnumEstadoEscaner {
+export enum EnumEstadoEscaner {
     ARCHIVADO = 'ARCHIVADO',
     INICIADO = 'INICIADO',
     DETENIDO = 'DETENIDO',

@@ -1,0 +1,17 @@
+<div class="configuration-card">
+  <div class="card-header">
+    <span class="card-title">{{ displayTitle }}</span>
+  </div>
+
+  <div class="card-content">
+    @if (cardType === EnumConfigurationCard.GENERAL) {
+      <app-forms [formFields]="generalFormFields"></app-forms>
+    }
+    @if (cardType === EnumConfigurationCard.TIME) {
+      <app-forms [formFields]="timeFormFields" [isHorizontal]="true"></app-forms>
+    }
+    @if (cardType === EnumConfigurationCard.MARKET) {
+      <app-forms [formFields]="marketFormFields" [isHorizontal]="true"></app-forms>
+    }
+  </div>
+</div>

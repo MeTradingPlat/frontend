@@ -2,7 +2,10 @@
     <div class="back-button">
         @if (backPath != '') {
             <a [routerLink]="backPath" (click)="onButtonClick('Atrás')">
-                <i class="bi bi-arrow-left"></i>
+              <app-button-navbar
+                [iconClass]="'bi bi-arrow-left-square-fill'"
+                [buttonText]="''"
+              ></app-button-navbar>
             </a>
         }
     </div>

@@ -1,14 +1,14 @@
 <app-second-navbar
+  [backPath]="backPath"
   [title]="title"
   [items]="navItems"
   (buttonClicked)="onNavbarButtonClick($event)"
 ></app-second-navbar>
 
 <div class="set-up-scanner-content">
-  <!-- Content for scanner setup will go here -->
-  @if (scannerId) {
-    <p i18n>Editando escáner con id:</p>
-  } @else {
-    <p i18n>Creando nuevo escáner</p>
+  @for (cardType of configurationCardTypes; track cardType) {
+    <app-configuration-card
+      [cardType]="cardType"
+    ></app-configuration-card>
   }
 </div>

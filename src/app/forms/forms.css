@@ -1,0 +1,106 @@
+.form-container {
+  display: flex;
+  flex-direction: column; /* Default to vertical flow */
+  gap: 15px; /* Maintain gap between form groups */
+  width: 100%; /* Ensure form container takes full width of its parent */
+}
+
+.form-horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.form-group {
+  width: 100%; /* Default to full width */
+  margin-bottom: 0; /* Remove margin-bottom as gap handles spacing */
+}
+
+.form-horizontal .form-group {
+  width: 135px; /* Set specific width for form groups in horizontal layout */
+}
+
+/* Override for form-group containing a checkbox-group in horizontal layout */
+.form-horizontal .form-group:has(.checkbox-group) {
+  width: 100%;
+}
+
+/* Ensure checkbox group takes full width within its form-group */
+.form-group .checkbox-group {
+  width: 100%;
+}
+
+.form-label {
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-lg-16);
+  font-weight: var(--font-weight-regular);
+  margin-bottom: 8px;
+  display: block;
+  text-align: center; /* Center the label text */
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-lg-16);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-primary);
+  background-color: var(--panel-alt);
+  background-clip: padding-box;
+  border: 1px solid var(--border-default);
+  border-radius: 5px;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  box-sizing: border-box;
+}
+
+/* Allow vertical resizing for textareas */
+textarea.form-control {
+  resize: vertical;
+}
+
+.form-control::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+.form-control:focus {
+  color: var(--text-primary);
+  background-color: var(--panel-alt);
+  border-color: var(--primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Space between checkboxes */
+  justify-content: center; /* Center checkboxes horizontally */
+  width: 100%; /* Ensure it takes full width */
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between checkbox input and label */
+  padding: 0; /* Remove default padding */
+  margin-bottom: 0; /* Remove default margin */
+}
+
+.form-check-input {
+  width: 16px;
+  height: 16px;
+  margin-top: 0; /* Align checkbox vertically */
+}
+
+.form-check-label {
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body-lg-16);
+  font-weight: var(--font-weight-regular);
+  margin-bottom: 0; /* Remove default margin */
+  cursor: pointer;
+}

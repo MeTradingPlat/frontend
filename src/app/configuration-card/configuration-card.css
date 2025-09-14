@@ -1,0 +1,51 @@
+:host, .configuration-card {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 400px;
+  /* permitir que el padre controle el tamaño mediante flex;
+     usar fallback si el card es usado fuera de un flex container */
+  flex: 1 1 320px;
+  min-width: 345px;
+  border-radius: 10px;
+  /* The following properties are kept from the original .configuration-card */
+  /* display: flex; */ /* This will be overridden by display: block from :host */
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: var(--panel);
+  overflow: hidden; /* Ensures border-radius applies to children */
+}
+
+.card-header {
+  display: flex;
+  flex-direction: row; /* Default for gap, but content is text, so row is fine */
+  gap: 10px;
+  padding: 5px;
+  width: 100%;
+  height: auto; /* hug */
+  align-items: center; /* align center */
+  justify-content: center; /* Center content horizontally */
+  background-color: var(--card-header);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.card-title {
+  font-family: var(--font-family);
+  font-size: var(--font-size-h2-24);
+  font-weight: var(--font-weight-semibold);
+  color: var(--card-header-text);
+  text-align: center; /* Ensure text is centered within its own span */
+}
+
+.configuration-card .card-content {
+  display: flex;
+  flex-direction: column; /* flow vertical */
+  gap: 15px;
+  padding: 20px 40px; /* superior/inferior 20, lados 40 */
+  width: 100%;
+  box-sizing: border-box; /* Include padding in the element's total width */
+  height: auto; /* hug */
+  align-items: stretch; /* align top center - horizontally center, vertically top */
+  justify-content: flex-start; /* align top center - horizontally center, vertically top */
+}
