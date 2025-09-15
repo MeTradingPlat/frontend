@@ -6,14 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-
-export enum CONTROL_TYPE {
-  TEXT,
-  TEXTAREA,
-  SELECT,
-  TIME,
-  CHECKBOX_GROUP, // New control type for multiple checkboxes
-}
+import { CONTROL_TYPE } from '../enums/control-type';
 
 export interface FormField {
   key: string;

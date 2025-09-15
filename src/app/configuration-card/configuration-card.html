@@ -13,5 +13,8 @@
     @if (cardType === EnumConfigurationCard.MARKET) {
       <app-forms [formFields]="marketFormFields" [isHorizontal]="true"></app-forms>
     }
+    @if (cardType === EnumConfigurationCard.FILTERS){
+      <app-filter-card [filtroEnum]="EnumFiltro.VOLUME"></app-filter-card>
+    }
   </div>
 </div>

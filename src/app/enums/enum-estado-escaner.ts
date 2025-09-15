@@ -1,0 +1,5 @@
+export enum EnumEstadoEscaner {
+    ARCHIVADO = 'ARCHIVADO',
+    INICIADO = 'INICIADO',
+    DETENIDO = 'DETENIDO',
+}

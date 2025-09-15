@@ -1,30 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Forms, FormField, CONTROL_TYPE } from '../forms/forms';
-
-export enum EnumConfigurationCard {
-  GENERAL,
-  TIME,
-  MARKET,
-  FILTERS,
-}
-
-export enum EnumTipoEjecucion {
-  UNA_VEZ,
-  DIARIA,
-}
-
-export enum EnumMercado {
-  NYSE = 'NYSE',
-  NASDAQ = 'NASDAQ',
-  AMEX = 'AMEX',
-  ETF = 'ETF',
-  OTC = 'OTC',
-}
+import { Forms, FormField } from '../forms/forms';
+import { CONTROL_TYPE } from '../enums/control-type';
+import { EnumConfigurationCard } from '../enums/enum-configuration-card';
+import { EnumTipoEjecucion } from '../enums/enum-tipo-ejecucion';
+import { EnumMercado } from '../enums/enum-mercado';
+import { EnumFiltro } from '../enums/enum-filtro';
+import { FilterCard } from '../filter-card/filter-card';
 
 @Component({
   selector: 'app-configuration-card',
   standalone: true,
-  imports: [Forms],
+  imports: [Forms, FilterCard],
   templateUrl: './configuration-card.html',
   styleUrls: ['./configuration-card.css'],
 })
@@ -34,6 +20,7 @@ export class ConfigurationCard implements OnInit {
 
   EnumConfigurationCard = EnumConfigurationCard;
   EnumTipoEjecucion = EnumTipoEjecucion;
+  EnumFiltro = EnumFiltro;
   // EnumMercado is directly accessible as it's exported at module level
 
   // Definición de campos para el formulario GENERAL

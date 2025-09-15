@@ -1,0 +1,49 @@
+:host {
+  display: block;
+}
+
+.card {
+  min-width: 300px;
+  max-width: 400px;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 12px;
+  border-radius: 10px;
+  background-color: var(--panel);
+  border: 1px solid var(--border-default);
+}
+
+.header {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+}
+
+.header span {
+  text-align: left;
+  flex-grow: 1;
+  color: var(--text-primary);
+}
+
+.header i {
+  color: var(--color-error);
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.content {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 0 5px;
+}

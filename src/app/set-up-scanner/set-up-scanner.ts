@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs/operators';
 import { SecondNavbar } from '../second-navbar/second-navbar';
-import { ConfigurationCard, EnumConfigurationCard } from '../configuration-card/configuration-card'; // Import ConfigurationCard and EnumConfigurationCard
+import { ConfigurationCard } from '../configuration-card/configuration-card'; // Import ConfigurationCard and EnumConfigurationCard
+import { EnumConfigurationCard } from '../enums/enum-configuration-card';
 
 interface NavItem {
   readonly path: string;
@@ -56,7 +57,7 @@ export class SetUpScanner implements OnInit {
     const allTypes = Object.keys(EnumConfigurationCard)
       .filter(key => !isNaN(Number(key)))
       .map(key => Number(key) as EnumConfigurationCard);
-
+    
     this.regularCardTypes = allTypes.filter(type => type !== EnumConfigurationCard.FILTERS);
     this.filterCardType = allTypes.find(type => type === EnumConfigurationCard.FILTERS);
   }
@@ -82,7 +83,7 @@ export class SetUpScanner implements OnInit {
       },
       { 
         path: '', 
-        iconClass: 'bi bi-trash3-fill', // Corregido: bi-trash-fill no existe
+        iconClass: 'bi bi-trash3-fill',
         buttonText: $localize`Borrar` 
       }
     ];

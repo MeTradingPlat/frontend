@@ -1,0 +1,10 @@
+<div class="card" *ngIf="filtroData$ | async as filtroData">
+  <div class="header">
+    <span class="body-lg">{{ filtroData.etiquetaNombre }}</span>
+    <i class="bi bi-x-lg"></i>
+  </div>
+  <div class="content">
+    <p>{{ filtroData.etiquetaDescripcion }}</p>
+    <!-- Future implementation for parameters -->
+  </div>
+</div>
