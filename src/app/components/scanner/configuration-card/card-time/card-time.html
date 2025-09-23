@@ -1,0 +1,52 @@
+<div class="configuration-card">
+  <div class="card-header">
+    <h2 class="manrope-20pt-medium">{{ displayTitle }}</h2>
+  </div>
+
+  <div class="card-content">
+    <form [formGroup]="timeForm" (formValidityChange)="formValidityChange.emit({ cardType: EnumConfigurationCard.TIME, isValid: timeForm.valid })">
+      <div>
+        <app-form-time
+          [label]="'Hora de Inicio'"
+          [controlId]="'horaInicio'"
+          [formControl]="timeFormHoraInicioControl"
+        ></app-form-time>
+        <div class="text-error">
+          @if (getTimeErrorMessage('horaInicio', 'required')) {
+            {{ getTimeErrorMessage('horaInicio', 'required') }}
+          }
+        </div>
+      </div>
+
+      <div>
+        <app-form-time
+          [label]="'Hora de Fin'"
+          [controlId]="'horaFin'"
+          [formControl]="timeFormHoraFinControl"
+        ></app-form-time>
+        <div class="text-error">
+          @if (getTimeErrorMessage('horaFin', 'required')) {
+            {{ getTimeErrorMessage('horaFin', 'required') }}
+          }
+        </div>
+      </div>
+
+      <div>
+        <app-form-select
+          [label]="'Tipo de Ejecución'"
+          [controlId]="'tipoEjecucion'"
+          [options]="[
+            { key: EnumTipoEjecucion.UNA_VEZ.toString(), value: 'Una vez' },
+            { key: EnumTipoEjecucion.DIARIA.toString(), value: 'Repetir' }
+          ]"
+          [formControl]="timeFormTipoEjecucionControl"
+        ></app-form-select>
+        <div class="text-error">
+          @if (getTimeErrorMessage('tipoEjecucion', 'required')) {
+            {{ getTimeErrorMessage('tipoEjecucion', 'required') }}
+          }
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

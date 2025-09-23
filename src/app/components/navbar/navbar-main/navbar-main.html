@@ -1,0 +1,19 @@
+<div class="content">
+    <div class="up">
+        <div class="logo" routerLink="/">
+            <h2 class="manrope-24pt-semibold">LOGO</h2>
+        </div>
+        <div class="items">
+            @for (item of navUpItems; track item.id){
+                <a [routerLink]="item.path" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" #rla="routerLinkActive">
+                    <app-navbar-item
+                        [isSelected]="rla.isActive"
+                        [item]="item"
+                    ></app-navbar-item>
+                </a>
+            }
+        </div>
+    </div>
+    <div class="down">
+    </div>
+</div>

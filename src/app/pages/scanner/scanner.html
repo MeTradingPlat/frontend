@@ -1,0 +1,17 @@
+<app-navbar-aux
+  [title]="title"
+  [items]="navItems"
+  (buttonClicked)="onNavButtonClicked($event)">
+</app-navbar-aux>
+
+<div class="content">
+  @if (filteredScanners(); as scanners) {
+    @for (scanner of scanners; track scanner.idEscaner) {
+      <app-scanner-info
+        [title]="scanner.nombre"
+        [estado]="scanner.objEstado.enumEstadoEscaner"
+        [idScanner]="scanner.idEscaner"
+      />
+    }
+  }
+</div>

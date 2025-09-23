@@ -1,0 +1,22 @@
+<div class="table-container">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Nombre Escáner</th>
+        <th scope="col">Configurar</th>
+        <th scope="col">Expandir</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (scanner of scanners(); track trackByScannerId($index, scanner)) {
+          <tr>
+              <td>{{scanner.fechaCreacion}}</td>
+              <td>{{scanner.nombre}}</td>
+              <td><i class="bi bi-gear-fill" (click)="navigateToConfiguration(scanner.idEscaner.toString())"></i></td>
+              <td><i class="bi bi-eye-fill" (click)="navigateToExpand(scanner.idEscaner.toString())"></i></td>
+          </tr>
+      }
+    </tbody>
+  </table>
+</div>

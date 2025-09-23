@@ -1,0 +1,110 @@
+.form-group {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  height: auto;
+  gap: 15px; /* Added gap */
+}
+
+.form-group > label {
+  font-family: var(--font-family-manrope);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-05);
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  gap: 5px; /* Added gap */
+}
+
+/* Ocultar el checkbox nativo */
+.form-check-input-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+/* Contenedor del checkbox personalizado */
+.form-check-custom {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-family: var(--font-family-manrope);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-05);
+  transition: var(--theme-transition);
+}
+
+/* Ícono no seleccionado (por defecto visible) */
+.checkbox-icon {
+  color: var(--text-primary); /* Mismo color que el texto */
+  font-size: 20px;
+  margin-right: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Ícono seleccionado (oculto por defecto) */
+.checkbox-icon-checked {
+  color: var(--text-primary); /* Mismo color que el texto, NO btn-selected */
+  font-size: 20px;
+  margin-right: 0.5rem;
+  display: none;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Cuando está checked: mostrar ícono de check y ocultar el vacío */
+.form-check-input-hidden:checked + .form-check-custom .checkbox-icon {
+  display: none;
+}
+
+.form-check-input-hidden:checked + .form-check-custom .checkbox-icon-checked {
+  display: inline-block;
+}
+
+/* Estados de hover y focus */
+.form-check-custom:hover .checkbox-icon,
+.form-check-custom:hover .checkbox-icon-checked {
+  opacity: 0.8;
+}
+
+.form-check-input-hidden:focus + .form-check-custom {
+  outline: 2px solid var(--state-focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Estado disabled */
+.form-check-input-hidden:disabled + .form-check-custom {
+  opacity: var(--state-disabled-opacity);
+  cursor: not-allowed;
+}
+
+.form-check-label {
+  user-select: none;
+}
+
+.text-error {
+  color: var(--color-error);
+  font-family: var(--font-family-manrope);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: var(--letter-spacing-05);
+  margin-top: 0.25rem;
+  text-align: center;
+}

@@ -1,0 +1,8 @@
+<div
+  class="scanner-sidebar-button"
+  [class.selected]="isSelected()"
+  (click)="onClick()"
+>
+  <i [class]="item().iconClass"></i>
+  <span class="manrope-12pt-regular">{{ item().buttonText }}</span>
+</div>

@@ -1,0 +1,13 @@
+div{
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+img{
+    max-width: 60%;
+    height: auto;
+    margin-top: 20px;
+}

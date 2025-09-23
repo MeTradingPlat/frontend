@@ -1,0 +1,35 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Centered horizontally */
+    align-items: flex-start; /* Aligned to the top */
+    padding: 15px;
+    gap: 15px;
+}
+
+.inf-conf {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 345px;
+    max-width: 400px;
+    height: fit-content;
+    gap: 15px;
+    box-sizing: border-box; 
+}
+
+.filter-conf {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 345px;
+    max-width: 1230px;
+    height: fit-content;
+    gap: 15px;
+    box-sizing: border-box; 
+}

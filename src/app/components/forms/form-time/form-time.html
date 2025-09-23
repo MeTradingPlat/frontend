@@ -1,0 +1,21 @@
+<div class="form-group">
+  @if (label()) {
+    <label [for]="controlId()">{{ label() }}</label>
+  }
+  <input
+    type="time"
+    class="form-control time-input"
+    [id]="controlId()"
+    [name]="controlId()"
+    [placeholder]="placeholder()"
+    [(ngModel)]="value"
+    [disabled]="isDisabled"
+    (blur)="onTouched()"
+    (input)="onInput($event)"
+  >
+  @if (required() && !value && onTouched()) {
+    <div class="invalid-feedback">
+      This field is required.
+    </div>
+  }
+</div>
