@@ -1,4 +1,4 @@
-name: CI Metradingplat Fronted
+name: CI Metradingplat Frontend
 
 on:
   push:

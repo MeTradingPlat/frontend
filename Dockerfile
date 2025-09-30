@@ -7,6 +7,6 @@ RUN npm run build
 
 FROM node:22.19.0
 WORKDIR /usr/app
-COPY --from=build /app/src/dist/PROJECT_NAME ./
+COPY --from=build /app/src/dist/frontend ./
 CMD node server/server.mjs
 EXPOSE 4000
