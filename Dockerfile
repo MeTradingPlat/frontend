@@ -1,12 +1,14 @@
 FROM node:22.19.0 as build
-WORKDIR /
+WORKDIR /usr/app
 COPY package*.json ./
 RUN npm ci
-COPY . ./
+COPY . .
 RUN npm run build
 
 FROM node:22.19.0
 WORKDIR /usr/app
-COPY --from=build /dist/frontend ./
-CMD node server/server.mjs
+COPY --from=build /usr/app/dist/frontend ./dist/frontend
+COPY --from=build /usr/app/package*.json ./
+RUN npm ci --omit=dev
+CMD node dist/frontend/server/server.mjs
 EXPOSE 4000
