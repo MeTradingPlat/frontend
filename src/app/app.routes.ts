@@ -8,7 +8,7 @@ import { ScannerExpand } from './pages/scanner-expand/scanner-expand';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/inicio', pathMatch: 'full' },
-    { path: 'inicio', component: Home }, // Changed from 'inicio' to 'home'
+    { path: 'inicio', component: Home },
     { path: 'escaner', component: Scanner },
     { path: 'escaner/archivados', component: ScannerArchived },
     { path: 'escaner/expandir/:id', component: ScannerExpand },
