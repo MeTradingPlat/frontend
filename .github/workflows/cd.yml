@@ -11,11 +11,14 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Pull Docker Image
-        run: sudo docker pull virtud142/metradingplat_frontend:latest
-
       - name: Delete Old Docker Container
         run: sudo docker rm -f frontend || true
+
+      - name: Remove Dangling Docker Images
+        run: sudo docker image prune -f
+        
+      - name: Pull Docker Image
+        run: sudo docker pull virtud142/metradingplat_frontend:latest
 
       - name: Run Docker Container
         run: |
@@ -24,6 +27,3 @@ jobs:
             --name frontend \
             --restart unless-stopped \
             virtud142/metradingplat_frontend:latest
-
-      - name: Remove Dangling Docker Images
-        run: sudo docker image prune -f
