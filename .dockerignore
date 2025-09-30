@@ -1,18 +1,20 @@
-# Node modules
+# Dependency directories
 node_modules
+.angular/cache
 
-# Local .env files
-.env
-.env.*
+# Build output
+dist/
 
-# Build output (NO bloquear .angular/ porque se crea durante el build)
-dist
+# IDE and editor files
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
 
-# IDE and editor configurations
-.vscode
-.idea
-*.sublime-project
-*.sublime-workspace
+# Git
+.git/
+.gitignore
 
 # Logs
 *.log
@@ -22,11 +24,14 @@ yarn-error.log*
 
 # OS generated files
 .DS_Store
-.git
-.gitignore
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.project
+.settings
+.classpath
 
-# roo code
-.roo
-
-# docs
-documentacion
+# Test files
+src/**/*.spec.ts
