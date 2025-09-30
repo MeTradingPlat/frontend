@@ -11,7 +11,7 @@
     (blur)="onBlur()"
     [disabled]="isDisabled"
   >
-    <option value="">{{ placeholder() }}</option>
+    
     @for (option of options(); track option.key) {
       <option [value]="option.key">{{ option.value }}</option>
     }
