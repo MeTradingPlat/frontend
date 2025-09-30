@@ -34,7 +34,7 @@ app.get('/health', (req, res) => {
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
-    index: false,
+    
     redirect: false,
   }),
 );
