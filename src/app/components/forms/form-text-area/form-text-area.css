@@ -28,7 +28,6 @@
   font-weight: 400; /* manrope-16pt-regular */
   line-height: normal;
   letter-spacing: var(--letter-spacing-05);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   resize: vertical; /* Allow vertical resizing of textarea */
 }
 

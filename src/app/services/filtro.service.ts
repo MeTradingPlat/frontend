@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { LanguageService } from './language.service';
@@ -13,7 +14,7 @@ import { EnumFiltro } from '../enums/enum-filtro';
   providedIn: 'root'
 })
 export class FiltroService {
-  private apiUrl = 'http://localhost:5000/api/escaner/filtro'; // Assuming backend runs on 8080
+  private apiUrl = `${environment.apiUrl}/escaner/filtro`; // Assuming backend runs on 8080
 
   private http = inject(HttpClient);
   private languageService = inject(LanguageService);

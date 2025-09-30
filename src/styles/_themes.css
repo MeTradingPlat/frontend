@@ -21,8 +21,6 @@
   --state-disabled-opacity: 0.4; /* Para desactivar cualquier elemento */
   --state-focus-ring: #4A7BA7;   /* Borde de foco accesible */
   
-  /* Transiciones para cambio de tema */
-  --theme-transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
   /* Filtros */
   --text-primary-invert-filter: 0; /* Default for light theme, no invert */
 }
@@ -97,7 +95,6 @@
 body {
   background-color: var(--background);
   color: var(--text-primary);
-  transition: var(--theme-transition);
 }
 
 /* ===============================
@@ -128,10 +125,6 @@ body {
 .disabled { opacity: var(--state-disabled-opacity); }
 .focus-ring:focus { outline: 2px solid var(--state-focus-ring); }
 
-/* Transiciones suaves */
-.theme-transition {
-  transition: var(--theme-transition);
-}
 
 /* ===============================
    6. JavaScript Helper

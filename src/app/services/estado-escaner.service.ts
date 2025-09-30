@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { LanguageService } from './language.service';
@@ -9,7 +10,7 @@ import { EstadoEscanerDTORespuesta } from '../models/estado-escaner.model';
   providedIn: 'root'
 })
 export class EstadoEscanerService {
-  private apiUrl = 'http://localhost:5000/api/escaner/estado'; // Assuming backend runs on 8080
+  private apiUrl = `${environment.apiUrl}/escaner/estado`; // Assuming backend runs on 8080
 
   private http = inject(HttpClient);
   private languageService = inject(LanguageService);

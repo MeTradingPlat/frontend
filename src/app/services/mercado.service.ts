@@ -1,3 +1,4 @@
+import { environment } from '../../environments/environment';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { LanguageService } from './language.service';
@@ -9,7 +10,7 @@ import { MercadoDTORespuesta } from '../models/mercado.model';
   providedIn: 'root'
 })
 export class MercadoService {
-  private apiUrl = 'http://localhost:5000/api/escaner/mercado';
+  private apiUrl = `${environment.apiUrl}/escaner/mercado`;
 
   private http = inject(HttpClient);
   private languageService = inject(LanguageService);

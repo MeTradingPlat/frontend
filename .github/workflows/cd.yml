@@ -1,0 +1,29 @@
+name: CD Metradingplat Frontend
+
+on:
+  workflow_run:
+    workflows: ["CI Metradingplat Fronted"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull Docker Image
+        run: sudo docker pull virtud142/metradingplat_frontend:latest
+
+      - name: Delete Old Docker Container
+        run: sudo docker rm -f frontend || true
+
+      - name: Run Docker Container
+        run: |
+          sudo docker run -d \
+            -p 80:4000 \
+            --name frontend \
+            --restart unless-stopped \
+            virtud142/metradingplat_frontend:latest
+
+      - name: Remove Dangling Docker Images
+        run: sudo docker image prune -f

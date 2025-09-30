@@ -28,7 +28,6 @@
   font-weight: 400;
   line-height: normal;
   letter-spacing: var(--letter-spacing-05);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   
   /* NO remover appearance - mantener la flecha nativa */
   /* appearance: none; ← ESTO SE QUITA */
@@ -67,7 +66,6 @@
 
 /* Transición suave para cambios de tema */
 .form-group .select-input {
-  transition: var(--theme-transition);
   width: 130px;
 }
 

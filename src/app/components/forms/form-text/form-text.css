@@ -27,7 +27,6 @@
   font-weight: 400;
   line-height: normal;
   letter-spacing: var(--letter-spacing-05);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .form-group .form-control:focus {

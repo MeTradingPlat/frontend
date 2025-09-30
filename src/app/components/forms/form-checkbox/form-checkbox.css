@@ -48,7 +48,6 @@
   font-weight: 400;
   line-height: normal;
   letter-spacing: var(--letter-spacing-05);
-  transition: var(--theme-transition);
 }
 
 /* Ícono no seleccionado (por defecto visible) */
@@ -56,7 +55,6 @@
   color: var(--text-primary); /* Mismo color que el texto */
   font-size: 20px;
   margin-right: 0.5rem;
-  transition: all 0.2s ease-in-out;
 }
 
 /* Ícono seleccionado (oculto por defecto) */
@@ -65,7 +63,6 @@
   font-size: 20px;
   margin-right: 0.5rem;
   display: none;
-  transition: all 0.2s ease-in-out;
 }
 
 /* Cuando está checked: mostrar ícono de check y ocultar el vacío */
