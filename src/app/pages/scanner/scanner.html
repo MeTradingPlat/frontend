@@ -1,16 +1,20 @@
 <app-navbar-aux
   [title]="title"
-  [items]="navItems"
+  [items]="navItems()"
   (buttonClicked)="onNavButtonClicked($event)">
 </app-navbar-aux>
 
-<div class="content">
+<div class="content" (click)="onContentClick($event)">
   @if (filteredScanners(); as scanners) {
     @for (scanner of scanners; track scanner.idEscaner) {
       <app-scanner-info
         [title]="scanner.nombre"
         [estado]="scanner.objEstado.enumEstadoEscaner"
         [idScanner]="scanner.idEscaner"
+        [isSelected]="selectedScanner()?.idEscaner === scanner.idEscaner"
+        (titleClicked)="onScannerTitleClicked($event)"
+        (expandClicked)="onScannerExpandClicked($event)"
+        (stateChange)="onScannerStateChange(scanner.idEscaner, $event)"
       />
     }
   }

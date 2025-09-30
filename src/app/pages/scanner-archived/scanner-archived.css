@@ -1,3 +1,10 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Take full viewport height */
+    overflow: hidden; /* Hide overflow from the host itself */
+}
+
 .content {
     display: flex;
     flex-direction: column;
@@ -5,5 +12,6 @@
     padding: 15px;
     gap: 15px;
     box-sizing: border-box;
-    height: calc(100vh - var(--navbar-height) - 30px); /* Adjust based on navbar height and desired padding */
+    flex: 1; /* Allow content to grow and shrink */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
 }

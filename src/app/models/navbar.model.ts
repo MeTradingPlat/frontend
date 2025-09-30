@@ -5,4 +5,5 @@ export interface NavMenuItem {
   buttonText: string;
   action: () => void;
   disabled?: boolean;
+  buttonClass?: string; // Add buttonClass property
 }

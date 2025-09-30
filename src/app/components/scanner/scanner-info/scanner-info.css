@@ -12,6 +12,14 @@
   flex-direction: column;
   height: 100%;
   aspect-ratio: 1 / 1; /* Make the card square */
+  transition: all 0.2s ease-in-out; /* Smooth transition for selection effect */
+  border: 2px solid transparent; /* Default transparent border */
+}
+
+.scanner-info-card.selected-scanner-card {
+  border-color: var(--btn-selected); /* Light select border effect */
+  box-shadow: 0 0 10px rgba(var(--btn-selected-rgb), 0.3); /* Subtle glow */
+  transform: translateY(-3px); /* Slight lift effect */
 }
 
 .scanner-info-header {
@@ -29,6 +37,11 @@
   flex-grow: 1;
   text-align: left;
   margin: 0;
+  cursor: pointer; /* Indicate clickable */
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For IE10+/Edge */
 }
 
 .scanner-info-icons {

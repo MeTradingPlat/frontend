@@ -4,6 +4,7 @@ import { Router } from '@angular/router'; // Import Router
 import { EnumEstadoEscaner } from '../../../enums/enum-estado-escaner';
 import { scannerInfoItem } from '../../../models/escaner.model';
 import { ScannerInfoItem } from "../scanner-info-item/scanner-info-item";
+import { EstadoEscanerService } from '../../../services/estado-escaner.service'; // Import EstadoEscanerService
 
 @Component({
   selector: 'app-scanner-info',
@@ -14,14 +15,18 @@ import { ScannerInfoItem } from "../scanner-info-item/scanner-info-item";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScannerInfo {
-  private router = inject(Router); // Inject Router
+  private router = inject(Router);
+  private estadoEscanerService = inject(EstadoEscanerService); // Inject EstadoEscanerService
 
   title = input.required<string>();
   estado = input<EnumEstadoEscaner>(EnumEstadoEscaner.DETENIDO);
   idScanner = input.required<number>();
+  isSelected = input<boolean>(false); // New input for selection state
 
   stateChange = output<EnumEstadoEscaner>();
   configure = output<number>();
+  titleClicked = output<number>(); // New output for title click
+  expandClicked = output<number>(); // New output for expand button click
 
   // Expose the enum to the template
   EnumEstadoEscaner = EnumEstadoEscaner;
@@ -29,14 +34,30 @@ export class ScannerInfo {
   selectedItemId: number = 1; // Initialize with the first item selected
 
   toggleScannerState() {
-    const newState = this.estado() === EnumEstadoEscaner.INICIADO 
-      ? EnumEstadoEscaner.DETENIDO 
-      : EnumEstadoEscaner.INICIADO;
-    this.stateChange.emit(newState);
+    const currentId = this.idScanner();
+    if (this.estado() === EnumEstadoEscaner.INICIADO) {
+      this.estadoEscanerService.detenerEscaner(currentId).subscribe({
+        next: () => this.stateChange.emit(EnumEstadoEscaner.DETENIDO),
+        error: (err) => console.error('Error al detener escáner:', err)
+      });
+    } else if (this.estado() === EnumEstadoEscaner.DETENIDO || this.estado() === EnumEstadoEscaner.DESARCHIVADO) {
+      this.estadoEscanerService.iniciarEscaner(currentId).subscribe({
+        next: () => this.stateChange.emit(EnumEstadoEscaner.INICIADO),
+        error: (err) => console.error('Error al iniciar escáner:', err)
+      });
+    }
   }
   
   navigateToConfiguration(id: number) {
     this.router.navigate(['/escaner/configuracion', id]);
+  }
+
+  navigateToExpand(id: number) {
+    this.expandClicked.emit(id);
+  }
+
+  onTitleClick(id: number) {
+    this.titleClicked.emit(id);
   }
 
   onSidebarItemClicked(buttonText: string) {

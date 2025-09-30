@@ -1,6 +1,6 @@
-<div class="scanner-info-card">
+<div class="scanner-info-card" [class.selected-scanner-card]="isSelected()">
   <div class="scanner-info-header">
-    <h2 class="manrope-20pt-medium">{{ title() }}</h2>
+    <h2 class="manrope-20pt-medium" (click)="onTitleClick(idScanner())">{{ title() }}</h2>
     <div class="scanner-info-icons">
       <i 
         class="bi" 
@@ -8,6 +8,7 @@
         (click)="toggleScannerState()">
       </i>
       <i class="bi bi-gear-fill" (click)="navigateToConfiguration(idScanner())"></i>
+      <i class="bi bi-fullscreen" (click)="navigateToExpand(idScanner())"></i>
     </div>
   </div>
 
@@ -26,3 +27,4 @@
       <!-- Info content will go here -->
     </div>
   </div>
+</div>

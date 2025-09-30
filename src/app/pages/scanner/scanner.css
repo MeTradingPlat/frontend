@@ -1,8 +1,18 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Take full viewport height */
+    overflow: hidden; /* Hide overflow from the host itself */
+}
+
 .content {
     display: flex;
+    flex-direction:row;
     flex-wrap: wrap;
     justify-content: center; /* Centered horizontally */
     align-items: flex-start; /* Aligned to the top */
     padding: 15px;
     gap: 15px;
+    flex: 1; /* Allow content to grow and shrink */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
 }
