@@ -66,10 +66,20 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "frontend:build:production"
+              "buildTarget": "frontend:build:production",
+              "host": "0.0.0.0",
+              "allowedHosts": [
+                "www.metradingplat.com",
+                "metradingplat.com"
+              ]
             },
             "development": {
-              "buildTarget": "frontend:build:development"
+              "buildTarget": "frontend:build:development",
+              "host": "0.0.0.0",
+              "allowedHosts": [
+                "www.metradingplat.com",
+                "metradingplat.com"
+              ]
             }
           },
           "defaultConfiguration": "development"

@@ -171,3 +171,36 @@ function detectSystemTheme() {
   return 'light';
 }
 */
+/* ===============================
+   7. Forced Colors Mode
+   =============================== */
+
+@media (forced-colors: active) {
+  /* Define high-contrast specific styles here */
+  body {
+    background-color: Canvas;
+    color: CanvasText;
+  }
+
+  /* Example for elements that might need specific high-contrast styling */
+  .theme-light, .theme-dark {
+    --background: Canvas;
+    --panel: Canvas;
+    --panel-alt: Canvas;
+    --navbar: Canvas;
+    --text-primary: CanvasText;
+    --text-secondary: GrayText;
+    --border-default: ButtonBorder;
+    --border-strong: ButtonBorder;
+    --filter-button: ButtonFace;
+    --btn-hover: Highlight;
+    --btn-selected: Highlight;
+    --card-header: Highlight;
+    --card-header-text: HighlightText;
+  }
+
+  /* Ensure focus rings are visible */
+  .focus-ring:focus {
+    outline: 2px solid Highlight;
+  }
+}
