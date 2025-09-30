@@ -8,6 +8,11 @@
     width: 110px;
     height: 100%;
 }
+.down{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
 .up{
     display: flex;
     flex-direction: column;
@@ -27,7 +32,8 @@ a{
     cursor: pointer;
 }
 
-/* .logo h2 {
+.logo h2 {
     margin: 0;
     padding: 0;
-} */
+    line-height: 1;
+}

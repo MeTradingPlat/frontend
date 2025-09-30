@@ -15,5 +15,11 @@
         </div>
     </div>
     <div class="down">
+        @for (item of navDownItems; track item.id){
+            <app-navbar-item
+                [item]="item"
+                (clickEvent)="item.action()"
+            ></app-navbar-item>
+        }
     </div>
 </div>
