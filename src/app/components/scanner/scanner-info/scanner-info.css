@@ -6,7 +6,6 @@
 }
 
 .scanner-info-card {
-  background-color: var(--panel);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -56,9 +55,12 @@
 }
 
 .scanner-info-content-area {
+  background-color: var(--panel);
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 .scanner-info-sidebar-container {
@@ -76,3 +78,4 @@
   padding: 5px;
   gap: 10px;
 }
+

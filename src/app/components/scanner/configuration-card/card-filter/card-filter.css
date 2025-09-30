@@ -24,6 +24,7 @@
   flex-grow: 1;
   text-align: center;
   margin: 0;
+  color: var(--card-header-text); /* Ensure header text color is applied */
 }
 
 
