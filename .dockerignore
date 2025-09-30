@@ -5,9 +5,8 @@ node_modules
 .env
 .env.*
 
-# Build output
+# Build output (NO bloquear .angular/ porque se crea durante el build)
 dist
-.angular/
 
 # IDE and editor configurations
 .vscode
