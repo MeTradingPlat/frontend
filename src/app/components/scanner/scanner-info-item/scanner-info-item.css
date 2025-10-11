@@ -30,6 +30,16 @@
   color: var(--text-primary);
 }
 
+.scanner-sidebar-button i.expanded-icon {
+  font-size: 30px;
+  width: 30px;
+  height: 30px;
+}
+
 .manrope-12pt-regular {
+  color: var(--text-primary);
+}
+
+.manrope-16pt-regular {
   color: var(--text-primary);
 }

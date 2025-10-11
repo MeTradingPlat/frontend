@@ -16,7 +16,7 @@
         [scannerData]="currentScannerData()"
         [submitted]="submitted()"
         (cardDataChange)="updateCardData(EnumConfigurationCard.GENERAL, $event.data)"
-        (formValidityChange)="onFormValidityChange($event.cardType, $event.isValid)">
+        (formValidityChange)="onFormValidityChange(EnumConfigurationCard.GENERAL, $event.isValid)">
       </app-card-general>
     </div>
 
@@ -26,7 +26,7 @@
         [scannerData]="currentScannerData()"
         [submitted]="submitted()"
         (cardDataChange)="updateCardData(EnumConfigurationCard.TIME, $event.data)"
-        (formValidityChange)="onFormValidityChange($event.cardType, $event.isValid)">
+        (formValidityChange)="onFormValidityChange(EnumConfigurationCard.TIME, $event.isValid)">
       </app-card-time>
     </div>
 
@@ -35,16 +35,16 @@
         [scannerData]="currentScannerData()"
         [submitted]="submitted()"
         (cardDataChange)="updateCardData(EnumConfigurationCard.MARKET, $event.data)"
-        (formValidityChange)="onFormValidityChange($event.cardType, $event.isValid)">
+        (formValidityChange)="onFormValidityChange(EnumConfigurationCard.MARKET, $event.isValid)">
       </app-card-market>
     </div>
 
     <div class="filter-conf">
       <app-card-filter
-        [scannerData]="currentScannerData()"
+        [idEscaner]="scannerId()!"
         [submitted]="submitted()"
         (cardDataChange)="updateCardData(EnumConfigurationCard.FILTERS, $event.data)"
-        (formValidityChange)="onFormValidityChange($event.cardType, $event.isValid)">
+        (formValidityChange)="onFormValidityChange(EnumConfigurationCard.FILTERS, $event.isValid)">
       </app-card-filter>
     </div>
   </div>

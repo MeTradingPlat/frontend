@@ -1,0 +1,40 @@
+.options-filter-container {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  height: fit-content;
+  gap: 5px;
+}
+
+.options-label-container {
+  padding-right: 15px;
+  display: flex;
+  align-items: center;
+  height: fit-content;
+  width: fit-content;
+  gap: 5px;
+}
+
+.options-inputs-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.options-select {
+  width: 95px;
+}
+
+.text-error {
+  color: var(--color-error); /* Updated color */
+  font-family: var(--font-family-manrope); /* Updated font family */
+  font-size: 12px; /* Updated font size */
+  font-weight: 400; /* Updated font weight */
+  line-height: normal; /* Updated line height */
+  letter-spacing: var(--letter-spacing-05); /* Updated letter spacing */
+  min-height: 1.2em; /* Allocate fixed space for error message */
+  margin-bottom: 8px; /* Add margin to ensure gap */
+  text-align: center; /* Center the error text */
+}

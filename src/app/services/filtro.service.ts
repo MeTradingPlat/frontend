@@ -58,12 +58,6 @@ export class FiltroService {
     );
   }
 
-  deleteFiltro(idFiltro: number): Observable<boolean> {
-    return this.http.delete<boolean>(`${this.apiUrl}/${idFiltro}`, { headers: this.getHeaders() }).pipe(
-      catchError(this.handleError)
-    );
-  }
-
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
     if (error.error && typeof error.error === 'string') {

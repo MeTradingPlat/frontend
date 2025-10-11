@@ -9,9 +9,11 @@ import { EnumEstadoEscaner } from '../../enums/enum-estado-escaner';
 import { EnumTipoEjecucion } from '../../enums/enum-tipo-ejecucion';
 import { EnumMercado } from '../../enums/enum-mercado';
 import { EnumConfigurationCard } from '../../enums/enum-configuration-card';
+import { FiltroDtoPeticion } from '../../models/filtro-peticion.model'; // Import FiltroDtoPeticion
 
 import { EscanerService } from '../../services/escaner.service';
 import { EstadoEscanerService } from '../../services/estado-escaner.service';
+import { FiltroService } from '../../services/filtro.service'; // Import FiltroService
 
 import { NavbarAux } from '../../components/navbar/navbar-aux/navbar-aux';
 import { LoadPage } from '../../components/page-state/load-page/load-page';
@@ -50,15 +52,18 @@ export class ScannerConfiguration {
   private readonly router = inject(Router);
   private readonly escanerService = inject(EscanerService);
   private readonly estadoEscanerService = inject(EstadoEscanerService);
+  private readonly filtroService = inject(FiltroService); // Inject FiltroService
 
   // State signals
   scannerId = signal<number | null>(null);
   scannerEstado = signal<EnumEstadoEscaner | null>(null);
   currentScannerData = signal<EscanerDTOPeticion | undefined>(undefined);
+  currentFilters = signal<FiltroDtoPeticion[]>([]); // New signal for filters
   submitted = signal<boolean>(false);
   generalFormValid = signal<boolean>(false);
   timeFormValid = signal<boolean>(false);
   marketFormValid = signal<boolean>(false);
+  filtersFormValid = signal<boolean>(true); // Filters are valid by default if none are selected
   formTouched = signal<boolean>(false);
   loading = signal<boolean>(false);
   error = signal<ApiError | null>(null);
@@ -66,7 +71,7 @@ export class ScannerConfiguration {
 
   // Computed signals
   isNewScanner = computed(() => !this.scannerId() || this.scannerId() === 0);
-  isFormValid = computed(() => this.generalFormValid() && this.timeFormValid() && this.marketFormValid());
+  isFormValid = computed(() => this.generalFormValid() && this.timeFormValid() && this.marketFormValid() && this.filtersFormValid());
 
   backPath = '/escaner';
   protected readonly EnumConfigurationCard = EnumConfigurationCard;
@@ -162,6 +167,7 @@ export class ScannerConfiguration {
       this.generalFormValid.set(true);
       this.timeFormValid.set(true);
       this.marketFormValid.set(true);
+      this.filtersFormValid.set(true); // Initialize filters form as valid
     });
   }
 
@@ -171,21 +177,25 @@ export class ScannerConfiguration {
     }
   }
 
-  updateCardData(cardType: EnumConfigurationCard, data: Partial<EscanerDTOPeticion>): void {
+  updateCardData(cardType: EnumConfigurationCard, data: Partial<EscanerDTOPeticion> | FiltroDtoPeticion[]): void {
     this.currentScannerData.update(currentData => {
       let updatedData = currentData ? { ...currentData } : this.getDefaultScannerData();
 
       switch (cardType) {
         case EnumConfigurationCard.GENERAL:
-          updatedData = { ...updatedData, nombre: data.nombre || '', descripcion: data.descripcion || '' };
+          const generalData = data as Partial<EscanerDTOPeticion>;
+          updatedData = { ...updatedData, nombre: generalData.nombre || '', descripcion: generalData.descripcion || '' };
           break;
         case EnumConfigurationCard.TIME:
-          updatedData = { ...updatedData, horaInicio: data.horaInicio || '', horaFin: data.horaFin || '', objTipoEjecucion: { enumTipoEjecucion: data.objTipoEjecucion?.enumTipoEjecucion as EnumTipoEjecucion } };
+          const timeData = data as Partial<EscanerDTOPeticion>;
+          updatedData = { ...updatedData, horaInicio: timeData.horaInicio || '', horaFin: timeData.horaFin || '', objTipoEjecucion: { enumTipoEjecucion: timeData.objTipoEjecucion?.enumTipoEjecucion as EnumTipoEjecucion } };
           break;
         case EnumConfigurationCard.MARKET:
-          updatedData = { ...updatedData, mercados: data.mercados?.map(m => ({ enumMercado: m.enumMercado })) || [] };
+          const marketData = data as Partial<EscanerDTOPeticion>;
+          updatedData = { ...updatedData, mercados: marketData.mercados?.map(m => ({ enumMercado: m.enumMercado })) || [] };
           break;
         case EnumConfigurationCard.FILTERS:
+          this.currentFilters.set(data as FiltroDtoPeticion[]);
           break;
       }
       this.formTouched.set(true);
@@ -205,6 +215,7 @@ export class ScannerConfiguration {
         this.marketFormValid.set(isValid);
         break;
       case EnumConfigurationCard.FILTERS:
+        this.filtersFormValid.set(isValid);
         break;
     }
   }
@@ -213,6 +224,7 @@ export class ScannerConfiguration {
     this.submitted.set(true);
     this.error.set(null);
     const scannerData = this.currentScannerData();
+    const filtersData = this.currentFilters();
 
     if (scannerData && this.isFormValid()) {
       this.loading.set(true);
@@ -223,6 +235,18 @@ export class ScannerConfiguration {
         : this.escanerService.createEscaner(scannerData);
 
       saveObservable.pipe(
+        switchMap(response => {
+          if (response && response.idEscaner) {
+            const idToUse = response.idEscaner;
+            if (filtersData.length > 0) {
+              return this.filtroService.saveFiltros(idToUse, filtersData).pipe(
+                map(() => response) // Return the original scanner response
+              );
+            }
+            return of(response);
+          }
+          return of(null);
+        }),
         finalize(() => this.loading.set(false)),
         catchError((err: HttpErrorResponse) => {
           this.error.set(err.error as ApiError);
@@ -248,6 +272,7 @@ export class ScannerConfiguration {
     this.error.set(null);
     this.loading.set(true);
     const scannerData = this.currentScannerData();
+    const filtersData = this.currentFilters();
 
     if (!scannerData || !this.isFormValid()) {
       this.error.set({
@@ -270,7 +295,13 @@ export class ScannerConfiguration {
         switchMap(createResponse => {
           if (createResponse && createResponse.idEscaner) {
             this.scannerId.set(createResponse.idEscaner);
-            return this.estadoEscanerService.archivarEscaner(createResponse.idEscaner);
+            const saveFiltersObservable = filtersData.length > 0
+              ? this.filtroService.saveFiltros(createResponse.idEscaner, filtersData)
+              : of([]); // If no filters, return an empty observable
+
+            return saveFiltersObservable.pipe(
+              switchMap(() => this.estadoEscanerService.archivarEscaner(createResponse.idEscaner))
+            );
           } else {
             return of(null);
           }
@@ -280,7 +311,13 @@ export class ScannerConfiguration {
       saveAndArchiveObservable = this.escanerService.updateEscaner(scannerId!, scannerData).pipe(
         switchMap(updateResponse => {
           if (updateResponse) {
-            return this.estadoEscanerService.archivarEscaner(scannerId!);
+            const saveFiltersObservable = filtersData.length > 0
+              ? this.filtroService.saveFiltros(scannerId!, filtersData)
+              : of([]); // If no filters, return an empty observable
+
+            return saveFiltersObservable.pipe(
+              switchMap(() => this.estadoEscanerService.archivarEscaner(scannerId!))
+            );
           } else {
             return of(null);
           }

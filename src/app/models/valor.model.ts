@@ -31,7 +31,7 @@ export interface ValorDTORespuesta {
 export interface ValorCondicionalDTORespuesta extends ValorDTORespuesta {
     enumCondicional: EnumCondicional;
     valor1: number;
-    valor2: number;
+    valor2?: number;
 }
 
 export interface ValorFloatDTORespuesta extends ValorDTORespuesta {

@@ -1,0 +1,32 @@
+.conditional-filter-container {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  height: fit-content;
+  gap: 5px;
+}
+
+.conditional-label-container {
+  padding-right: 15px;
+  display: flex;
+  align-items: center;
+  height: fit-content;
+  width: fit-content;
+  gap: 5px;
+}
+
+.conditional-inputs-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.conditional-select {
+  width: 95px;
+}
+
+.conditional-input {
+  width: 72px;
+}

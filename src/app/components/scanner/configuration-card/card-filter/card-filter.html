@@ -4,9 +4,22 @@
   </div>
 
   <div class="card-content">
-    <div class="text-error">
-      <!-- Filter error messages will go here -->
-    </div>
-    <p>Filter card content</p>
+    @if (loading()) {
+      <p>Cargando filtros...</p>
+    } @else if (error()) {
+      <p class="text-error">{{ error() }}</p>
+    } @else {
+      @for (filtro of filtros(); track filtro.enumFiltro; let i = $index) {
+        <app-filter-selected-card
+          [filtro]="filtro"
+          [submitted]="submitted()"
+          (filterChange)="handleFilterChange($event, i)"
+        ></app-filter-selected-card>
+      }
+      <button type="button" class="btn btn-primary" (click)="onAddFilter()">
+        Agregar Filtro
+      </button>
+    }
   </div>
 </div>
+<!-- Minor change to trigger re-compilation -->

@@ -1,0 +1,28 @@
+.number-filter-container {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  height: fit-content;
+  gap: 5px;
+}
+
+.number-label-container {
+  padding-right: 15px;
+  display: flex;
+  align-items: center;
+  height: fit-content;
+  width: fit-content;
+  gap: 5px;
+}
+
+.number-inputs-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  height: fit-content;
+}
+
+.number-input {
+  width: 72px;
+}

@@ -55,3 +55,39 @@
   margin-bottom: 8px; /* Add margin to ensure gap */
   text-align: center; /* Center the error text */
 }
+
+.add-filter-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fill-available; /* Equivalent to Figma's fill */
+  height: hug-content; /* Equivalent to Figma's hug */
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: var(--color-success);
+  color: var(--card-header-text);
+  font-family: var(--font-family-manrope);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  border: none;
+  cursor: pointer;
+}
+
+.add-filter-button i {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+  color: var(--card-header-text);
+}
+
+.selected-filters-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; /* Align top center */
+  gap: 15px;
+  padding: 0;
+}

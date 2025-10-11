@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ScannerConfiguration } from './scanner-configuration';
+import { ScannerInfoExpand } from './scanner-info-expand';
 
-describe('ScannerConfiguration', () => {
-  let component: ScannerConfiguration;
-  let fixture: ComponentFixture<ScannerConfiguration>;
+describe('ScannerInfoExpand', () => {
+  let component: ScannerInfoExpand;
+  let fixture: ComponentFixture<ScannerInfoExpand>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ScannerConfiguration]
+      imports: [ScannerInfoExpand]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ScannerConfiguration);
+    fixture = TestBed.createComponent(ScannerInfoExpand);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

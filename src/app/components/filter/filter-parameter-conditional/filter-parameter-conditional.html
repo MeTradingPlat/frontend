@@ -1,0 +1,30 @@
+<div class="conditional-filter-container" [formGroup]="conditionalForm">
+  <div class="conditional-label-container">
+    <span class="manrope-12pt-regular text-primary">{{ parametro().etiqueta }}</span>
+  </div>
+  <div class="conditional-inputs-container">
+    <app-form-select
+      [controlId]="'conditional-select'"
+      [options]="conditionalOptions()"
+      formControlName="conditional"
+      class="conditional-select"
+    ></app-form-select>
+
+    <app-form-text
+      [controlId]="'valor1-input'"
+      [type]="inputType"
+      formControlName="valor1"
+      class="conditional-input"
+    ></app-form-text>
+
+    @if (showSecondInput()) {
+      <span class="manrope-12pt-regular text-primary">y</span>
+      <app-form-text
+        [controlId]="'valor2-input'"
+        [type]="inputType"
+        formControlName="valor2"
+        class="conditional-input"
+      ></app-form-text>
+    }
+  </div>
+</div>

@@ -3,6 +3,6 @@
   [class.selected]="isSelected()"
   (click)="onClick()"
 >
-  <i [class]="item().iconClass"></i>
-  <span class="manrope-12pt-regular">{{ item().buttonText }}</span>
+  <i [class]="item().iconClass" [class.expanded-icon]="isExpandedView()"></i>
+  <span [class.manrope-16pt-regular]="isExpandedView()" [class.manrope-12pt-regular]="!isExpandedView()">{{ item().buttonText }}</span>
 </div>

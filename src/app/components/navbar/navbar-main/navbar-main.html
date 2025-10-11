@@ -5,7 +5,7 @@
         </div>
         <div class="items">
             @for (item of navUpItems; track item.id){
-                <a [routerLink]="item.path" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" #rla="routerLinkActive">
+                <a [routerLink]="item.path" routerLinkActive="active-link" [routerLinkActiveOptions]="item.path === '/escaner' ? {exact: false} : {exact: true}" #rla="routerLinkActive">
                     <app-navbar-item
                         [isSelected]="rla.isActive"
                         [item]="item"
