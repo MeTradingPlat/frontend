@@ -10,6 +10,12 @@ import { EnumTipoEjecucion } from '../../enums/enum-tipo-ejecucion';
 import { EnumMercado } from '../../enums/enum-mercado';
 import { EnumConfigurationCard } from '../../enums/enum-configuration-card';
 import { FiltroDtoPeticion } from '../../models/filtro-peticion.model'; // Import FiltroDtoPeticion
+import { FiltroDtoRespuesta } from '../../models/filtro.model'; // Import FiltroDtoRespuesta
+import { ParametroDTOPeticion } from '../../models/parametro-peticion.model';
+import { ParametroDTORespuesta } from '../../models/parametro.model';
+import { ValorDTOPeticion, ValorCondicionalDTOPeticion, ValorFloatDTOPeticion, ValorIntegerDTOPeticion, ValorStringDTOPeticion } from '../../models/valor.model';
+import { ValorDTORespuesta, ValorCondicionalDTORespuesta, ValorFloatDTORespuesta, ValorIntegerDTORespuesta, ValorStringDTORespuesta } from '../../models/valor.model';
+
 
 import { EscanerService } from '../../services/escaner.service';
 import { EstadoEscanerService } from '../../services/estado-escaner.service';
@@ -52,7 +58,7 @@ export class ScannerConfiguration {
   private readonly router = inject(Router);
   private readonly escanerService = inject(EscanerService);
   private readonly estadoEscanerService = inject(EstadoEscanerService);
-  private readonly filtroService = inject(FiltroService); // Inject FiltroService
+  private readonly filtroService = inject(FiltroService);
 
   // State signals
   scannerId = signal<number | null>(null);
@@ -146,9 +152,25 @@ export class ScannerConfiguration {
 
         if (id && id !== 0) {
           return this.escanerService.getEscanerById(id).pipe(
-            map(response => {
-              this.scannerEstado.set(response.objEstado.enumEstadoEscaner);
-              return this.mapResponseToPeticion(response);
+            switchMap(scannerResponse => {
+              this.scannerEstado.set(scannerResponse.objEstado.enumEstadoEscaner);
+              const scannerData = this.mapResponseToPeticion(scannerResponse);
+
+              return this.filtroService.getScannerFiltros(id).pipe(
+                map(filtersResponse => {
+                  const filtersPeticion: FiltroDtoPeticion[] = filtersResponse.map(filter => ({
+                    enumFiltro: filter.enumFiltro,
+                    parametros: filter.parametros.map(param => this.mapParametroRespuestaToPeticion(param))
+                  }));
+                  this.currentFilters.set(filtersPeticion);
+                  return scannerData;
+                }),
+                catchError((err: HttpErrorResponse) => {
+                  console.error('Error fetching filters:', err);
+                  this.loadError.set(err.error as ApiError);
+                  return of(scannerData); // Continue with scanner data even if filters fail
+                })
+              );
             }),
             catchError((err: HttpErrorResponse) => {
               this.loadError.set(err.error as ApiError);
@@ -169,6 +191,12 @@ export class ScannerConfiguration {
       this.marketFormValid.set(true);
       this.filtersFormValid.set(true); // Initialize filters form as valid
     });
+
+    // Check for new filter from router state
+    const newFilter = this.router.getCurrentNavigation()?.extras.state?.['newFilter'];
+    if (newFilter) {
+      this.currentFilters.update(filters => [...filters, newFilter]);
+    }
   }
 
   onNavButtonClicked(item: NavMenuItem): void {
@@ -401,6 +429,52 @@ export class ScannerConfiguration {
       horaFin: response.horaFin,
       objTipoEjecucion: response.objTipoEjecucion || { enumTipoEjecucion: EnumTipoEjecucion.UNA_VEZ },
       mercados: response.mercados.map(m => ({ enumMercado: m.enumMercado }))
+    };
+  }
+
+  private mapParametroRespuestaToPeticion(parametroRespuesta: ParametroDTORespuesta): ParametroDTOPeticion {
+    let valorPeticion: ValorDTOPeticion;
+
+    // Determine the specific type of ValorDTORespuesta and map it to the corresponding ValorDTOPeticion
+    if ('enumCondicional' in parametroRespuesta.objValorSeleccionado) {
+      const condicional = parametroRespuesta.objValorSeleccionado as ValorCondicionalDTORespuesta;
+      valorPeticion = {
+        enumTipoValor: condicional.enumTipoValor,
+        enumCondicional: condicional.enumCondicional,
+        valor1: condicional.valor1,
+        valor2: condicional.valor2
+      } as ValorCondicionalDTOPeticion;
+    } else if ('valor' in parametroRespuesta.objValorSeleccionado) {
+      switch (parametroRespuesta.objValorSeleccionado.enumTipoValor) {
+        case 'INTEGER':
+          valorPeticion = {
+            enumTipoValor: parametroRespuesta.objValorSeleccionado.enumTipoValor,
+            valor: (parametroRespuesta.objValorSeleccionado as ValorIntegerDTORespuesta).valor
+          } as ValorIntegerDTOPeticion;
+          break;
+        case 'FLOAT':
+          valorPeticion = {
+            enumTipoValor: parametroRespuesta.objValorSeleccionado.enumTipoValor,
+            valor: (parametroRespuesta.objValorSeleccionado as ValorFloatDTORespuesta).valor
+          } as ValorFloatDTOPeticion;
+          break;
+        case 'STRING':
+          valorPeticion = {
+            enumTipoValor: parametroRespuesta.objValorSeleccionado.enumTipoValor,
+            valor: (parametroRespuesta.objValorSeleccionado as ValorStringDTORespuesta).valor
+          } as ValorStringDTOPeticion;
+          break;
+        default:
+          valorPeticion = { enumTipoValor: parametroRespuesta.objValorSeleccionado.enumTipoValor };
+          break;
+      }
+    } else {
+      valorPeticion = { enumTipoValor: parametroRespuesta.objValorSeleccionado.enumTipoValor };
+    }
+
+    return {
+      enumParametro: parametroRespuesta.enumParametro,
+      objValorSeleccionado: valorPeticion
     };
   }
 

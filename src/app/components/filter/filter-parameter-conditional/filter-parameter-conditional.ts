@@ -1,90 +1,143 @@
-import { Component, input, output, signal, computed, ChangeDetectionStrategy, OnInit, effect } from '@angular/core';
+import { Component, input, output, computed, ChangeDetectionStrategy, effect, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, Validators, FormGroup, FormBuilder } from '@angular/forms';
 import { ParametroDTORespuesta } from '../../../models/parametro.model';
 import { ValorCondicionalDTORespuesta } from '../../../models/valor.model';
 import { EnumCondicional } from '../../../enums/enum-condicional';
-import { EnumTipoValor } from '../../../enums/enum-tipo-valor';
 import { FormSelect } from '../../forms/form-select/form-select';
 import { FormText } from '../../forms/form-text/form-text';
 
 interface SelectOption {
   key: string;
   value: string;
-  enum?: string;
 }
 
 @Component({
   selector: 'app-filter-parameter-conditional',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, FormSelect, FormText],
+  imports: [CommonModule, ReactiveFormsModule, FormSelect, FormText],
   templateUrl: './filter-parameter-conditional.html',
   styleUrl: './filter-parameter-conditional.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  
 })
 export class FilterParameterConditional implements OnInit {
+  protected EnumCondicional = EnumCondicional;
+  
+  
+  
+  
+  private fb = inject(FormBuilder);
+
+  protected Validators = Validators;
+  conditionalForm!: FormGroup;
+
+  submitted = input(false);
   parametro = input.required<ParametroDTORespuesta>();
+  cardDataChange = output<{ cardType: ParametroDTORespuesta, data: any }>();
   parameterChange = output<ParametroDTORespuesta>();
-  submitted = input<boolean>(false); // Added submitted input
 
-  conditionalForm = new FormGroup({
-    conditional: new FormControl<EnumCondicional | null>(null),
-    valor1: new FormControl<number | null>(null),
-    valor2: new FormControl<number | null>(null),
-  });
+  get conditionalSelectControl(): FormControl {
+    if (!this.conditionalForm) {
+      return new FormControl(null);
+    }
+    return this.conditionalForm.get('conditional-select') as FormControl;
+  }
 
-  conditionalOptions = computed<SelectOption[]>(() => {
-    return this.parametro().opciones.map(option => ({
-      key: (option as ValorCondicionalDTORespuesta).enumCondicional,
-      value: option.etiqueta,
-      enum: (option as ValorCondicionalDTORespuesta).enumCondicional
+  get value1Control(): FormControl {
+    if (!this.conditionalForm) {
+      return new FormControl(null);
+    }
+    return this.conditionalForm.get('value1') as FormControl;
+  }
+
+  get value2Control(): FormControl {
+    if (!this.conditionalForm) {
+      return new FormControl(null);
+    }
+    return this.conditionalForm.get('value2') as FormControl;
+  }
+
+  selectOptions = computed<SelectOption[]>(() => {
+    return Object.values(EnumCondicional).map(key => ({
+      key: key,
+      value: this.formatEnumKey(key)
     }));
   });
 
   constructor() {
     effect(() => {
       const parametro = this.parametro();
-      const selectedValue = this.parametro().objValorSeleccionado as ValorCondicionalDTORespuesta;
-      if (selectedValue) {
-        this.conditionalForm.patchValue({
-          conditional: selectedValue.enumCondicional,
-          valor1: selectedValue.valor1,
-          valor2: selectedValue.valor2,
-        }, { emitEvent: false });
+      if (this.conditionalForm) {
+        const selectedConditional = (parametro.objValorSeleccionado as ValorCondicionalDTORespuesta)?.enumCondicional;
+        const valor1 = (parametro.objValorSeleccionado as ValorCondicionalDTORespuesta)?.valor1;
+        const valor2 = (parametro.objValorSeleccionado as ValorCondicionalDTORespuesta)?.valor2;
+
+        this.conditionalSelectControl.setValue(selectedConditional || null, { emitEvent: false });
+        this.value1Control.setValue(valor1 ?? null, { emitEvent: false });
+        this.value2Control.setValue(valor2 ?? null, { emitEvent: false });
       }
     });
   }
 
   ngOnInit(): void {
-    this.conditionalForm.valueChanges.subscribe(values => {
-      const updatedParametro = { ...this.parametro() };
-      const selectedValue = updatedParametro.objValorSeleccionado as ValorCondicionalDTORespuesta;
-      selectedValue.enumCondicional = values.conditional!;
-      selectedValue.valor1 = values.valor1!;
-      selectedValue.valor2 = values.valor2!;
-      this.parameterChange.emit(updatedParametro);
-    });
-
-    this.conditionalForm.get('conditional')?.valueChanges.subscribe(value => {
-      if (value !== EnumCondicional.ENTRE && value !== EnumCondicional.FUERA) {
-        this.conditionalForm.get('valor2')?.reset(undefined, { emitEvent: false });
-      }
-    });
+    this.initializeForm(this.parametro());
+    this.setupFormListeners();
   }
 
-  get inputType(): string {
-    const selectedValue = this.parametro().opciones.find(
-      option => (option as ValorCondicionalDTORespuesta).enumCondicional === this.conditionalForm.get('conditional')?.value
-    );
-    return selectedValue?.enumTipoValor === EnumTipoValor.INTEGER ? 'number' : 'text';
+  private initializeForm(parametro: ParametroDTORespuesta): void {
+    const selectedConditional = (parametro.objValorSeleccionado as ValorCondicionalDTORespuesta)?.enumCondicional;
+    const valor1 = (parametro.objValorSeleccionado as ValorCondicionalDTORespuesta)?.valor1;
+    const valor2 = (parametro.objValorSeleccionado as ValorCondicionalDTORespuesta)?.valor2;
+
+    this.conditionalForm = this.fb.group({
+      'conditional-select': [selectedConditional || null, Validators.required],
+      'value1': [valor1 ?? null, Validators.required],
+      'value2': [valor2 ?? null], // valor2 is optional
+    });
+
+    this.updateValue2Validators(selectedConditional);
   }
 
-  showSecondInput(): boolean {
-    const conditional = this.conditionalForm.get('conditional')?.value;
-    return conditional === EnumCondicional.ENTRE || conditional === EnumCondicional.FUERA;
+  private setupFormListeners(): void {
+    this.conditionalSelectControl.valueChanges.subscribe(value => {
+      this.updateValue2Validators(value);
+      this.emitChanges();
+    });
+
+    this.value1Control.valueChanges.subscribe(() => this.emitChanges());
+    this.value2Control.valueChanges.subscribe(() => this.emitChanges());
+  }
+
+  private updateValue2Validators(conditional: EnumCondicional): void {
+    if (conditional === EnumCondicional.ENTRE || conditional === EnumCondicional.FUERA) {
+      this.value2Control.addValidators(Validators.required);
+    } else {
+      this.value2Control.removeValidators(Validators.required);
+      this.value2Control.setValue(null); // Clear value2 if not needed
+    }
+    this.value2Control.updateValueAndValidity();
+  }
+
+  private emitChanges(): void {
+    const updatedParametro = { ...this.parametro() };
+    const selectedConditional = this.conditionalSelectControl.value;
+    const valor1 = this.value1Control.value;
+    const valor2 = this.value2Control.value;
+
+    (updatedParametro.objValorSeleccionado as ValorCondicionalDTORespuesta) = {
+      ...(updatedParametro.objValorSeleccionado as ValorCondicionalDTORespuesta),
+      enumCondicional: selectedConditional,
+      valor1: valor1,
+      valor2: (selectedConditional === EnumCondicional.ENTRE || selectedConditional === EnumCondicional.FUERA) ? valor2 : undefined,
+    };
+    this.parameterChange.emit(updatedParametro);
   }
 
   trackByOption(index: number, option: SelectOption): any {
-    return option.enum ?? index;
+    return option.key ?? index;
+  }
+  private formatEnumKey(key: string): string {
+    return key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
   }
 }

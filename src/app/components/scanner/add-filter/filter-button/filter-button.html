@@ -1,0 +1,10 @@
+<div
+  class="filter-button"
+  [class.selected]="isSelected()"
+  (click)="onClick()"
+>
+  @if (iconClass()) {
+    <i class="bi {{ iconClass() }}"></i>
+  }
+  <span class="manrope-16pt-regular">{{ category()?.etiqueta }}</span>
+</div>

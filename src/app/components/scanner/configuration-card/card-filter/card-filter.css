@@ -1,11 +1,12 @@
 .configuration-card {
+  max-width: 1230px;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
+  align-items: center;
+  height: fit-content;
   background-color: var(--panel);
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -24,70 +25,85 @@
   flex-grow: 1;
   text-align: center;
   margin: 0;
-  color: var(--card-header-text); /* Ensure header text color is applied */
+  color: var(--card-header-text);
 }
-
 
 .manrope-24pt-semibold {
   color: var(--card-header-text);
-  margin: 0; /* Remove default margins */
-  flex-grow: 1; /* Allow the title to take up available space */
-  text-align: left; /* Ensure text is aligned to the left */
+  margin: 0;
+  flex-grow: 1;
+  text-align: left;
 }
 
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Updated gap to 8px */
+  align-items: stretch;
+  gap: 15px;
   padding: 20px 40px;
   width: 100%;
+  height: 100%;
   box-sizing: border-box;
 }
 
 .text-error {
-  color: var(--color-error); /* Updated color */
-  font-family: var(--font-family-manrope); /* Updated font family */
-  font-size: 12px; /* Updated font size */
-  font-weight: 400; /* Updated font weight */
-  line-height: normal; /* Updated line height */
-  letter-spacing: var(--letter-spacing-05); /* Updated letter spacing */
-  min-height: 1.2em; /* Allocate fixed space for error message */
-  margin-bottom: 8px; /* Add margin to ensure gap */
-  text-align: center; /* Center the error text */
+  color: var(--color-error);
+  font-family: var(--font-family-manrope);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: var(--letter-spacing-05);
+  min-height: 1.2em;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
-.add-filter-button {
+.loading-text {
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 20px 0;
+  font-family: var(--font-family-manrope);
+  font-size: 14px;
+}
+
+.add-filter-div {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: fill-available; /* Equivalent to Figma's fill */
-  height: hug-content; /* Equivalent to Figma's hug */
   padding: 5px 10px;
-  border-radius: 5px;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
   background-color: var(--color-success);
   color: var(--card-header-text);
+  border-radius: 5px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.add-filter-div .bi-plus-circle {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.add-filter-div .add-filter-text {
   font-family: var(--font-family-manrope);
   font-size: 16px;
   font-weight: 400;
   line-height: normal;
-  border: none;
-  cursor: pointer;
-}
-
-.add-filter-button i {
-  font-size: 22px;
-  width: 22px;
-  height: 22px;
-  color: var(--card-header-text);
+  letter-spacing: var(--letter-spacing-05);
+  width: fit-content;
+  height: fit-content;
 }
 
 .selected-filters-container {
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center; /* Align top center */
+  flex-direction: column;    /* CAMBIADO: ahora vertical para que cada tarjeta ocupe su fila */
+  align-items: stretch;      /* CAMBIADO: estira los hijos horizontalmente */
   gap: 15px;
-  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
 }

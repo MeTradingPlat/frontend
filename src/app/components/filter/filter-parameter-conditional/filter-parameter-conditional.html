@@ -3,28 +3,34 @@
     <span class="manrope-12pt-regular text-primary">{{ parametro().etiqueta }}</span>
   </div>
   <div class="conditional-inputs-container">
-    <app-form-select
-      [controlId]="'conditional-select'"
-      [options]="conditionalOptions()"
-      formControlName="conditional"
-      class="conditional-select"
-    ></app-form-select>
+    <div class="select-container">
+      <app-form-select
+        [controlId]="'conditional-select'"
+        [options]="selectOptions()"
+        [required]="conditionalSelectControl.hasValidator(Validators.required)"
+        [formControl]="conditionalSelectControl"
+        class="conditional-select"
+      ></app-form-select>
+    </div>
 
-    <app-form-text
-      [controlId]="'valor1-input'"
-      [type]="inputType"
-      formControlName="valor1"
-      class="conditional-input"
-    ></app-form-text>
-
-    @if (showSecondInput()) {
-      <span class="manrope-12pt-regular text-primary">y</span>
+    <div class="inputs-container">
       <app-form-text
-        [controlId]="'valor2-input'"
-        [type]="inputType"
-        formControlName="valor2"
+        [controlId]="'value1'"
+        [type]="'number'"
+        [required]="value1Control.hasValidator(Validators.required)"
+        [formControl]="value1Control"
         class="conditional-input"
       ></app-form-text>
-    }
+
+      @if (conditionalSelectControl.value === EnumCondicional.ENTRE || conditionalSelectControl.value === EnumCondicional.FUERA) {
+        <app-form-text
+          [controlId]="'value2'"
+          [type]="'number'"
+          [required]="value2Control.hasValidator(Validators.required)"
+          [formControl]="value2Control"
+          class="conditional-input"
+        ></app-form-text>
+      }
+    </div>
   </div>
 </div>

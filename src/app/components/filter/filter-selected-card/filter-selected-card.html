@@ -6,45 +6,51 @@
       [value]="filterName"
       readonly
     />
-    <button
-      type="button"
-      class="btn-icon"
-      (click)="onRemoveFilter()"
-    >
-      <i class="bi bi-x"></i>
-    </button>
+    <i 
+      class="bi bi-x remove-icon" 
+      (click)="onRemoveFilter()" 
+      title="Eliminar filtro"
+    ></i>
   </div>
 
   <div class="filter-selected-card-parameters">
     @for (parametro of filtro()?.parametros; track trackByParametro($index, parametro); let i = $index) {
       @switch (parametro.objValorSeleccionado.enumTipoValor) {
         @case (EnumTipoValor.CONDICIONAL) {
-          <app-filter-parameter-conditional 
-            [parametro]="parametro"
-            [submitted]="submitted()"
-            (parameterChange)="onParameterChange($event, i)"
-          ></app-filter-parameter-conditional>
+          <div class="conditional-container">
+            <app-filter-parameter-conditional 
+              [parametro]="parametro"
+              [submitted]="submitted()"
+              (parameterChange)="onParameterChange($event, i)"
+            ></app-filter-parameter-conditional>
+          </div>
         }
         @case (EnumTipoValor.STRING) {
-          <app-filter-parameter-options
-            [submitted]="submitted()"
-            [parametro]="parametro"
-            (parameterChange)="onParameterChange($event, i)"
-          ></app-filter-parameter-options>
+          <div class="string-container">
+            <app-filter-parameter-options
+              [submitted]="submitted()"
+              [parametro]="parametro"
+              (parameterChange)="onParameterChange($event, i)"
+            ></app-filter-parameter-options>
+          </div>
         }
         @case (EnumTipoValor.INTEGER) {
-          <app-filter-parameter-number 
-            [parametro]="parametro"
-            [submitted]="submitted()"
-            (parameterChange)="onParameterChange($event, i)"
-          ></app-filter-parameter-number>
+          <div class="integer-container">
+            <app-filter-parameter-number 
+              [parametro]="parametro"
+              [submitted]="submitted()"
+              (parameterChange)="onParameterChange($event, i)"
+            ></app-filter-parameter-number>
+          </div>
         }
         @case (EnumTipoValor.FLOAT) {
-          <app-filter-parameter-number 
-            [parametro]="parametro"
-            [submitted]="submitted()"
-            (parameterChange)="onParameterChange($event, i)"
-          ></app-filter-parameter-number>
+          <div class="float-container">
+            <app-filter-parameter-number 
+              [parametro]="parametro"
+              [submitted]="submitted()"
+              (parameterChange)="onParameterChange($event, i)"
+            ></app-filter-parameter-number>
+          </div>
         }
       }
     }

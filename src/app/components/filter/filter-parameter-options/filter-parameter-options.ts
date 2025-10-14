@@ -38,44 +38,36 @@ export class FilterParameterOptions implements OnInit {
   }
 
   selectOptions = computed<SelectOption[]>(() => {
-    const options = this.parametro().opciones.map((option, index) => {
+    const options = this.parametro().opciones.map(option => {
+      // As per user's clarification, 'valor' is always present and unique for the key.
       const valor = (option as ValorStringDTORespuesta).valor;
-      // Ensure key is unique, even if valor is empty
-      const key = valor !== '' && valor !== undefined && valor !== null ? valor : `${option.etiqueta}-${index}`;
       return {
-        key: key,
+        key: valor,
         value: option.etiqueta
       };
     });
-    console.log('[FilterParameterOptions] Computed selectOptions:', options);
     return options;
   });
 
   constructor() {
     effect(() => {
       const parametro = this.parametro();
-      console.log('[FilterParameterOptions] Parametro input changed:', parametro);
 
       // Only patch value if the form is initialized
       if (this.optionForm) {
         const selectedValue = (parametro.objValorSeleccionado as ValorStringDTORespuesta)?.valor;
-        console.log('[FilterParameterOptions] Setting value to form control:', selectedValue);
         this.valueControl.setValue(selectedValue || null, { emitEvent: false }); // Set to null if no value
-      } else {
-        console.log('[FilterParameterOptions] optionForm not yet initialized in effect.');
       }
     });
   }
 
   ngOnInit(): void {
-    console.log('[FilterParameterOptions] ngOnInit - Initializing form with parametro:', this.parametro());
     this.initializeForm(this.parametro());
     this.setupFormListeners();
   }
 
   private initializeForm(parametro: ParametroDTORespuesta): void {
     const selectedValue = (parametro.objValorSeleccionado as ValorStringDTORespuesta)?.valor;
-    console.log('[FilterParameterOptions] initializeForm - Selected value:', selectedValue);
     this.optionForm = this.fb.group({
       'options-select': [selectedValue || null, Validators.required], // Set to null if no value
     });
@@ -85,7 +77,6 @@ export class FilterParameterOptions implements OnInit {
     this.optionForm.valueChanges.subscribe(value => {
       const updatedParametro = { ...this.parametro() };
       (updatedParametro.objValorSeleccionado as ValorStringDTORespuesta).valor = value['options-select'] as string;
-      console.log('[FilterParameterOptions] Form value changed, emitting:', updatedParametro);
       this.parameterChange.emit(updatedParametro);
     });
   }

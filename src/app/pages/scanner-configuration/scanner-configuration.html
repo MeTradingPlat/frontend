@@ -1,3 +1,4 @@
+
 <app-navbar-aux
   [backPath]="backPath"
   [title]="title()"
@@ -34,7 +35,6 @@
       <app-card-market
         [scannerData]="currentScannerData()"
         [submitted]="submitted()"
-        (cardDataChange)="updateCardData(EnumConfigurationCard.MARKET, $event.data)"
         (formValidityChange)="onFormValidityChange(EnumConfigurationCard.MARKET, $event.isValid)">
       </app-card-market>
     </div>

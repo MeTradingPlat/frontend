@@ -1,0 +1,29 @@
+.filter-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: var(--filter-button);
+  cursor: pointer;
+  user-select: none; /* Disable text selection */
+  -webkit-user-select: none; /* For Safari */
+  -moz-user-select: none; /* For Firefox */
+  -ms-user-select: none; /* For Internet Explorer/Edge */
+}
+
+.filter-button.selected {
+  background-color: var(--btn-selected);
+}
+
+.filter-button i {
+  color: var(--text-primary);
+  width: 16px;
+  height: 16px;
+  margin-right: 5px; /* Add some space between icon and text */
+}
+
+.filter-button span {
+  color: var(--text-primary);
+}

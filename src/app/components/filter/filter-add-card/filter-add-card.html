@@ -3,7 +3,7 @@
     <input
       type="text"
       class="form-control manrope-16pt-regular"
-      [value]="filterName"
+      [value]="filter()?.etiquetaNombre"
       readonly
     />
     <button
@@ -18,15 +18,14 @@
   <div class="filter-add-card-description">
     <textarea
       class="form-control manrope-12pt-regular"
+      [value]="filter()?.etiquetaDescripcion || ''"
       readonly
-    >
-      {{ filterDescription }}
-    </textarea>
+    ></textarea>
   </div>
 
   <div class="filter-add-card-type">
     <span class="manrope-8pt-medium">
-      {{ filterCategory }}
+      {{ filter()?.objCategoria?.etiqueta }}
     </span>
   </div>
 </div>

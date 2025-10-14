@@ -16,4 +16,9 @@ export class LanguageService {
     // In a real application, you would also save this preference (e.g., to localStorage)
     // and potentially reload translations.
   }
+
+  getTranslation(key: string): string {
+    // For now, just return the key. In a real app, this would fetch from a translation file.
+    return key;
+  }
 }

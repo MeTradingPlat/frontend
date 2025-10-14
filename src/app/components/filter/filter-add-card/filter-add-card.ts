@@ -1,5 +1,8 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FiltroDtoRespuesta } from '../../../models/filtro.model';
+import { FiltroService } from '../../../services/filtro.service';
+import { EnumFiltro } from '../../../enums/enum-filtro';
 
 @Component({
   selector: 'app-filter-add-card',
@@ -10,12 +13,23 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterAddCard {
-  @Input() filterName: string = $localize`Filtro`;
-  @Input() filterDescription: string = $localize`Descripción`;
-  @Input() filterCategory: string = $localize`Categoría`;
+  filter = input<FiltroDtoRespuesta>();
+  filterAdded = output<FiltroDtoRespuesta>();
+
+  private filtroService = inject(FiltroService);
+
   addFilterTitle = $localize`Agregar nuevo filtro`;
 
   onAddFilter(): void {
-    console.log('Agregar nuevo filtro');
+    if (this.filter()?.enumFiltro) {
+      this.filtroService.getDefaultFiltro(this.filter()!.enumFiltro).subscribe({
+        next: (defaultFiltro) => {
+          this.filterAdded.emit(defaultFiltro);
+        },
+        error: (err) => {
+          
+        }
+      });
+    }
   }
 }

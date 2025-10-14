@@ -60,7 +60,7 @@ export class FilterSelectedCard {
   }
 
   trackByParametro(index: number, parametro: ParametroDTORespuesta): string {
-    const uniquePart = parametro.enumParametro || parametro.etiqueta || 'unknown';
+    const uniquePart = parametro.enumParametro;
     return `${uniquePart}-${index}`;
   }
 }
