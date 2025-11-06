@@ -300,7 +300,7 @@ export class ScannerConfiguration implements OnInit {
     const dialogRef = this.dialog.open(DialogAddFilters, {
       width: '800px',
       maxWidth: '90vw',
-      maxHeight: '90vh',
+      maxHeight: window.innerWidth <= 768 ? 'calc(100vh - 90px)' : '90vh',
       disableClose: false,
       data: {
         excludedFilters: selectedFilterEnums

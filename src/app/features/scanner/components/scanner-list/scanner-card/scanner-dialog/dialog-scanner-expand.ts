@@ -122,16 +122,16 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
       padding: 0 !important;
       max-height: none !important;
     }
-    
+
     .dialog-scanner-card {
-      height: 90vh;
+      height: 100%;
       max-height: none;
       display: flex;
       flex-direction: column;
       border: none;
       border-radius: 0;
       overflow: visible;
-      
+
       .mat-mdc-card-header {
         display: flex;
         box-sizing: border-box;
