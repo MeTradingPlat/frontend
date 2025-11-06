@@ -302,6 +302,7 @@ export class ScannerConfiguration implements OnInit {
       maxWidth: '90vw',
       maxHeight: window.innerWidth <= 768 ? 'calc(100vh - 90px)' : '90vh',
       disableClose: false,
+      autoFocus: false,
       data: {
         excludedFilters: selectedFilterEnums
       }
