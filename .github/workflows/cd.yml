@@ -23,7 +23,30 @@ jobs:
             -p 80:4200 \
             --name frontend \
             --restart unless-stopped \
+            --label project=metradingplat \
+            --label service=frontend \
             virtud142/metradingplat_frontend:latest
 
-      - name: Remove Dangling Docker Images
+      - name: Clean Old Images of This Service
+        run: |
+          echo "Cleaning old images for frontend service..."
+          # Remove old images of this specific service (excluding the one currently in use)
+          CURRENT_IMAGE=$(sudo docker inspect frontend --format='{{.Image}}' 2>/dev/null || echo "")
+          if [ -n "$CURRENT_IMAGE" ]; then
+            sudo docker images --filter "label=service=frontend" --format "{{.ID}}" | while read img; do
+              if [ "$img" != "${CURRENT_IMAGE:7:12}" ]; then
+                echo "Removing old image: $img"
+                sudo docker rmi -f $img 2>/dev/null || true
+              fi
+            done
+          fi
+          # Also clean by repository name
+          sudo docker images virtud142/metradingplat_frontend --format "{{.ID}} {{.Tag}}" | grep -v "latest" | awk '{print $1}' | xargs -r sudo docker rmi -f 2>/dev/null || true
+
+      - name: Clean Stopped Containers of This Service
+        run: |
+          echo "Cleaning stopped containers for frontend service..."
+          sudo docker ps -a --filter "label=service=frontend" --filter "status=exited" -q | xargs -r sudo docker rm 2>/dev/null || true
+
+      - name: Remove Dangling Images
         run: sudo docker image prune -f

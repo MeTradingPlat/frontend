@@ -18,6 +18,8 @@ RUN npm run build
 
 # Stage 2: Production
 FROM node:20-alpine AS production
+LABEL project="metradingplat"
+LABEL service="frontend"
 
 # Set working directory
 WORKDIR /app
