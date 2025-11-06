@@ -1,14 +1,14 @@
 import { Component, inject, input } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatSidenav } from '@angular/material/sidenav';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ThemeService } from '../../../../core/services/theme/theme.service';
 import { I18nService } from '../../../../core/services/i18n/i18n.service';
 
 @Component({
   selector: 'app-side-navbar',
-  imports: [MatButton, RouterLink, TranslatePipe],
+  imports: [MatButton, RouterLink, RouterLinkActive, TranslatePipe],
   templateUrl: './side-navbar.html',
   styleUrl: './side-navbar.scss'
 })

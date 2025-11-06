@@ -52,6 +52,14 @@
             background-color: var(--mat-sys-surface-container-highest);
             color: var(--mat-sys-on-surface);
         }
+
+        &.active {
+            background-color: var(--mat-sys-secondary-container);
+
+            i, span {
+                color: var(--mat-sys-on-secondary-container);
+            }
+        }
     }
 
     .flex-spacer {
@@ -99,6 +107,14 @@
     &:hover {
         background-color: var(--mat-sys-surface-container-highest) !important;
     }
+
+    &.active {
+        background-color: var(--mat-sys-secondary-container) !important;
+
+        i, span {
+            color: var(--mat-sys-on-secondary-container) !important;
+        }
+    }
 }
 
 // Bottom navigation for mobile
@@ -135,6 +151,14 @@
         }
 
         &:active {
+            background-color: var(--mat-sys-secondary-container);
+
+            i {
+                color: var(--mat-sys-on-secondary-container);
+            }
+        }
+
+        &.active {
             background-color: var(--mat-sys-secondary-container);
 
             i {

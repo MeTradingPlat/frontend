@@ -1,13 +1,13 @@
 @if (isBottomNav()) {
     <!-- Bottom navigation for mobile -->
     <nav class="navbar-bottom">
-        <button routerLink="/inicio" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Inicio">
+        <button routerLink="/inicio" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Inicio">
             <i class="bi bi-house-fill"></i>
         </button>
-        <button routerLink="/escaneres" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Escáner">
+        <button routerLink="/escaneres" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Escáner">
             <i class="bi bi-clipboard-data-fill"></i>
         </button>
-        <button routerLink="/noticias" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
+        <button routerLink="/noticias" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
             <i class="bi bi-newspaper"></i>
         </button>
         <div class="flex-spacer"></div>
@@ -22,15 +22,15 @@
             <h1>LOGO</h1>
         }
 
-        <button routerLink="/inicio" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+        <button routerLink="/inicio" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
             <i class="bi bi-house-fill"></i>
             <span>{{ 'NAV.INICIO' | translate }}</span>
         </button>
-        <button routerLink="/escaneres" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+        <button routerLink="/escaneres" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
             <i class="bi bi-clipboard-data-fill"></i>
             <span>{{ 'NAV.ESCANER' | translate }}</span>
         </button>
-        <button routerLink="/noticias" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+        <button routerLink="/noticias" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
             <i class="bi bi-newspaper"></i>
             <span>{{ 'NAV.NOTICIAS' | translate }}</span>
         </button>

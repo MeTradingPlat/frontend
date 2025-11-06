@@ -19,9 +19,13 @@ html {
   ));
 }
 
-html, body { height: 100%; }
-body { 
-  margin: 0; 
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
   font-family: 'Manrope', sans-serif;
   font-optical-sizing: auto;
 
@@ -35,6 +39,14 @@ body {
 
   @media(prefers-contrast: more) {
     @include custom.high-contrast-overrides(color-scheme)
+  }
+}
+
+@media (max-width: 768px) {
+  html, body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
   }
 }
 

@@ -1,11 +1,13 @@
 :host {
+    --header-navbar-height: 95px;
+
     background-color: var(--mat-sys-surface-container);
     color: var(--mat-sys-on-surface-container);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 95px;
+    height: var(--header-navbar-height);
     margin-left: 105px;
     z-index: 2;
     transition: margin-left 0.3s ease;
@@ -107,9 +109,12 @@
 // Mobile responsive styles
 @media (max-width: 768px) {
     :host {
+        --header-navbar-height: auto;
+        --header-navbar-min-height: 100px;
+
         margin-left: 0;
-        height: auto;
-        min-height: 100px;
+        height: var(--header-navbar-height);
+        min-height: var(--header-navbar-min-height);
         z-index: 5;
     }
 
