@@ -9,13 +9,8 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Create Docker Network
-        run: |
-          sudo docker network create metradingplat-network || echo "Network already exists"
-
       - name: Pull Docker Image
         run: sudo docker pull virtud142/metradingplat_frontend:latest
 
@@ -27,21 +22,8 @@ jobs:
           sudo docker run -d \
             -p 80:4200 \
             --name frontend \
-            --network metradingplat-network \
             --restart unless-stopped \
             virtud142/metradingplat_frontend:latest
-
-      - name: Wait for service to be ready
-        run: |
-          echo "Waiting for frontend to be ready..."
-          sleep 10
-
-      - name: Check container status
-        run: sudo docker ps | grep frontend
-
-      - name: Show container logs
-        if: failure()
-        run: sudo docker logs frontend --tail=50
 
       - name: Remove Dangling Docker Images
         run: sudo docker image prune -f
