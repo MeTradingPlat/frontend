@@ -1,0 +1,63 @@
+<mat-dialog-content>
+  <mat-card appearance="outlined" class="dialog-card">
+    <mat-card-header>
+        <mat-card-title>{{ 'SCANNER.ADD_FILTER_TITLE' | translate }}</mat-card-title>
+        <div class="header-icons">
+          <i mat-dialog-close class="bi bi-x-circle-fill"></i>
+        </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="card-content-1">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>{{ 'SCANNER.SEARCH_FILTER' | translate }}</mat-label>
+          <input matInput [formControl]="searchControl" [placeholder]="'SCANNER.SEARCH_PLACEHOLDER' | translate">
+          <mat-icon matPrefix>search</mat-icon>
+          @if (searchControl.value) {
+            <button matSuffix mat-icon-button (click)="searchControl.setValue('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+      </div>
+      <mat-divider/>
+      <div class="card-content-2">
+        @for (category of categories(); track category.enumCategoriaFiltro) {
+          <button
+            mat-button
+            [class.selected]="selectedCategory() === category.enumCategoriaFiltro"
+            (click)="onCategorySelected(category)">
+            <span>{{category.etiqueta}}</span>
+          </button>
+        }
+      </div>
+      <mat-divider/>
+      <div class="card-content-3">
+          @if (filteredFilters().length === 0) {
+            <div class="empty-state">
+              <mat-icon>search_off</mat-icon>
+              <p>{{ 'SCANNER.NO_FILTERS_FOUND' | translate }}</p>
+            </div>
+          } @else {
+            @for (filter of filteredFilters(); track filter.enumFiltro) {
+              <mat-card appearance="outlined" class="filter-item">
+                <mat-card-content>
+                  <div class="filter-info">
+                    <h3 class="filter-name">{{filter.etiquetaNombre}}</h3>
+                    <p class="filter-description">{{filter.etiquetaDescripcion}}</p>
+                    <span class="filter-category">{{filter.objCategoria?.etiqueta}}</span>
+                  </div>
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    (click)="onFilterAdded(filter)">
+                    <mat-icon>add</mat-icon>
+                    <span>{{ 'SCANNER.ADD' | translate }}</span>
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            }
+          }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</mat-dialog-content>

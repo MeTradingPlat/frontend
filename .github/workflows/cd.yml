@@ -9,21 +9,30 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      - name: Pull Docker Image
-        run: sudo docker pull virtud142/metradingplat_frontend:latest
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Delete Old Docker Container
-        run: sudo docker rm -f frontend || true
+      - name: Pull latest images
+        run: sudo docker compose pull frontend
 
-      - name: Run Docker Container
+      - name: Deploy with docker-compose
         run: |
-          sudo docker run -d \
-            -p 80:4200 \
-            --name frontend \
-            --restart unless-stopped \
-            virtud142/metradingplat_frontend:latest
+          sudo docker compose up -d frontend --remove-orphans
 
-      - name: Remove Dangling Docker Images
+      - name: Wait for service to be healthy
+        run: |
+          echo "Waiting for frontend to be ready..."
+          timeout 60 bash -c 'until sudo docker compose exec frontend node -e "require(\"http\").get(\"http://localhost:4200\", (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" 2>/dev/null; do sleep 2; done' || echo "Health check timeout - service may still be starting"
+
+      - name: Check service status
+        run: sudo docker compose ps
+
+      - name: Show service logs
+        if: failure()
+        run: sudo docker compose logs frontend --tail=50
+
+      - name: Clean up dangling images
         run: sudo docker image prune -f

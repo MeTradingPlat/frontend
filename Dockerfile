@@ -1,38 +1,60 @@
-FROM node:22.19.0 AS dev
+# Stage 1: Build
+FROM node:20-alpine AS builder
+
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to leverage Docker cache for npm install
-COPY package.json package-lock.json ./
+# Copy package files
+COPY package*.json ./
 
-# Remove node_modules and .angular/cache from any previous layers before installing dependencies
-RUN rm -rf node_modules .angular/cache
+# Install dependencies
+RUN npm ci --only=production=false
 
-# Install dependencies, including Angular CLI globally
-RUN npm install -g @angular/cli
-RUN npm install
-
-# Copy the rest of the application code
+# Copy source code
 COPY . .
 
-# Aggressively clear Angular cache and Vite's optimized dependencies to prevent stale pre-bundle issues
-# Removed --force flag as it caused an "Unknown argument" error.
-RUN ng cache clean && rm -rf .angular/cache node_modules/.vite
+# Build the application with both locales (es and en)
+RUN npm run build
 
+# Stage 2: Production
+FROM node:20-alpine AS production
+
+# Set working directory
+WORKDIR /app
+
+# Install dumb-init to handle signals properly
+RUN apk add --no-cache dumb-init
+
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Create a non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Change ownership to non-root user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
 EXPOSE 4200
-CMD ["ng", "serve", "--host", "0.0.0.0"]
 
-# # Etapa de build
-# FROM node:20-alpine AS build
-# WORKDIR /app
-# COPY . .
-# RUN npm install -g @angular/cli
-# RUN npm install
-# RUN ng build --configuration production
+# Set environment variables
+ENV PORT=4200
+ENV NODE_ENV=production
 
-# # Etapa de runtime
-# FROM node:20-alpine AS runtime
-# WORKDIR /app
-# RUN npm install -g http-server
-# COPY --from=build /app/dist /app/dist
-# EXPOSE 4000
-# CMD ["http-server", "dist", "-p", "4000"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:4200', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Use dumb-init to handle signals
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the server
+CMD ["node", "dist/frontend/server/server.mjs"]

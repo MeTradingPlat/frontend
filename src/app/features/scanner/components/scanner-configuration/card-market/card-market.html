@@ -1,0 +1,24 @@
+<mat-card
+  class="scanner-card"
+  appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>{{ 'SCANNER.MARKETS' | translate }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <section class="section" [formGroup]="marketsForm">
+      @for (mercado of mercados(); track mercado.enumMercado) {
+        <mat-checkbox
+          [formControlName]="mercado.enumMercado"
+          (change)="onCheckboxChange()">
+          {{ mercado.etiqueta }}
+        </mat-checkbox>
+      }
+    </section>
+    @if (errors()['mercados']) {
+      <div class="error-message">
+        <span class="material-icons">error</span>
+        <span>{{errors()['mercados']}}</span>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

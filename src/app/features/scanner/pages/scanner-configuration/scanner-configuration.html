@@ -1,0 +1,23 @@
+<app-header-navbar
+  [backPath]="backPath"
+  [title]="title()"
+  [buttons]="navButtons()"
+  (action)="selectAction($event)"
+/>
+<div class="page-content">
+    @if (loading()) {
+    <app-page-loading/>
+  } @else if (error()) {
+    <app-page-error [message]="error()?.mensaje || ''" (reload)="reloadPage()"/>
+  } @else {
+    <app-card-general [(scanner)]="scanner" [errors]="scannerErrors()"/>
+    <app-card-time [(scanner)]="scanner" [errors]="scannerErrors()"/>
+    <app-card-market [(scanner)]="scanner" [mercados]="mercados()" [errors]="scannerErrors()"/>
+    <app-card-selected-filters
+      [filtros]="filtros()"
+      [validationErrors]="validationErrors()"
+      (openAddDialog)="onOpenAddDialog()"
+      (removeFilter)="onRemoveFilter($event)"/>
+  }
+</div>
+

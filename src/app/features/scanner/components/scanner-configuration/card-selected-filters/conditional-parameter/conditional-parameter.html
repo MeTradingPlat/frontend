@@ -1,0 +1,49 @@
+<div class="conditional-container">
+  <mat-form-field class="conditional-field" appearance="outline">
+    <mat-label>{{ 'SCANNER.CONDITION' | translate }}</mat-label>
+    <mat-select
+      [ngModel]="valorCondicional.enumCondicional"
+      (ngModelChange)="onCondicionalChange($event)"
+    >
+      @for (opcion of parametro().opciones; track $index) {
+        <mat-option [value]="getOpcionValue(opcion)">
+          {{opcion.etiqueta}}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <div class="values-container">
+    <mat-form-field class="value-field" appearance="outline">
+      <mat-label>{{ 'SCANNER.VALUE' | translate }}</mat-label>
+      <input
+        matInput
+        [type]="inputType()"
+        [step]="inputStep()"
+        [ngModel]="valorCondicional.valor1"
+        [errorStateMatcher]="errorStateMatcher"
+        (input)="onValor1Change($event)"
+      />
+      @if (errorMessage()) {
+        <mat-error>{{errorMessage()}}</mat-error>
+      }
+    </mat-form-field>
+
+    @if (requiresValor2()) {
+      <mat-form-field class="value-field" appearance="outline">
+        <mat-label>{{ 'SCANNER.VALUE2' | translate }}</mat-label>
+        <input
+          matInput
+          [type]="inputType()"
+          [step]="inputStep()"
+          [ngModel]="valorCondicional.valor2"
+          [errorStateMatcher]="errorStateMatcher"
+          (input)="onValor2Change($event)"
+        />
+        @if (errorMessage()) {
+          <mat-error>{{errorMessage()}}</mat-error>
+        }
+      </mat-form-field>
+    }
+  </div>
+</div>

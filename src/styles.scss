@@ -1,0 +1,122 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use '../src/app/styles/_theme-colors' as custom;
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css";
+
+html {
+  @include mat.theme((
+    color: (
+      primary: custom.$primary-palette,
+      tertiary: custom.$tertiary-palette
+    ),
+    typography: (
+      plain-family: 'Manrope, sans-serif',
+      brand-family: 'Manrope, sans-serif',
+    ),
+    density: 0
+  ));
+}
+
+html, body { height: 100%; }
+body { 
+  margin: 0; 
+  font-family: 'Manrope', sans-serif;
+  font-optical-sizing: auto;
+
+  &.dark-mode{
+    color-scheme: dark;
+  }
+
+  &.light-mode{
+    color-scheme: light;
+  }
+
+  @media(prefers-contrast: more) {
+    @include custom.high-contrast-overrides(color-scheme)
+  }
+}
+
+// Fix para que los errores de mat-form-field empujen el contenido hacia abajo
+.mat-mdc-form-field-subscript-wrapper {
+  position: static !important;
+  height: auto !important;
+  margin-top: -16px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.mat-mdc-form-field-error-wrapper,
+.mat-mdc-form-field-hint-wrapper {
+  position: static !important;
+  min-height: fit-content !important;
+  height: auto !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.mat-mdc-form-field-error {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+// Snackbar custom styles using Material Design 3 color roles
+.snackbar-success {
+  .mdc-snackbar__surface {
+    background-color: var(--mat-sys-inverse-surface) !important;
+  }
+  .mat-mdc-snack-bar-label {
+    color: var(--mat-sys-inverse-on-surface) !important;
+  }
+  .mat-mdc-button {
+    color: var(--mat-sys-inverse-primary) !important;
+  }
+}
+
+.snackbar-error {
+  .mdc-snackbar__surface {
+    background-color: var(--mat-sys-error) !important;
+  }
+  .mat-mdc-snack-bar-label,
+  .mat-mdc-button {
+    color: var(--mat-sys-on-error) !important;
+  }
+}
+
+.snackbar-warning {
+  .mdc-snackbar__surface {
+    background-color: var(--mat-sys-tertiary) !important;
+  }
+  .mat-mdc-snack-bar-label,
+  .mat-mdc-button {
+    color: var(--mat-sys-on-tertiary) !important;
+  }
+}
+
+.snackbar-info {
+  .mdc-snackbar__surface {
+    background-color: var(--mat-sys-inverse-surface) !important;
+  }
+  .mat-mdc-snack-bar-label {
+    color: var(--mat-sys-inverse-on-surface) !important;
+  }
+  .mat-mdc-button {
+    color: var(--mat-sys-inverse-primary) !important;
+  }
+}
+
+// Responsive adjustments for pages with header navbar
+@media (max-width: 768px) {
+  // Adjust margin-top for pages that use header navbar
+  app-scanner-list,
+  app-scanner-list-archives,
+  app-scanner-configuration,
+  app-news-list {
+    :host {
+      margin-top: 100px !important;
+    }
+  }
+}

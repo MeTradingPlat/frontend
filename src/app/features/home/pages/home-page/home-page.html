@@ -1,0 +1,137 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        {{ 'HOME.TITLE' | translate }}
+      </h1>
+      <p class="hero-subtitle">
+        {{ 'HOME.SUBTITLE' | translate }}
+      </p>
+      <div class="hero-actions">
+        <button mat-raised-button color="primary" class="cta-button" (click)="getStarted()">
+          {{ 'HOME.CTA_START' | translate }}
+        </button>
+        <button mat-raised-button class="secondary-button" routerLink="/noticias">
+          {{ 'HOME.CTA_NEWS' | translate }}
+        </button>
+      </div>
+    </div>
+    <div class="hero-illustration">
+      <i class="bi bi-graph-up-arrow"></i>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2 class="section-title">{{ 'HOME.FEATURES_TITLE' | translate }}</h2>
+      <p class="section-description">
+        {{ 'HOME.FEATURES_SUBTITLE' | translate }}
+      </p>
+    </div>
+
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <mat-card
+          class="feature-card"
+          [class.clickable]="feature.route"
+          (click)="navigateTo(feature.route)"
+        >
+          <mat-card-content>
+            <div class="feature-icon">
+              <i [class]="'bi ' + feature.icon"></i>
+            </div>
+            <h3 class="feature-title">{{ feature.title | translate }}</h3>
+            <p class="feature-description">{{ feature.description | translate }}</p>
+            @if (feature.route) {
+              <div class="feature-action">
+                <span>{{ 'HOME.EXPLORE' | translate }}</span>
+                <i class="bi bi-arrow-right"></i>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section">
+    <div class="stat-item">
+      <i class="bi bi-lightning-charge-fill stat-icon"></i>
+      <h3 class="stat-value">{{ 'HOME.REALTIME_TITLE' | translate }}</h3>
+      <p class="stat-label">{{ 'HOME.REALTIME_DESC' | translate }}</p>
+    </div>
+    <div class="stat-item">
+      <i class="bi bi-sliders stat-icon"></i>
+      <h3 class="stat-value">{{ 'HOME.CUSTOMIZABLE_TITLE' | translate }}</h3>
+      <p class="stat-label">{{ 'HOME.CUSTOMIZABLE_DESC' | translate }}</p>
+    </div>
+    <div class="stat-item">
+      <i class="bi bi-shield-check stat-icon"></i>
+      <h3 class="stat-value">{{ 'HOME.RELIABLE_TITLE' | translate }}</h3>
+      <p class="stat-label">{{ 'HOME.RELIABLE_DESC' | translate }}</p>
+    </div>
+  </section>
+
+  <!-- How it Works Section -->
+  <section class="how-it-works-section">
+    <div class="section-header">
+      <h2 class="section-title">{{ 'HOME.HOW_IT_WORKS' | translate }}</h2>
+    </div>
+
+    <div class="steps-container">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3 class="step-title">{{ 'HOME.STEP1_TITLE' | translate }}</h3>
+          <p class="step-description">
+            {{ 'HOME.STEP1_DESC' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3 class="step-title">{{ 'HOME.STEP2_TITLE' | translate }}</h3>
+          <p class="step-description">
+            {{ 'HOME.STEP2_DESC' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3 class="step-title">{{ 'HOME.STEP3_TITLE' | translate }}</h3>
+          <p class="step-description">
+            {{ 'HOME.STEP3_DESC' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h3 class="step-title">{{ 'HOME.STEP4_TITLE' | translate }}</h3>
+          <p class="step-description">
+            {{ 'HOME.STEP4_DESC' | translate }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <h2 class="cta-title">{{ 'HOME.CTA_QUESTION' | translate }}</h2>
+    <p class="cta-description">
+      {{ 'HOME.CTA_DESC' | translate }}
+    </p>
+    <button mat-raised-button color="primary" class="cta-button" (click)="getStarted()">
+      {{ 'HOME.CTA_CREATE' | translate }}
+    </button>
+  </section>
+</div>

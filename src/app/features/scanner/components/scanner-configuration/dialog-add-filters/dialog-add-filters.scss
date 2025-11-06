@@ -1,0 +1,162 @@
+mat-dialog-content {
+  padding: 0 !important;
+  max-height: none !important;
+}
+
+.dialog-card {
+  height: 90vh;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  border: none;
+
+  .mat-mdc-card-header {
+    display: flex;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--mat-sys-primary);
+    width: 100%;
+  }
+
+  .mat-mdc-card-title {
+    color: var(--mat-sys-on-primary);
+  }
+
+  .header-icons {
+    position: absolute;
+    right: 16px;
+    width: auto;
+    display: flex;
+    color: var(--mat-sys-on-primary);
+
+    i {
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .mat-mdc-card-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    background-color: var(--mat-sys-surface-container-low);
+  }
+}
+
+.card-content-1 {
+  padding: 16px;
+
+  .search-field {
+    width: 100%;
+  }
+}
+
+.card-content-2 {
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  button {
+    border-radius: 20px;
+    transition: all 0.2s ease;
+
+    &.selected {
+      background-color: var(--mat-sys-primary);
+      color: var(--mat-sys-on-primary);
+    }
+
+    &:hover {
+      background-color: var(--mat-sys-primary-container);
+    }
+
+    &.selected:hover {
+      background-color: var(--mat-sys-primary);
+      opacity: 0.9;
+    }
+  }
+}
+
+.card-content-3 {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 12px;
+  align-content: start;
+
+  .empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: var(--mat-sys-on-surface-variant);
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    p {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+
+  .filter-item {
+
+    .mat-mdc-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      background-color: transparent;
+    }
+
+    .filter-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+
+      .filter-name {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--mat-sys-on-surface);
+      }
+
+      .filter-description {
+        margin: 0;
+        font-size: 14px;
+        color: var(--mat-sys-on-surface-variant);
+      }
+
+      .filter-category {
+        font-size: 12px;
+        color: var(--mat-sys-primary);
+        font-weight: 500;
+        margin-top: 4px;
+      }
+    }
+
+    button {
+      align-self: center;
+    }
+  }
+}

@@ -1,0 +1,45 @@
+@if (loading()) {
+  <div class="loading-container">
+    <p>{{ 'SCANNER.LOADING_NEWS' | translate }}</p>
+  </div>
+} @else if (dataSource().length === 0) {
+  <div class="empty-state">
+    <p>{{ 'SCANNER.NO_NEWS' | translate }}</p>
+  </div>
+} @else {
+  <table mat-table [dataSource]="dataSource()">
+
+    <!-- Fecha Column -->
+    <ng-container matColumnDef="fecha">
+      <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>
+      <td mat-cell *matCellDef="let row">{{ row.fecha }}</td>
+    </ng-container>
+
+    <!-- Noticia Column -->
+    <ng-container matColumnDef="noticia">
+      <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.NEWS' | translate }}</th>
+      <td mat-cell *matCellDef="let row">{{ row.noticia }}</td>
+    </ng-container>
+
+    <!-- Acción Column -->
+    <ng-container matColumnDef="accion">
+      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.ACTION' | translate }}</th>
+      <td mat-cell *matCellDef="let row">{{ row.accion }}</td>
+    </ng-container>
+
+    <!-- Details Column -->
+    <ng-container matColumnDef="details">
+      <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DETAILS' | translate }}</th>
+      <td mat-cell *matCellDef="let row" class="details-cell">
+        <i
+          class="bi bi-eye-fill action-icon"
+          (click)="onViewDetails(row)"
+          [matTooltip]="'NEWS.VIEW_DETAILS' | translate"
+        ></i>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+}

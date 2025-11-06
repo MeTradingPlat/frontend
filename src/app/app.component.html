@@ -1,0 +1,25 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- Drawer for mobile -->
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="'dialog'"
+    [mode]="'over'"
+    [opened]="false">
+    <app-side-navbar [isMobile]="true" [drawer]="drawer" />
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <!-- Desktop sidebar -->
+    <app-side-navbar [isMobile]="false" [class.desktop-only]="true" />
+
+    <!-- Main content -->
+    <div class="app-content" [class.mobile-content]="isHandset()">
+      <router-outlet/>
+    </div>
+
+    <!-- Mobile bottom navigation -->
+    <app-side-navbar [isMobile]="true" [isBottomNav]="true" [drawer]="drawer" [class.mobile-only]="true" />
+  </mat-sidenav-content>
+</mat-sidenav-container>

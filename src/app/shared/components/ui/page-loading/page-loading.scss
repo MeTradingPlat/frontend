@@ -1,0 +1,23 @@
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 200px;
+    padding: 2rem;
+    gap: 1rem;
+
+    border-radius: 1rem;
+}
+
+.loading-message {
+    font: var(--mat-sys-title-medium);
+}
+
+
+@media (max-width: 768px) {
+    .loading-container {
+        min-height: 150px;
+        padding: 1.5rem;
+    }
+}

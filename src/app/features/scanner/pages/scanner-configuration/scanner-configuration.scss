@@ -1,0 +1,16 @@
+:host {
+    margin-top: 95px;
+}
+
+.page-content {
+    padding: 15px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.no-data-message {
+    font: var(--mat-sys-title-medium);
+}

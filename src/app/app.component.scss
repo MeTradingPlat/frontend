@@ -1,0 +1,47 @@
+.sidenav-container {
+  height: 100vh;
+  width: 100%;
+}
+
+.sidenav {
+  width: 280px;
+}
+
+.app-content {
+  margin-left: 105px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  min-height: 100vh;
+  transition: margin 0.3s ease;
+
+  &.mobile-content {
+    margin-left: 0;
+    margin-bottom: 60px;
+  }
+}
+
+// Show/hide elements based on screen size
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+
+  .app-content {
+    margin-left: 0;
+    margin-bottom: 60px;
+  }
+}

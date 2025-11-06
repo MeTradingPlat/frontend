@@ -1,0 +1,24 @@
+<app-header-navbar
+  [title]="title()"
+  [buttons]="navButtons()"
+/>
+
+<div class="page-content">
+  @if (loading()) {
+    <app-page-loading/>
+  } @else if (error()) {
+    <app-page-error [message]="error()?.mensaje || ''" (reload)="reloadPage()"/>
+  } @else if (scanners().length === 0) {
+    <p class="no-data-message">{{ 'SCANNER.NO_SCANNERS' | translate }}</p>
+  } @else {
+      @for (scanner of scanners(); track scanner.idEscaner) {
+        <app-scanner-card
+          [scanner]="scanner"
+          (editScanner)="onEditScanner($event)"
+          (toggleScannerStatus)="onToggleScannerStatus($event)"
+          (viewScannerDetails)="onViewScannerDetails($event)"
+        />
+      }
+  }
+</div>
+

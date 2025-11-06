@@ -1,0 +1,57 @@
+@if (isBottomNav()) {
+    <!-- Bottom navigation for mobile -->
+    <nav class="navbar-bottom">
+        <button routerLink="/inicio" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Inicio">
+            <i class="bi bi-house-fill"></i>
+        </button>
+        <button routerLink="/escaneres" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Escáner">
+            <i class="bi bi-clipboard-data-fill"></i>
+        </button>
+        <button routerLink="/noticias" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
+            <i class="bi bi-newspaper"></i>
+        </button>
+        <div class="flex-spacer"></div>
+        <button mat-button class="nav-item" (click)="openDrawer()" aria-label="Más opciones">
+            <i class="bi bi-three-dots"></i>
+        </button>
+    </nav>
+} @else {
+    <!-- Side navigation (desktop or drawer) -->
+    <nav class="navbar-side" [class.drawer-nav]="isMobile()">
+        @if (!isMobile()) {
+            <h1>LOGO</h1>
+        }
+
+        <button routerLink="/inicio" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+            <i class="bi bi-house-fill"></i>
+            <span>{{ 'NAV.INICIO' | translate }}</span>
+        </button>
+        <button routerLink="/escaneres" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+            <i class="bi bi-clipboard-data-fill"></i>
+            <span>{{ 'NAV.ESCANER' | translate }}</span>
+        </button>
+        <button routerLink="/noticias" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+            <i class="bi bi-newspaper"></i>
+            <span>{{ 'NAV.NOTICIAS' | translate }}</span>
+        </button>
+
+        <div class="flex-spacer"></div>
+
+        <!-- Botón para cambiar idioma -->
+        <button mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="toggleLanguage(); closeDrawerIfMobile()">
+            <i class="bi bi-translate"></i>
+            <span>{{ 'LANGUAGE.SWITCH_TO' | translate }}</span>
+        </button>
+
+        <!-- Botón para cambiar tema -->
+        <button mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="toggleTheme(); closeDrawerIfMobile()">
+            @if(isDarkMode()){
+                <i class="bi bi-sun-fill"></i>
+                <span>{{ 'THEME.CLARO' | translate }}</span>
+            }@else {
+                <i class="bi bi-moon-fill"></i>
+                <span>{{ 'THEME.OSCURO' | translate }}</span>
+            }
+        </button>
+    </nav>
+}

@@ -1,0 +1,77 @@
+<mat-card
+  class="scanner-card"
+  appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>{{ scanner().nombre }}</mat-card-title>
+    <div class="header-icons">
+      <i
+        class="bi bi-gear-fill"
+        routerLink="/escaneres/configuracion/{{scanner().idEscaner!}}"
+        (click)="$event.stopPropagation(); editScanner.emit(scanner().idEscaner!)"
+        [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner().idEscaner}"></i>
+      @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
+        <div class="button-with-spinner">
+          <span class="loader"></span>
+          <i
+            class="bi bi-stop-fill"
+            role="button"
+            (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
+            [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
+          ></i>
+        </div>
+      } @else {
+        <i
+          class="bi bi-play-fill"
+          role="button"
+          (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
+          [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
+        ></i>
+      }
+      <i
+        class="bi bi-fullscreen"
+        (click)="openScannerDialog(scanner()); $event.stopPropagation()"
+        [matTooltip]="'SCANNER.EXPAND' | translate: {id: scanner().idEscaner}"></i>
+    </div>
+  </mat-card-header>
+  <mat-tab-group headerPosition="below" mat-stretch-tabs="false" mat-align-tabs="center">
+    <mat-tab [label]="'SCANNER.SIGNALS' | translate">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <app-scanner-signals-tab [scanner]="scanner()"/>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab [label]="'SCANNER.ASSETS' | translate">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <app-scanner-assets-tab [scanner]="scanner()"/>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab [label]="'NEWS.NEWS' | translate">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <app-scanner-news-tab [scanner]="scanner()"/>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab [label]="'SCANNER.REGISTRY' | translate">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <app-scanner-registry-tab [scanner]="scanner()"/>
+        </div>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab [label]="'SCANNER.FILTERS' | translate">
+      <ng-template matTabContent>
+        <div class="tab-content">
+          <app-scanner-filters-tab [scanner]="scanner()"/>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</mat-card>

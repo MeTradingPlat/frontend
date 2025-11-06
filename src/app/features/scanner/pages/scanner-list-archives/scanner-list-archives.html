@@ -1,0 +1,74 @@
+<app-header-navbar
+  [title]="title()"
+  backPath="{{backPath}}"
+/>
+
+<div class="page-content">
+  @if (loading()) {
+    <app-page-loading/>
+  } @else if (error()) {
+    <app-page-error [message]="error()?.mensaje || ''" (reload)="reloadPage()"/>
+  } @else {
+    <div class="table-container">
+      <mat-form-field class="filter-field" appearance="outline">
+        <mat-label>{{ 'NEWS.FILTER' | translate }}</mat-label>
+        <input matInput (keyup)="applyFilter($event)" [placeholder]="'SCANNER.ARCHIVED_PLACEHOLDER' | translate" #input>
+      </mat-form-field>
+
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource" matSort>
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'SCANNER.NAME' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+          </ng-container>
+
+          <!-- Creation Date Column -->
+          <ng-container matColumnDef="fechaCreacion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'SCANNER.CREATION_DATE' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.fechaCreacion }}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.ACTIONS' | translate }}</th>
+            <td mat-cell *matCellDef="let row" class="actions-cell">
+              <div class="actions-container">
+                <i
+                  class="bi bi-gear-fill action-icon"
+                  (click)="onConfigureScanner(row.idEscaner)"
+                  [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: row.idEscaner}"
+                ></i>
+                <i
+                  class="bi bi-fullscreen action-icon"
+                  (click)="onExpandScanner(row.scanner)"
+                  [matTooltip]="'SCANNER.EXPAND' | translate: {id: row.idEscaner}"
+                ></i>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+          <!-- Row shown when there is no matching data -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data-cell" colspan="3">
+              @if (input.value) {
+                <span>{{ 'NEWS.NO_RESULTS' | translate: {value: input.value} }}</span>
+              } @else {
+                <span>{{ 'SCANNER.NO_ARCHIVED' | translate }}</span>
+              }
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator
+          [pageSizeOptions]="[5, 10, 25, 100]"
+          [aria-label]="'SCANNER.SELECT_ARCHIVED_PAGE' | translate"
+        ></mat-paginator>
+      </div>
+    </div>
+  }
+</div>

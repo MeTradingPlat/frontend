@@ -1,0 +1,51 @@
+<mat-card class="scanner-card" appearance="outlined">
+  <mat-card-header class="scanner-card-header">
+    <mat-card-title class="scanner-card-title">{{ 'SCANNER.FILTERS' | translate }}</mat-card-title>
+    <div class="header-icons">
+      <i class="bi bi-plus-circle-fill" (click)="onAddFilter()" [matTooltip]="'SCANNER.ADD_FILTER' | translate"></i>
+    </div>
+  </mat-card-header>
+  <mat-card-content class="scanner-card-content">
+    <div class="filters-grid">
+      @for (filtro of filtros(); track $index) {
+        <mat-card class="filter-card" appearance="outlined">
+          <mat-card-header class="filter-card-header">
+            <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
+            <i class="bi bi-x-circle-fill remove-filter-icon"
+              (click)="onRemoveFilter($index)"
+              [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
+          </mat-card-header>
+          <mat-card-content class="filter-card-content">
+            @for (parametro of filtro.parametros; track parametro.enumParametro) {
+              @switch (parametro.objValorSeleccionado.enumTipoValor) {
+                @case ('INTEGER') {
+                  <app-integer-parameter
+                    [(parametro)]="filtro.parametros[$index]"
+                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                }
+                @case ('FLOAT') {
+                  <app-float-parameter
+                    [(parametro)]="filtro.parametros[$index]"
+                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                }
+                @case ('STRING') {
+                  <app-options-parameter
+                    [(parametro)]="filtro.parametros[$index]"
+                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                }
+                @case ('CONDICIONAL') {
+                  <app-conditional-parameter
+                    [(parametro)]="filtro.parametros[$index]"
+                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                }
+              }
+            }
+          </mat-card-content>
+          <mat-card-footer class="filter-card-footer">
+            <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
+          </mat-card-footer>
+        </mat-card>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

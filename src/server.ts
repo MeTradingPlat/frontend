@@ -23,24 +23,17 @@ const angularApp = new AngularNodeAppEngine();
  * });
  * ```
  */
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
 
 /**
- * Serve static files from /browser
+ * Serve static files from /browser directory
  */
-app.use(
-  express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: false,
-    redirect: false,
-  }),
-);
+app.use(express.static(browserDistFolder, {
+  maxAge: '1y',
+  index: false,
+}));
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Handle all other requests by rendering the Angular application
  */
 app.use((req, res, next) => {
   angularApp
@@ -53,7 +46,7 @@ app.use((req, res, next) => {
 
 /**
  * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ * The server listens on the port defined by the `PORT` environment variable, or defaults to 4200.
  */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4200;

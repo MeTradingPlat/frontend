@@ -1,0 +1,26 @@
+.conditional-container {
+  display: flex;
+  height: auto;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+.conditional-label {
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.conditional-field {
+  width: 100%;
+}
+
+.values-container {
+  display: flex;
+  gap: 4px;
+}
+
+.value-field {
+  flex: 1;
+}
