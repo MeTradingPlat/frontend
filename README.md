@@ -5,7 +5,6 @@ Una plataforma moderna y profesional para el análisis de mercados financieros c
 ![Angular](https://img.shields.io/badge/Angular-19-red?style=flat-square&logo=angular)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square&logo=typescript)
 ![Material](https://img.shields.io/badge/Material-Design-purple?style=flat-square&logo=material-design)
-![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 
 ## 🚀 Características Principales
 
