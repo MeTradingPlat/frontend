@@ -53,11 +53,12 @@ export class ScannerCardComponent {
     this.dialog.open(DialogScannerExpand, {
       width: '90vw',
       maxWidth: '1400px',
-      height: window.innerWidth <= 768 ? 'calc(100vh - 90px)' : '90vh',
+      height: window.innerWidth <= 768 ? '80vh' : '90vh',
       data: scanner,
       enterAnimationDuration: '300ms',
       exitAnimationDuration: '200ms',
-      panelClass: 'scanner-dialog-panel'
+      panelClass: 'scanner-dialog-panel',
+      autoFocus: false
     });
   }
 }
