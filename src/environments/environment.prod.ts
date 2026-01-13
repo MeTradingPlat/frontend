@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://metradingplat.com:8080/api'
+  apiUrl: 'https://metradingplat.com:8080/api'
 };
