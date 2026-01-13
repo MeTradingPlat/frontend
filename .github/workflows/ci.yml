@@ -2,7 +2,7 @@ name: CI Metradingplat Frontend
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ['master']
 
 jobs:
   build:
@@ -11,14 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Login Dockerhub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
-      - name: Build the Docker image
-        run: docker build --no-cache -t virtud142/metradingplat_frontend:latest .
-
-      - name: Push to Dockerhub
-        run: docker push virtud142/metradingplat_frontend:latest
+      - name: Build and push Docker image
+        run: |
+          docker build --no-cache -t virtud142/metradingplat_frontend:latest .
+          docker push virtud142/metradingplat_frontend:latest
