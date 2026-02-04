@@ -125,7 +125,13 @@
     "SELECT_ARCHIVED_PAGE": "Select archived scanners page",
     "STARTED_SUCCESS": "Scanner \"{{name}}\" has been started successfully",
     "STOPPED_SUCCESS": "Scanner \"{{name}}\" has been stopped successfully",
-    "STATE_CHANGE_ERROR": "Error changing scanner state"
+    "STATE_CHANGE_ERROR": "Error changing scanner state",
+    "STATUS": "Status",
+    "DETECTION_DATE": "Detection Date",
+    "UPDATE_DATE": "Last Update",
+    "LEVEL": "Level",
+    "MESSAGE": "Message",
+    "TYPE": "Type"
   },
   "COMMON": {
     "RETRY": "Retry",

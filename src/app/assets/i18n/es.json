@@ -125,7 +125,13 @@
     "SELECT_ARCHIVED_PAGE": "Seleccione página de escáneres archivados",
     "STARTED_SUCCESS": "El escáner \"{{name}}\" se ha iniciado correctamente",
     "STOPPED_SUCCESS": "El escáner \"{{name}}\" se ha detenido correctamente",
-    "STATE_CHANGE_ERROR": "Error al cambiar el estado del escáner"
+    "STATE_CHANGE_ERROR": "Error al cambiar el estado del escáner",
+    "STATUS": "Estado",
+    "DETECTION_DATE": "Fecha Detección",
+    "UPDATE_DATE": "Última Actualización",
+    "LEVEL": "Nivel",
+    "MESSAGE": "Mensaje",
+    "TYPE": "Tipo"
   },
   "COMMON": {
     "RETRY": "Reintentar",

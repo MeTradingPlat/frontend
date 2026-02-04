@@ -9,22 +9,34 @@
 } @else {
   <table mat-table [dataSource]="dataSource()">
 
-    <!-- Fecha Column -->
-    <ng-container matColumnDef="fecha">
-      <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>
-      <td mat-cell *matCellDef="let row">{{ row.fecha }}</td>
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="symbol">
+      <th mat-header-cell *matHeaderCellDef>Symbol</th>
+      <td mat-cell *matCellDef="let row" class="symbol-cell">
+        <strong>{{ row.symbol }}</strong>
+      </td>
     </ng-container>
 
-    <!-- Nombre Column -->
-    <ng-container matColumnDef="nombre">
-      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.NAME' | translate }}</th>
-      <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+    <!-- Estado Column -->
+    <ng-container matColumnDef="estado">
+      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.STATUS' | translate }}</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-chip [color]="getEstadoColor(row.estado)" selected>
+          {{ row.estado }}
+        </mat-chip>
+      </td>
     </ng-container>
 
-    <!-- Stock Column -->
-    <ng-container matColumnDef="stock">
-      <th mat-header-cell *matHeaderCellDef>Stock</th>
-      <td mat-cell *matCellDef="let row">{{ row.stock }}</td>
+    <!-- Fecha Detección Column -->
+    <ng-container matColumnDef="fechaDeteccion">
+      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.DETECTION_DATE' | translate }}</th>
+      <td mat-cell *matCellDef="let row">{{ formatDate(row.fechaDeteccion) }}</td>
+    </ng-container>
+
+    <!-- Fecha Actualización Column -->
+    <ng-container matColumnDef="fechaActualizacion">
+      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.UPDATE_DATE' | translate }}</th>
+      <td mat-cell *matCellDef="let row">{{ formatDate(row.fechaActualizacion) }}</td>
     </ng-container>
 
     <!-- Details Column -->

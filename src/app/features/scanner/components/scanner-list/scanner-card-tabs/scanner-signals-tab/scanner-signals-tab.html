@@ -9,34 +9,35 @@
 } @else {
   <table mat-table [dataSource]="dataSource()">
 
-    <!-- Fecha Column -->
-    <ng-container matColumnDef="fecha">
+    <!-- Timestamp Column -->
+    <ng-container matColumnDef="timestamp">
       <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>
-      <td mat-cell *matCellDef="let row">{{ row.fecha }}</td>
+      <td mat-cell *matCellDef="let row" class="timestamp-cell">{{ formatDate(row.timestamp) }}</td>
     </ng-container>
 
-    <!-- Nombre Column -->
-    <ng-container matColumnDef="nombre">
-      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.NAME' | translate }}</th>
-      <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="symbol">
+      <th mat-header-cell *matHeaderCellDef>Symbol</th>
+      <td mat-cell *matCellDef="let row" class="symbol-cell">
+        <strong>{{ row.symbol }}</strong>
+      </td>
     </ng-container>
 
-    <!-- Acción Column -->
-    <ng-container matColumnDef="accion">
-      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.ACTION' | translate }}</th>
-      <td mat-cell *matCellDef="let row">{{ row.accion }}</td>
+    <!-- Tipo Column -->
+    <ng-container matColumnDef="tipo">
+      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.TYPE' | translate }}</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-chip [color]="getTipoColor(row.tipo)" selected>
+          <i [class]="'bi ' + getTipoIcon(row.tipo)" style="margin-right: 4px;"></i>
+          {{ row.tipo }}
+        </mat-chip>
+      </td>
     </ng-container>
 
-    <!-- TP Column -->
-    <ng-container matColumnDef="tp">
-      <th mat-header-cell *matHeaderCellDef>TP</th>
-      <td mat-cell *matCellDef="let row">{{ row.tp }}</td>
-    </ng-container>
-
-    <!-- SL Column -->
-    <ng-container matColumnDef="sl">
-      <th mat-header-cell *matHeaderCellDef>SL</th>
-      <td mat-cell *matCellDef="let row">{{ row.sl }}</td>
+    <!-- Mensaje Column -->
+    <ng-container matColumnDef="mensaje">
+      <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.MESSAGE' | translate }}</th>
+      <td mat-cell *matCellDef="let row" class="mensaje-cell">{{ row.mensaje }}</td>
     </ng-container>
 
     <!-- Details Column -->
@@ -52,6 +53,8 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+        [class.entrada-row]="row.tipo === 'ENTRADA' || row.tipo === 'NUEVA'"
+        [class.salida-row]="row.tipo === 'SALIDA'"></tr>
   </table>
 }
