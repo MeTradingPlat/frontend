@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http'; // Eliminar HttpErrorResponse
 import { Observable } from 'rxjs'; // Eliminar throwError
 import { environment } from '../../../../environments/environment';
 import { EscanerDTOPeticion, EscanerDTORespuesta } from '../models/escaner.interface';
+import { EstadoEscanerDTORespuesta } from '../models/estado-escaner.interface';
 import { MercadoDTORespuesta } from '../models/mercado.interface';
 import { FiltroDtoRespuesta, FiltroDtoPeticion } from '../models/filtro.interface';
 import { CategoriaDTORespuesta } from '../models/categoria.interface';
@@ -79,29 +80,29 @@ export class ScannerApiService {
   /**
    * Inicia un escaner
    */
-  iniciarEscaner(id: number): Observable<EscanerDTORespuesta> {
-    return this.http.post<EscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/iniciar`, {});
+  iniciarEscaner(id: number): Observable<EstadoEscanerDTORespuesta> {
+    return this.http.post<EstadoEscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/iniciar`, {});
   }
 
   /**
    * Detiene un escaner
    */
-  detenerEscaner(id: number): Observable<EscanerDTORespuesta> {
-    return this.http.post<EscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/detener`, {});
+  detenerEscaner(id: number): Observable<EstadoEscanerDTORespuesta> {
+    return this.http.post<EstadoEscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/detener`, {});
   }
 
   /**
    * Archiva un escaner
    */
-  archivarEscaner(id: number): Observable<EscanerDTORespuesta> {
-    return this.http.post<EscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/archivar`, {});
+  archivarEscaner(id: number): Observable<EstadoEscanerDTORespuesta> {
+    return this.http.post<EstadoEscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/archivar`, {});
   }
 
   /**
    * Desarchiva un escaner
    */
-  desarchivarEscaner(id: number): Observable<EscanerDTORespuesta> {
-    return this.http.post<EscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/desarchivar`, {});
+  desarchivarEscaner(id: number): Observable<EstadoEscanerDTORespuesta> {
+    return this.http.post<EstadoEscanerDTORespuesta>(`${this.apiUrl}/estado/${id}/desarchivar`, {});
   }
 
   // ===== MÉTODOS DE FILTROS =====

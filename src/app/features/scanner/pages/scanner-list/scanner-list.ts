@@ -173,13 +173,25 @@ export class ScannerList implements OnInit, OnDestroy {
       : this.scannerApi.iniciarEscaner(id);
 
     action$.subscribe({
-      next: () => {
+      next: (nuevoEstado) => {
         // Usar interpolación de strings para evitar problemas con translate.instant
         const message = isRunning
           ? `${this.translate.instant('SCANNER.STOPPED_SUCCESS').replace('{{name}}', scanner.nombre).replace('"{{name}}"', `"${scanner.nombre}"`)}`
           : `${this.translate.instant('SCANNER.STARTED_SUCCESS').replace('{{name}}', scanner.nombre).replace('"{{name}}"', `"${scanner.nombre}"`)}`;
         this.notificationService.showSuccess(message);
-        // El estado se actualizara automaticamente via SSE
+
+        // Actualizar el estado local inmediatamente con la respuesta de la API
+        const currentScanners = this.scanners();
+        const updatedScanners = currentScanners.map(s => {
+          if (s.idEscaner === id) {
+            return {
+              ...s,
+              objEstado: nuevoEstado
+            };
+          }
+          return s;
+        });
+        this.facade.escaners.set(updatedScanners);
       },
       error: (err) => {
         const errorMessage = err?.error?.mensaje || err?.message || this.translate.instant('SCANNER.STATE_CHANGE_ERROR');
