@@ -4,6 +4,7 @@ import { map, tap, catchError, finalize } from 'rxjs/operators';
 import { ScannerApiService } from './scanner-api.service';
 import { ScannerStorageService } from './scanner-storage.service';
 import { Escaner, EscanerDTOPeticion, EscanerDTORespuesta } from '../models/escaner.interface';
+import { EstadoEscaner, EstadoEscanerDTORespuesta } from '../models/estado-escaner.interface';
 import { Mercado, MercadoDTORespuesta } from '../models/mercado.interface';
 import { ApiError } from '../../../core/models/api-error';
 import { Filtro, FiltroDtoRespuesta, FiltroDtoPeticion } from '../models/filtro.interface';
@@ -198,15 +199,15 @@ export class ScannerFacadeService {
   /**
    * Inicia un escaner
    */
-  iniciarEscaner(id: number): Observable<Escaner> {
+  iniciarEscaner(id: number): Observable<EstadoEscaner> {
     this.loading.set(true);
     this.error.set(null);
 
     return this.apiService.iniciarEscaner(id).pipe(
-      map(responseDto => this.mapDTOToEscaner(responseDto)),
-      tap(updatedEscaner => {
+      map(responseDto => this.mapDTOToEstadoEscaner(responseDto)),
+      tap(nuevoEstado => {
         this.escaners.update(current =>
-          current.map(e => e.idEscaner === id ? updatedEscaner : e)
+          current.map(e => e.idEscaner === id ? { ...e, objEstado: nuevoEstado } : e)
         );
         this.storageService.saveEscaners(this.escaners());
       }),
@@ -221,15 +222,15 @@ export class ScannerFacadeService {
   /**
    * Detiene un escaner
    */
-  detenerEscaner(id: number): Observable<Escaner> {
+  detenerEscaner(id: number): Observable<EstadoEscaner> {
     this.loading.set(true);
     this.error.set(null);
 
     return this.apiService.detenerEscaner(id).pipe(
-      map(responseDto => this.mapDTOToEscaner(responseDto)),
-      tap(updatedEscaner => {
+      map(responseDto => this.mapDTOToEstadoEscaner(responseDto)),
+      tap(nuevoEstado => {
         this.escaners.update(current =>
-          current.map(e => e.idEscaner === id ? updatedEscaner : e)
+          current.map(e => e.idEscaner === id ? { ...e, objEstado: nuevoEstado } : e)
         );
         this.storageService.saveEscaners(this.escaners());
       }),
@@ -244,12 +245,19 @@ export class ScannerFacadeService {
   /**
    * Archiva un escaner
    */
-  archivarEscaner(id: number): Observable<Escaner> {
+  archivarEscaner(id: number): Observable<EstadoEscaner> {
     this.loading.set(true);
     this.error.set(null);
 
     return this.apiService.archivarEscaner(id).pipe(
-      map(responseDto => this.mapDTOToEscaner(responseDto)),
+      map(responseDto => this.mapDTOToEstadoEscaner(responseDto)),
+      tap(nuevoEstado => {
+        // Remover de la lista de escaners activos (se va a archivados)
+        this.escaners.update(current =>
+          current.filter(e => e.idEscaner !== id)
+        );
+        this.storageService.saveEscaners(this.escaners());
+      }),
       catchError(error => {
         this.error.set(error);
         return throwError(() => error);
@@ -261,12 +269,12 @@ export class ScannerFacadeService {
   /**
    * Desarchiva un escaner
    */
-  desarchivarEscaner(id: number): Observable<Escaner> {
+  desarchivarEscaner(id: number): Observable<EstadoEscaner> {
     this.loading.set(true);
     this.error.set(null);
 
     return this.apiService.desarchivarEscaner(id).pipe(
-      map(responseDto => this.mapDTOToEscaner(responseDto)),
+      map(responseDto => this.mapDTOToEstadoEscaner(responseDto)),
       catchError(error => {
         this.error.set(error);
         return throwError(() => error);
@@ -671,5 +679,15 @@ export class ScannerFacadeService {
     }
 
     return baseDTO;
+  }
+
+  /**
+   * Convierte un DTO de estado de escaner a modelo de dominio
+   */
+  private mapDTOToEstadoEscaner(dto: EstadoEscanerDTORespuesta): EstadoEscaner {
+    return {
+      enumEstadoEscaner: dto.enumEstadoEscaner,
+      fechaRegistro: dto.fechaRegistro
+    };
   }
 }
