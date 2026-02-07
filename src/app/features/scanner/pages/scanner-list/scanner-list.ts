@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { PageLoading } from '../../../../shared/components/ui/page-loading/page-loading';
 import { HeaderNavbar } from "../../../../shared/components/layout/header-navbar/header-navbar";
 import { PageError } from '../../../../shared/components/ui/page-error/page-error';
@@ -18,6 +19,8 @@ import { DialogScannerExpand } from '../../components/scanner-list/scanner-card/
 import { I18nService } from '../../../../core/services/i18n/i18n.service';
 import { NotificationService } from '../../../../core/services/notification/notification.service';
 import { ScannerApiService } from '../../services/scanner-api.service';
+import { NotificacionSseService } from '../../services/notificacion-sse.service';
+import { MetadatosEstadoEscaner } from '../../models/notificacion.interface';
 
 @Component({
   selector: 'app-scanner-list',
@@ -39,13 +42,16 @@ import { ScannerApiService } from '../../services/scanner-api.service';
   styleUrl: './scanner-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerList implements OnInit {
+export class ScannerList implements OnInit, OnDestroy {
   private readonly facade = inject(ScannerFacadeService);
   private readonly dialog = inject(MatDialog);
   private readonly translate = inject(TranslateService);
   private readonly i18nService = inject(I18nService);
   private readonly notificationService = inject(NotificationService);
   private readonly scannerApi = inject(ScannerApiService);
+  private readonly notificacionSseService = inject(NotificacionSseService);
+
+  private sseSubscription?: Subscription;
 
   readonly scanners = this.facade.escaners;
   readonly loading = this.facade.loading;
@@ -79,6 +85,71 @@ export class ScannerList implements OnInit {
   ngOnInit(): void {
     // Siempre forzar recarga desde la API para tener datos actualizados
     this.facade.loadEscaners(true).subscribe();
+    // Suscribirse a cambios de estado en tiempo real
+    this.subscribeToStateChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.sseSubscription?.unsubscribe();
+    this.notificacionSseService.desconectar();
+  }
+
+  private subscribeToStateChanges(): void {
+    this.sseSubscription = this.notificacionSseService.conectar().subscribe({
+      next: (notificacion) => {
+        if (notificacion.tipo === 'SCANNER_STATE' && notificacion.idEscaner) {
+          this.handleStateChange(notificacion);
+        }
+      },
+      error: (error) => {
+        console.error('Error en SSE de estados:', error);
+      }
+    });
+  }
+
+  private handleStateChange(notificacion: any): void {
+    if (!notificacion.metadatos) return;
+
+    try {
+      const metadatos: MetadatosEstadoEscaner = JSON.parse(notificacion.metadatos);
+      const idEscaner = notificacion.idEscaner!;
+
+      // Actualizar el estado local del escaner
+      const currentScanners = this.scanners();
+      const updatedScanners = currentScanners.map(scanner => {
+        if (scanner.idEscaner === idEscaner) {
+          return {
+            ...scanner,
+            objEstado: {
+              ...scanner.objEstado,
+              enumEstadoEscaner: metadatos.estadoNuevo,
+              fechaRegistro: notificacion.timestamp
+            }
+          };
+        }
+        return scanner;
+      });
+
+      // Forzar actualizacion del signal
+      this.facade.escaners.set(updatedScanners);
+
+      // Mostrar notificacion al usuario
+      const scannerName = this.getScannerName(idEscaner);
+      const mensaje = `Escaner "${scannerName}" cambio a ${metadatos.estadoNuevo}`;
+      if (metadatos.estadoNuevo === 'DETENIDO') {
+        this.notificationService.showInfo(mensaje);
+      } else if (metadatos.estadoNuevo === 'INICIADO') {
+        this.notificationService.showSuccess(mensaje);
+      }
+
+    } catch (e) {
+      console.error('Error parseando metadatos de estado:', e);
+    }
+  }
+
+  private getScannerName(id: number): string {
+    const scanner = this.scanners().find(s => s.idEscaner === id);
+    return scanner?.nombre || `ID:${id}`;
   }
 
 
@@ -108,8 +179,7 @@ export class ScannerList implements OnInit {
           ? `${this.translate.instant('SCANNER.STOPPED_SUCCESS').replace('{{name}}', scanner.nombre).replace('"{{name}}"', `"${scanner.nombre}"`)}`
           : `${this.translate.instant('SCANNER.STARTED_SUCCESS').replace('{{name}}', scanner.nombre).replace('"{{name}}"', `"${scanner.nombre}"`)}`;
         this.notificationService.showSuccess(message);
-        // Reload scanners to get updated state
-        this.facade.loadEscaners(true).subscribe();
+        // El estado se actualizara automaticamente via SSE
       },
       error: (err) => {
         const errorMessage = err?.error?.mensaje || err?.message || this.translate.instant('SCANNER.STATE_CHANGE_ERROR');
