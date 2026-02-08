@@ -1,5 +1,6 @@
-import { Injectable, NgZone, inject } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Injectable, NgZone, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Observable, Subject, EMPTY } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { NotificacionDTORespuesta } from '../models/notificacion.interface';
 
@@ -12,12 +13,14 @@ import { NotificacionDTORespuesta } from '../models/notificacion.interface';
  * - Last-Event-Id: si hay reconexión, el servidor reenvía eventos perdidos
  * - Auto-reconexión nativa del EventSource (envía Last-Event-Id automáticamente)
  * - Fallback manual si la conexión se cierra permanentemente
+ * - Compatible con SSR (solo se conecta en el navegador)
  */
 @Injectable({
   providedIn: 'root'
 })
 export class NotificacionSseService {
   private readonly ngZone = inject(NgZone);
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly apiUrl = `${environment.apiUrl}/notificaciones`;
 
   private eventSource: EventSource | null = null;
@@ -28,6 +31,10 @@ export class NotificacionSseService {
    * Conecta al stream SSE de todas las notificaciones
    */
   conectar(): Observable<NotificacionDTORespuesta> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return EMPTY;
+    }
+
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
@@ -51,6 +58,10 @@ export class NotificacionSseService {
    * Conecta al stream SSE filtrado por escaner
    */
   conectarPorEscaner(idEscaner: number): Observable<NotificacionDTORespuesta> {
+    if (!isPlatformBrowser(this.platformId)) {
+      return EMPTY;
+    }
+
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
