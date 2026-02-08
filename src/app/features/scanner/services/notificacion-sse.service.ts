@@ -31,10 +31,13 @@ export class NotificacionSseService {
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
-      const token = environment.sseAuthToken;
-      let url = `${this.apiUrl}/stream?token=${encodeURIComponent(token)}`;
+      let url = `${this.apiUrl}/stream`;
+      const params: string[] = [];
       if (this.lastEventId) {
-        url += `&lastEventId=${encodeURIComponent(this.lastEventId)}`;
+        params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
+      }
+      if (params.length > 0) {
+        url += `?${params.join('&')}`;
       }
 
       this.eventSource = new EventSource(url);
@@ -51,10 +54,13 @@ export class NotificacionSseService {
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
-      const token = environment.sseAuthToken;
-      let url = `${this.apiUrl}/stream/escaner/${idEscaner}?token=${encodeURIComponent(token)}`;
+      let url = `${this.apiUrl}/stream/escaner/${idEscaner}`;
+      const params: string[] = [];
       if (this.lastEventId) {
-        url += `&lastEventId=${encodeURIComponent(this.lastEventId)}`;
+        params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
+      }
+      if (params.length > 0) {
+        url += `?${params.join('&')}`;
       }
 
       this.eventSource = new EventSource(url);
