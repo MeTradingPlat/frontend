@@ -38,5 +38,51 @@
     .mat-mdc-card-title {
         color: var(--mat-sys-on-primary);
     }
-    
+
+}
+
+.timezone-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--mat-sys-surface-container);
+    border-radius: 4px;
+    margin-bottom: 12px;
+
+    .timezone-label {
+        font-size: 0.875rem;
+        color: var(--mat-sys-on-surface-variant);
+        font-weight: 500;
+    }
+}
+
+.time-conversion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background-color: var(--mat-sys-primary-container);
+    border-radius: 4px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+
+    .local-time {
+        color: var(--mat-sys-on-primary-container);
+        font-weight: 500;
+    }
+
+    .arrow {
+        color: var(--mat-sys-on-primary-container);
+        font-size: 1rem;
+    }
+
+    .utc-time {
+        color: var(--mat-sys-primary);
+        font-weight: 600;
+        background-color: var(--mat-sys-surface);
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, model, signal } from '@angular/core';
 import { Escaner } from '../../../models/escaner.interface';
 import { FormControl, FormGroupDirective, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { ErrorStateMatcher, provideNativeDateAdapter } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe } from '@ngx-translate/core';
+import { TimezoneService } from '@core/services/timezone.service';
 
 /** Custom error state matcher that shows errors when errorMessage is present */
 class CustomErrorStateMatcher implements ErrorStateMatcher {
@@ -27,23 +28,39 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CardTime {
+  private timezoneService = inject(TimezoneService);
+
   scanner = model.required<Escaner>();
   errors = input<Record<string, string>>({});
   startTime = new FormControl<Date | null>(null);
   endTime = new FormControl<Date | null>(null);
   selectEjecution = new FormControl<string>('UNA_VEZ', { nonNullable: true });
 
+  // Señales para mostrar conversión UTC
+  horaInicioLocal = signal<string>('');
+  horaInicioUTC = signal<string>('');
+  horaFinLocal = signal<string>('');
+  horaFinUTC = signal<string>('');
+  timezoneAbbreviation = signal<string>('');
+
   // Error state matchers
   startTimeErrorMatcher = new CustomErrorStateMatcher(() => !!this.errors()['horaInicio']);
   endTimeErrorMatcher = new CustomErrorStateMatcher(() => !!this.errors()['horaFin']);
 
   constructor() {
+    // Inicializar timezone abbreviation
+    this.timezoneAbbreviation.set(this.timezoneService.getTimezoneAbbreviation());
+
     // Inicializar FormControls con valores del scanner o defaults
     effect(() => {
       const scannerValue = this.scanner();
 
       if (scannerValue.horaInicio) {
-        this.startTime.setValue(this.parseTime(scannerValue.horaInicio), { emitEvent: false });
+        // Backend envía en UTC, convertir a local para mostrar en el picker
+        const localTime = this.timezoneService.convertUTCToLocal(scannerValue.horaInicio);
+        this.startTime.setValue(this.parseTime(localTime), { emitEvent: false });
+        this.horaInicioUTC.set(scannerValue.horaInicio);
+        this.horaInicioLocal.set(localTime);
       } else {
         const defaultStart = new Date();
         defaultStart.setHours(9, 30, 0);
@@ -51,7 +68,11 @@ export class CardTime {
       }
 
       if (scannerValue.horaFin) {
-        this.endTime.setValue(this.parseTime(scannerValue.horaFin), { emitEvent: false });
+        // Backend envía en UTC, convertir a local para mostrar en el picker
+        const localTime = this.timezoneService.convertUTCToLocal(scannerValue.horaFin);
+        this.endTime.setValue(this.parseTime(localTime), { emitEvent: false });
+        this.horaFinUTC.set(scannerValue.horaFin);
+        this.horaFinLocal.set(localTime);
       } else {
         const defaultEnd = new Date();
         defaultEnd.setHours(16, 0, 0);
@@ -65,16 +86,32 @@ export class CardTime {
 
     // Sincronizar cambios hacia el scanner
     this.startTime.valueChanges.subscribe(value => {
+      const localTime = this.formatTime(value);
+      const utcTime = this.timezoneService.convertLocalToUTC(localTime);
+
+      // Actualizar signals para mostrar en UI
+      this.horaInicioLocal.set(localTime);
+      this.horaInicioUTC.set(utcTime);
+
+      // Guardar en UTC
       this.scanner.update(s => ({
         ...s,
-        horaInicio: this.formatTime(value)
+        horaInicio: utcTime
       }));
     });
 
     this.endTime.valueChanges.subscribe(value => {
+      const localTime = this.formatTime(value);
+      const utcTime = this.timezoneService.convertLocalToUTC(localTime);
+
+      // Actualizar signals para mostrar en UI
+      this.horaFinLocal.set(localTime);
+      this.horaFinUTC.set(utcTime);
+
+      // Guardar en UTC
       this.scanner.update(s => ({
         ...s,
-        horaFin: this.formatTime(value)
+        horaFin: utcTime
       }));
     });
 

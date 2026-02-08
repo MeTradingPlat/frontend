@@ -5,6 +5,10 @@
     <mat-card-title>{{ 'SCANNER.EXECUTION' | translate }}</mat-card-title>
   </mat-card-header>
   <mat-card-content>
+    <div class="timezone-info">
+      <span class="timezone-label">⏰ Zona horaria: {{ timezoneAbbreviation() }} → UTC</span>
+    </div>
+
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.START_TIME' | translate }}</mat-label>
       <input matInput [formControl]="startTime" [matTimepicker]="startPicker" [errorStateMatcher]="startTimeErrorMatcher">
@@ -15,6 +19,14 @@
       }
     </mat-form-field>
 
+    @if (horaInicioLocal() && horaInicioUTC()) {
+      <div class="time-conversion">
+        <span class="local-time">{{ horaInicioLocal() }} {{ timezoneAbbreviation() }}</span>
+        <span class="arrow">→</span>
+        <span class="utc-time">{{ horaInicioUTC() }} UTC</span>
+      </div>
+    }
+
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.END_TIME' | translate }}</mat-label>
       <input matInput [formControl]="endTime" [matTimepicker]="endPicker" [errorStateMatcher]="endTimeErrorMatcher">
@@ -24,6 +36,14 @@
         <mat-error>{{errors()['horaFin']}}</mat-error>
       }
     </mat-form-field>
+
+    @if (horaFinLocal() && horaFinUTC()) {
+      <div class="time-conversion">
+        <span class="local-time">{{ horaFinLocal() }} {{ timezoneAbbreviation() }}</span>
+        <span class="arrow">→</span>
+        <span class="utc-time">{{ horaFinUTC() }} UTC</span>
+      </div>
+    }
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.EXECUTION_TYPE' | translate }}</mat-label>
