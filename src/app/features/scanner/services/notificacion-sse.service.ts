@@ -24,7 +24,10 @@ export class NotificacionSseService {
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
-      this.eventSource = new EventSource(`${this.apiUrl}/stream`);
+      // Agregar token de autenticación como query parameter
+      // NOTA: EventSource no soporta headers personalizados, solo query params
+      const token = environment.sseAuthToken;
+      this.eventSource = new EventSource(`${this.apiUrl}/stream?token=${encodeURIComponent(token)}`);
 
       this.eventSource.onmessage = (event) => {
         this.ngZone.run(() => {
@@ -55,7 +58,9 @@ export class NotificacionSseService {
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
-      this.eventSource = new EventSource(`${this.apiUrl}/stream/escaner/${idEscaner}`);
+      // Agregar token de autenticación como query parameter
+      const token = environment.sseAuthToken;
+      this.eventSource = new EventSource(`${this.apiUrl}/stream/escaner/${idEscaner}?token=${encodeURIComponent(token)}`);
 
       this.eventSource.onmessage = (event) => {
         this.ngZone.run(() => {
