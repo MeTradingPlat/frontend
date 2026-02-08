@@ -8,7 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { ErrorStateMatcher, provideNativeDateAdapter } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslatePipe } from '@ngx-translate/core';
-import { TimezoneService } from '../../../../../../core/services/timezone.service';
+import { TimezoneService } from '../../../../../core/services/timezone.service';
 
 /** Custom error state matcher that shows errors when errorMessage is present */
 class CustomErrorStateMatcher implements ErrorStateMatcher {
