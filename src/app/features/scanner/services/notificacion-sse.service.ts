@@ -11,8 +11,7 @@ import { NotificacionDTORespuesta } from '../models/notificacion.interface';
  * Características:
  * - Heartbeat del servidor cada 30s mantiene la conexión viva con Cloudflare
  * - Last-Event-Id: si hay reconexión, el servidor reenvía eventos perdidos
- * - Auto-reconexión nativa del EventSource (envía Last-Event-Id automáticamente)
- * - Fallback manual si la conexión se cierra permanentemente
+ * - Reconexión con backoff exponencial (3s -> 6s -> 12s -> 30s max)
  * - Compatible con SSR (solo se conecta en el navegador)
  */
 @Injectable({
@@ -26,6 +25,11 @@ export class NotificacionSseService {
   private eventSource: EventSource | null = null;
   private notificacionSubject = new Subject<NotificacionDTORespuesta>();
   private lastEventId: string | null = null;
+  private reconnectAttempts = 0;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private static readonly BASE_DELAY = 3000;
+  private static readonly MAX_DELAY = 30000;
 
   /**
    * Conecta al stream SSE de todas las notificaciones
@@ -38,15 +42,7 @@ export class NotificacionSseService {
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
-      let url = `${this.apiUrl}/stream`;
-      const params: string[] = [];
-      if (this.lastEventId) {
-        params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
-      }
-      if (params.length > 0) {
-        url += `?${params.join('&')}`;
-      }
-
+      const url = this.buildUrl(`${this.apiUrl}/stream`);
       this.eventSource = new EventSource(url);
       this.configurarEventSource(() => this.conectar());
     });
@@ -65,15 +61,7 @@ export class NotificacionSseService {
     this.desconectar();
 
     this.ngZone.runOutsideAngular(() => {
-      let url = `${this.apiUrl}/stream/escaner/${idEscaner}`;
-      const params: string[] = [];
-      if (this.lastEventId) {
-        params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
-      }
-      if (params.length > 0) {
-        url += `?${params.join('&')}`;
-      }
-
+      const url = this.buildUrl(`${this.apiUrl}/stream/escaner/${idEscaner}`);
       this.eventSource = new EventSource(url);
       this.configurarEventSource(() => this.conectarPorEscaner(idEscaner));
     });
@@ -85,6 +73,10 @@ export class NotificacionSseService {
    * Desconecta el stream SSE
    */
   desconectar(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;
@@ -98,17 +90,39 @@ export class NotificacionSseService {
     return this.notificacionSubject.asObservable();
   }
 
+  private buildUrl(baseUrl: string): string {
+    const params: string[] = [];
+    if (this.lastEventId) {
+      params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
+    }
+    return params.length > 0 ? `${baseUrl}?${params.join('&')}` : baseUrl;
+  }
+
+  /**
+   * Calcula delay con backoff exponencial: 3s -> 6s -> 12s -> 24s -> 30s (max)
+   */
+  private getReconnectDelay(): number {
+    const delay = Math.min(
+      NotificacionSseService.BASE_DELAY * Math.pow(2, this.reconnectAttempts),
+      NotificacionSseService.MAX_DELAY
+    );
+    return delay;
+  }
+
   /**
    * Configura los handlers del EventSource.
+   * - onopen: resetea contador de reintentos al conectar exitosamente
    * - onmessage: procesa notificaciones y guarda el lastEventId
-   * - onerror: deja que EventSource auto-reconecte (envía Last-Event-Id header),
-   *   solo hace reconexión manual si la conexión se cerró permanentemente
+   * - onerror: cierra EventSource y reconecta con backoff exponencial
    */
   private configurarEventSource(reconectarFn: () => void): void {
     if (!this.eventSource) return;
 
+    this.eventSource.onopen = () => {
+      this.reconnectAttempts = 0;
+    };
+
     this.eventSource.onmessage = (event) => {
-      // Guardar el ID para reconexiones
       if (event.lastEventId) {
         this.lastEventId = event.lastEventId;
       }
@@ -124,15 +138,18 @@ export class NotificacionSseService {
     };
 
     this.eventSource.onerror = () => {
-      if (this.eventSource?.readyState === EventSource.CLOSED) {
-        // Conexión cerrada permanentemente - reconexión manual con lastEventId
-        console.warn('SSE conexión cerrada. Reconectando en 5s...');
-        this.ngZone.run(() => {
-          setTimeout(() => reconectarFn(), 5000);
-        });
-      }
-      // Si readyState es CONNECTING, EventSource auto-reconecta
-      // y envía Last-Event-Id header automáticamente
+      // Cerrar para evitar auto-reconnect nativo del browser (sin backoff)
+      this.eventSource?.close();
+      this.eventSource = null;
+
+      const delay = this.getReconnectDelay();
+      this.reconnectAttempts++;
+      console.warn(`SSE error. Reconectando en ${delay / 1000}s (intento ${this.reconnectAttempts})...`);
+
+      this.reconnectTimer = setTimeout(() => {
+        this.reconnectTimer = null;
+        reconectarFn();
+      }, delay);
     };
   }
 }
