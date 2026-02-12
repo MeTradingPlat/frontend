@@ -25,6 +25,13 @@ const angularApp = new AngularNodeAppEngine();
  */
 
 /**
+ * Health check endpoint for Docker healthcheck
+ */
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+/**
  * Serve static files from /browser directory
  */
 app.use(express.static(browserDistFolder, {
