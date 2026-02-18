@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogAddFilters } from '../../components/scanner-configuration/dialog-add-filters/dialog-add-filters';
 import { isValidationErrorResponse, isScannerFieldErrors, ValidationErrorResponse, ScannerFieldErrors } from '../../models/api-error.interface';
 import { I18nService } from '../../../../core/services/i18n/i18n.service';
+import { NotificationService } from '../../../../core/services/notification/notification.service';
 
 @Component({
   selector: 'app-scanner-configuration',
@@ -39,6 +40,7 @@ export class ScannerConfiguration implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly translate = inject(TranslateService);
   private readonly i18nService = inject(I18nService);
+  private readonly notificationService = inject(NotificationService);
 
   // Estado del componente
   readonly backPath = "/escaneres";
@@ -173,6 +175,9 @@ export class ScannerConfiguration implements OnInit {
     switch (action) {
       case 'save':
         this.saveAll(currentScanner, scannerId, currentFiltros, () => {
+          this.notificationService.showSuccess(
+            this.translate.instant('SCANNER.SAVE_SUCCESS')
+          );
           this.router.navigate(['/escaneres']);
         });
         break;
@@ -211,10 +216,15 @@ export class ScannerConfiguration implements OnInit {
         if (scannerId) {
           this.facade.deleteEscaner(scannerId).subscribe({
             next: () => {
+              this.notificationService.showSuccess(
+                this.translate.instant('SCANNER.DELETE_SUCCESS')
+              );
               this.router.navigate(['/escaneres']);
             },
             error: (err) => {
-              console.error('Error al eliminar el escáner:', err);
+              const errorMessage = err?.error?.mensaje || err?.mensaje || err?.message
+                || this.translate.instant('SCANNER.DELETE_ERROR');
+              this.notificationService.showError(errorMessage);
             }
           });
         }
@@ -259,6 +269,7 @@ export class ScannerConfiguration implements OnInit {
         error: (err) => {
           console.error('Error al actualizar el escáner:', err);
           this.handleScannerValidationErrors(err);
+          this.mostrarErrorSnackbar(err);
         }
       });
     } else {
@@ -288,6 +299,7 @@ export class ScannerConfiguration implements OnInit {
         error: (err) => {
           console.error('Error al crear el escáner:', err);
           this.handleScannerValidationErrors(err);
+          this.mostrarErrorSnackbar(err);
         }
       });
     }
@@ -459,5 +471,15 @@ export class ScannerConfiguration implements OnInit {
         general: err.error?.mensaje || err.message || 'Error desconocido'
       });
     }
+  }
+
+  /**
+   * Muestra un snackbar con el mensaje de error del backend.
+   * Útil para errores como "no se puede modificar un escáner en ejecución".
+   */
+  private mostrarErrorSnackbar(err: any): void {
+    const errorMessage = err?.error?.mensaje || err?.message
+      || this.translate.instant('SCANNER.SAVE_ERROR');
+    this.notificationService.showError(errorMessage);
   }
 }
