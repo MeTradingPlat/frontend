@@ -190,7 +190,11 @@ export class ScannerFacadeService {
         this.storageService.saveEscaners(this.escaners());
       }),
       catchError(error => {
-        this.error.set(error);
+        // Solo establecer error global para errores de servidor (500, 503, etc.)
+        // Los errores de validación (400, 406) deben manejarse en el componente
+        if (error.status && error.status >= 500) {
+          this.error.set(error);
+        }
         return throwError(() => error);
       }),
       finalize(() => this.loading.set(false))
