@@ -263,7 +263,9 @@ export class ScannerFacadeService {
         this.storageService.saveEscaners(this.escaners());
       }),
       catchError(error => {
-        this.error.set(error);
+        if (error.status && error.status >= 500) {
+          this.error.set(error);
+        }
         return throwError(() => error);
       }),
       finalize(() => this.loading.set(false))
@@ -280,7 +282,9 @@ export class ScannerFacadeService {
     return this.apiService.desarchivarEscaner(id).pipe(
       map(responseDto => this.mapDTOToEstadoEscaner(responseDto)),
       catchError(error => {
-        this.error.set(error);
+        if (error.status && error.status >= 500) {
+          this.error.set(error);
+        }
         return throwError(() => error);
       }),
       finalize(() => this.loading.set(false))

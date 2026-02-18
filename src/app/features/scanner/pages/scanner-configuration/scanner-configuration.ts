@@ -190,7 +190,7 @@ export class ScannerConfiguration implements OnInit {
                 this.router.navigate(['/escaneres']);
               },
               error: (err) => {
-                console.error('Error al archivar el escáner:', err);
+                this.mostrarErrorSnackbar(err);
               }
             });
           });
@@ -205,7 +205,7 @@ export class ScannerConfiguration implements OnInit {
                 this.router.navigate(['/escaneres']);
               },
               error: (err) => {
-                console.error('Error al desarchivar el escáner:', err);
+                this.mostrarErrorSnackbar(err);
               }
             });
           });
