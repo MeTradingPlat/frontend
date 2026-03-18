@@ -8,6 +8,7 @@ import { Escaner } from '../../../../models/escaner.interface';
 import { LogApiService } from '../../../../services/log-api.service';
 import { NotificacionSseService } from '../../../../services/notificacion-sse.service';
 import { RegistroLog } from '../../../../models/registro-log.interface';
+import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 
 @Component({
   selector: 'app-scanner-registry-tab',
@@ -15,7 +16,8 @@ import { RegistroLog } from '../../../../models/registro-log.interface';
     CommonModule,
     MatTableModule,
     MatChipsModule,
-    TranslatePipe
+    TranslatePipe,
+    LocalDatetimePipe
   ],
   templateUrl: './scanner-registry-tab.html',
   styleUrl: './scanner-registry-tab.scss',
@@ -129,16 +131,4 @@ export class ScannerRegistryTab implements OnInit, OnDestroy {
     }
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleString('es-CO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  }
 }

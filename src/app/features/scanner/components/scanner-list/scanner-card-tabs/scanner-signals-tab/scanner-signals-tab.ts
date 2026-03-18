@@ -9,6 +9,7 @@ import { Subscription } from 'rxjs';
 import { Escaner } from '../../../../models/escaner.interface';
 import { LogApiService } from '../../../../services/log-api.service';
 import { NotificacionSseService } from '../../../../services/notificacion-sse.service';
+import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 
 interface SignalRow {
   id: number;
@@ -27,7 +28,8 @@ interface SignalRow {
     MatIconModule,
     MatTooltipModule,
     MatChipsModule,
-    TranslatePipe
+    TranslatePipe,
+    LocalDatetimePipe
   ],
   templateUrl: './scanner-signals-tab.html',
   styleUrl: './scanner-signals-tab.scss',
@@ -157,16 +159,4 @@ export class ScannerSignalsTab implements OnInit, OnDestroy {
     }
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleString('es-CO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-  }
 }

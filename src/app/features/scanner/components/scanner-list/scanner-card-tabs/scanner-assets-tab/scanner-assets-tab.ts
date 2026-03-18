@@ -10,6 +10,7 @@ import { Escaner } from '../../../../models/escaner.interface';
 import { ActivoApiService } from '../../../../services/activo-api.service';
 import { NotificacionSseService } from '../../../../services/notificacion-sse.service';
 import { Activo } from '../../../../models/activo.interface';
+import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 
 @Component({
   selector: 'app-scanner-assets-tab',
@@ -19,7 +20,8 @@ import { Activo } from '../../../../models/activo.interface';
     MatIconModule,
     MatTooltipModule,
     MatChipsModule,
-    TranslatePipe
+    TranslatePipe,
+    LocalDatetimePipe
   ],
   templateUrl: './scanner-assets-tab.html',
   styleUrl: './scanner-assets-tab.scss',
@@ -104,15 +106,4 @@ export class ScannerAssetsTab implements OnInit, OnDestroy {
     }
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleString('es-CO', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
 }
