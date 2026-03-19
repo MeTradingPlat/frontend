@@ -33,8 +33,18 @@
         [matTooltip]="'SCANNER.EXPAND' | translate: {id: scanner().idEscaner}"></i>
     </div>
   </mat-card-header>
-  <mat-tab-group headerPosition="below" mat-stretch-tabs="false" mat-align-tabs="center">
-    <mat-tab [label]="'SCANNER.SIGNALS' | translate">
+  <mat-tab-group headerPosition="below" mat-stretch-tabs="false" mat-align-tabs="center"
+                 (selectedTabChange)="onTabChange($event.index)">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span
+          [matBadge]="conteoSenalesNoLeidas() > 0 ? conteoSenalesNoLeidas() : null"
+          matBadgeColor="warn"
+          matBadgeSize="small"
+          matBadgeOverlap="false">
+          {{ 'SCANNER.SIGNALS' | translate }}
+        </span>
+      </ng-template>
       <ng-template matTabContent>
         <div class="tab-content">
           <app-scanner-signals-tab [scanner]="scanner()"/>
