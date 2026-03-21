@@ -217,23 +217,25 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
           overflow: auto;
         }
 
-        .mat-mdc-tab-header-pagination {
-          display: none !important;
-        }
-
-        .mat-mdc-tab-label-container {
-          overflow-x: auto !important;
-          -webkit-overflow-scrolling: touch;
-          overscroll-behavior-x: contain;
-          scrollbar-width: none;
-
-          &::-webkit-scrollbar {
-            display: none;
+        @media (pointer: coarse) {
+          .mat-mdc-tab-header-pagination {
+            display: none !important;
           }
-        }
 
-        .mat-mdc-tab-list {
-          transform: none !important;
+          .mat-mdc-tab-label-container {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+              display: none;
+            }
+          }
+
+          .mat-mdc-tab-list {
+            transform: none !important;
+          }
         }
       }
     }
