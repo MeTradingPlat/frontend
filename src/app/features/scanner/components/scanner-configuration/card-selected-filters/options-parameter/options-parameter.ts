@@ -3,6 +3,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { Parametro } from '../../../../models/parametro.interface';
+import { Valor } from '../../../../models/valor.interface';
 import { ValorString } from '../../../../models/valor-string.interface';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
@@ -40,11 +41,14 @@ export class OptionsParameter {
     return this.parametro().objValorSeleccionado as ValorString;
   }
 
-  onValueChange(newEnumTipoValor: string): void {
+  asValorString(v: Valor): ValorString {
+    return v as ValorString;
+  }
+
+  onValueChange(newValor: string): void {
     const currentParam = this.parametro();
-    // Buscar la opción seleccionada para obtener su etiqueta
     const opcionSeleccionada = currentParam.opciones.find(
-      opt => opt.enumTipoValor === newEnumTipoValor
+      opt => (opt as ValorString).valor === newValor
     );
 
     if (opcionSeleccionada) {

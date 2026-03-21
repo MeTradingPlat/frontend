@@ -1,12 +1,12 @@
 <mat-form-field class="parameter-field" appearance="outline">
   <mat-label>{{parametro().etiqueta}}</mat-label>
   <mat-select
-    [ngModel]="valorString.enumTipoValor"
+    [ngModel]="valorString.valor"
     [errorStateMatcher]="errorStateMatcher"
     (selectionChange)="onValueChange($event.value)"
   >
     @for (opcion of parametro().opciones; track $index) {
-      <mat-option [value]="opcion.enumTipoValor">
+      <mat-option [value]="asValorString(opcion).valor">
         {{opcion.etiqueta}}
       </mat-option>
     }
