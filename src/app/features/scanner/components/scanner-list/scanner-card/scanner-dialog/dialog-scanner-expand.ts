@@ -199,9 +199,9 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         flex: 1;
         display: flex;
         border-radius: 0;
-        overflow: hidden;
+        overflow: clip;
       }
-      
+
       ::ng-deep {
         .mat-mdc-tab-body-wrapper {
           flex: 1;
@@ -215,6 +215,16 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         .mat-mdc-tab-body-content {
           height: 100%;
           overflow: auto;
+        }
+
+        .mat-mdc-tab-label-container {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
         }
       }
     }
