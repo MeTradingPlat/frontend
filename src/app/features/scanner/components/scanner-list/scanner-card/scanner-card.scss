@@ -86,6 +86,10 @@
         display: flex;
         border-radius: 0px 0px 11px 11px;
         overflow: clip;
+
+        @media (pointer: coarse) {
+            overflow: hidden;
+        }
     }
 
     ::ng-deep {

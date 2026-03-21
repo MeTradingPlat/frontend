@@ -200,6 +200,10 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         display: flex;
         border-radius: 0;
         overflow: clip;
+
+        @media (pointer: coarse) {
+          overflow: hidden;
+        }
       }
 
       ::ng-deep {
