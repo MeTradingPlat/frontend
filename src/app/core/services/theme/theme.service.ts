@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject, signal, effect, DOCUMENT } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal, computed, effect, DOCUMENT } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { StorageService } from '../storage.service';
 import { Theme, ThemeConfig, THEME_CONSTANTS } from './theme.types';
