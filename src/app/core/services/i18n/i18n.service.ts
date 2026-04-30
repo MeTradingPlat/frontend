@@ -62,27 +62,38 @@ export class I18nService {
     // Establecer el idioma por defecto y el fallback
     this.translate.setDefaultLang(I18N_CONSTANTS.DEFAULT_LOCALE);
     this.translate.setFallbackLang(I18N_CONSTANTS.DEFAULT_LOCALE);
+  }
 
-    // Establecer el idioma inicial
-    const initialLocale = this.getInitialLocale();
+  /**
+   * Inicializa el servicio de i18n
+   * Retorna una promesa para ser usada en APP_INITIALIZER
+   */
+  init(): Promise<void> {
+    return new Promise((resolve) => {
+      const initialLocale = this.getInitialLocale();
+      
+      // En el servidor, establecemos el idioma inmediatamente
+      if (!this.isBrowser) {
+        this.translate.use(initialLocale);
+        this.currentLocale.set(initialLocale);
+        resolve();
+        return;
+      }
 
-    // En el servidor, establecemos el idioma inmediatamente para el renderizado inicial
-    // En el navegador, esperamos a que cargue el JSON para evitar el parpadeo de llaves
-    if (this.isBrowser) {
+      // En el navegador, esperamos a que el JSON cargue antes de resolver
+      // Esto evita que Angular empiece a renderizar componentes antes de tener las traducciones
       this.translate.use(initialLocale).subscribe({
         next: () => {
           this.currentLocale.set(initialLocale);
+          resolve();
         },
         error: () => {
-          console.error('Error loading translations, falling back to default');
+          console.error('Error al cargar el idioma inicial, usando valores por defecto');
           this.currentLocale.set(I18N_CONSTANTS.DEFAULT_LOCALE);
+          resolve();
         }
       });
-    } else {
-      // SSR: Intentar usar el idioma sin esperar al subscribe (HttpClient en servidor puede ser síncrono o fallar)
-      this.translate.use(initialLocale);
-      this.currentLocale.set(initialLocale);
-    }
+    });
   }
 
   /**

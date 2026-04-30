@@ -7,6 +7,8 @@ import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideAppInitializer, inject } from '@angular/core';
+import { I18nService } from './core/services/i18n/i18n.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,6 +25,7 @@ export const appConfig: ApplicationConfig = {
         prefix: './assets/i18n/',
         suffix: '.json'
       })
-    })
+    }),
+    provideAppInitializer(() => inject(I18nService).init())
   ]
 };
