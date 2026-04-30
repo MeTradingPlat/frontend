@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -21,8 +22,12 @@ export class AuthService {
   // Usamos signals para que la UI reaccione automáticamente
   public currentUser = signal<LoginResponse | null>(null);
 
+  private platformId = inject(PLATFORM_ID);
+
   constructor(private http: HttpClient, private router: Router) {
-    this.loadUserFromStorage();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadUserFromStorage();
+    }
   }
 
   private loadUserFromStorage() {
@@ -47,22 +52,29 @@ export class AuthService {
   login(credentials: any) {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        localStorage.setItem('user', JSON.stringify(response));
-        localStorage.setItem('token', response.token);
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('user', JSON.stringify(response));
+          localStorage.setItem('token', response.token);
+        }
         this.currentUser.set(response);
       })
     );
   }
 
   logout() {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+    }
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
 
   isAuthenticated(): boolean {
