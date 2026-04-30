@@ -58,7 +58,7 @@ export class I18nService {
   constructor() {
     // Configurar idiomas disponibles
     this.translate.addLangs(Object.keys(SUPPORTED_LOCALES));
-    this.translate.setDefaultLang(I18N_CONSTANTS.DEFAULT_LOCALE);
+    this.translate.setFallbackLang(I18N_CONSTANTS.DEFAULT_LOCALE);
 
     // Establecer el idioma inicial
     const initialLocale = this.getInitialLocale();

@@ -1,25 +1,22 @@
-import { mergeApplicationConfig, ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
 import { provideServerRendering, withRoutes } from '@angular/ssr';
 import { appConfig } from './app.config';
 import { serverRoutes } from './app.routes.server';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateLoader } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { join } from 'path';
 import { readFileSync } from 'fs';
 
-// Cargador de traducciones específico para el servidor (Node.js)
 export class ServerTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
     try {
-      // Intentar varias rutas comunes en despliegues Docker de Angular
       const paths = [
         join(process.cwd(), 'dist', 'frontend', 'browser', 'assets', 'i18n', `${lang}.json`),
         join(process.cwd(), 'browser', 'assets', 'i18n', `${lang}.json`),
-        // Nueva ruta basada en la carpeta public
         join(process.cwd(), 'public', 'assets', 'i18n', `${lang}.json`),
         join(import.meta.dirname, '..', 'browser', 'assets', 'i18n', `${lang}.json`)
       ];
-      
+
       for (const p of paths) {
         try {
           const data = JSON.parse(readFileSync(p, 'utf8'));
@@ -36,14 +33,7 @@ export class ServerTranslateLoader implements TranslateLoader {
 const serverConfig: ApplicationConfig = {
   providers: [
     provideServerRendering(withRoutes(serverRoutes)),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        loader: {
-          provide: TranslateLoader,
-          useClass: ServerTranslateLoader
-        }
-      })
-    )
+    { provide: TranslateLoader, useClass: ServerTranslateLoader }
   ]
 };
 
