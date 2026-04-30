@@ -28,7 +28,7 @@
               {
                 "glob": "*.json",
                 "input": "src/app/assets/i18n",
-                "output": "app/assets/i18n"
+                "output": "assets/i18n"
               }
             ],
             "styles": [

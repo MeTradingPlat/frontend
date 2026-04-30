@@ -1,4 +1,3 @@
-@if (authService.isAuthenticated()) {
 <mat-sidenav-container class="sidenav-container">
   <!-- Drawer for mobile -->
   <mat-sidenav
@@ -25,6 +24,3 @@
     <app-side-navbar [isMobile]="true" [isBottomNav]="true" [drawer]="drawer" [class.mobile-only]="true" />
   </mat-sidenav-content>
 </mat-sidenav-container>
-} @else {
-  <router-outlet/>
-}

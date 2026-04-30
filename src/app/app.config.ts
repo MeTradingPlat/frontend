@@ -9,30 +9,18 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 
-// Custom TranslateLoader que funciona en SSR y evita el circular dependency
+// TranslateLoader para el navegador
 export class BrowserTranslateLoader implements TranslateLoader {
-  private http: HttpClient;
-  private platformId: any;
-
-  constructor(httpBackend: HttpBackend) {
-    // Usar HttpBackend en lugar de HttpClient para evitar el circular dependency con interceptors
-    this.http = new HttpClient(httpBackend);
-    this.platformId = inject(PLATFORM_ID);
-  }
+  constructor(private http: HttpClient) {}
 
   getTranslation(lang: string): Observable<any> {
-    // Solo cargar traducciones en el navegador
-    if (isPlatformBrowser(this.platformId)) {
-      return this.http.get(`/app/assets/i18n/${lang}.json`);
-    }
-    // En el servidor, retornar objeto vacío
-    return of({});
+    // Usar ruta relativa para el navegador
+    return this.http.get(`./assets/i18n/${lang}.json`);
   }
 }
 
-// Factory function
-export function HttpLoaderFactory(httpBackend: HttpBackend) {
-  return new BrowserTranslateLoader(httpBackend);
+export function HttpLoaderFactory(http: HttpClient) {
+  return new BrowserTranslateLoader(http);
 }
 
 export const appConfig: ApplicationConfig = {
@@ -51,7 +39,7 @@ export const appConfig: ApplicationConfig = {
         loader: {
           provide: TranslateLoader,
           useFactory: HttpLoaderFactory,
-          deps: [HttpBackend]
+          deps: [HttpClient]
         }
       })
     )
