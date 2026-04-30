@@ -11,9 +11,8 @@ import { isPlatformBrowser } from '@angular/common';
 
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-export function HttpLoaderFactory(handler: HttpBackend) {
-  // Usamos any para saltar un error de tipado en el build de prod, el código es funcionalmente correcto
-  return new (TranslateHttpLoader as any)(new HttpClient(handler), './assets/i18n/', '.json');
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 export const appConfig: ApplicationConfig = {
@@ -32,7 +31,7 @@ export const appConfig: ApplicationConfig = {
         loader: {
           provide: TranslateLoader,
           useFactory: HttpLoaderFactory,
-          deps: [HttpBackend]
+          deps: [HttpClient]
         }
       })
     )
