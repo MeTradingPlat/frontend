@@ -3,24 +3,27 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { I18nService } from '../../core/services/i18n/i18n.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  public i18nService = inject(I18nService);
+
   loginForm: FormGroup;
   errorMessage: string = '';
   isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],

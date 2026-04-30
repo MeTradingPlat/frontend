@@ -1,4 +1,7 @@
 <div class="login-container">
+  <!-- Forzar reactividad en modo Zoneless vinculando a la señal de idioma -->
+  <span [hidden]="true">{{ i18nService.currentLocale() }}</span>
+  
   <div class="login-card">
     <h2>{{ 'AUTH.WELCOME' | translate }}</h2>
     <p class="subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
