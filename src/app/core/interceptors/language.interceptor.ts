@@ -19,8 +19,8 @@ import { I18nService } from '../services/i18n/i18n.service';
  * };
  */
 export const languageInterceptor: HttpInterceptorFn = (req, next) => {
-  // Evitar dependencias circulares: no inyectar I18nService si la petición es para un archivo de traducción
-  if (req.url.includes('.json')) {
+  // Omitir interceptor para traducciones y para la ruta de login
+  if (req.url.includes('.json') || req.url.includes('/auth/login')) {
     return next(req);
   }
 
