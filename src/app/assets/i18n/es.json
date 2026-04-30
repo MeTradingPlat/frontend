@@ -151,6 +151,7 @@
     "USERNAME_PLACEHOLDER": "Ingrese su usuario",
     "PASSWORD": "Contraseña",
     "PASSWORD_PLACEHOLDER": "Ingrese su contraseña",
-    "SUBMIT": "Ingresar"
+    "SUBMIT": "Ingresar",
+    "ERROR_INVALID_CREDENTIALS": "Credenciales inválidas. Por favor intente de nuevo."
   }
 }

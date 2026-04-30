@@ -41,7 +41,8 @@ export class LoginComponent {
       },
       error: err => {
         this.isLoading = false;
-        this.errorMessage = 'Credenciales inválidas. Por favor intente de nuevo.';
+        // Usar clave de traducción para el error
+        this.errorMessage = 'AUTH.ERROR_INVALID_CREDENTIALS';
       }
     });
   }

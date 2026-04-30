@@ -15,7 +15,9 @@ export class ServerTranslateLoader implements TranslateLoader {
       const paths = [
         join(process.cwd(), 'dist', 'frontend', 'browser', 'assets', 'i18n', `${lang}.json`),
         join(process.cwd(), 'browser', 'assets', 'i18n', `${lang}.json`),
-        join(process.cwd(), 'assets', 'i18n', `${lang}.json`)
+        join(process.cwd(), 'assets', 'i18n', `${lang}.json`),
+        // Ruta relativa al archivo server.mjs (dist/frontend/server/server.mjs)
+        join(import.meta.dirname, '..', 'browser', 'assets', 'i18n', `${lang}.json`)
       ];
       
       for (const p of paths) {
