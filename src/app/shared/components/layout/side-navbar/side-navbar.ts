@@ -5,6 +5,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ThemeService } from '../../../../core/services/theme/theme.service';
 import { I18nService } from '../../../../core/services/i18n/i18n.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-side-navbar',
@@ -21,6 +22,7 @@ export class SideNavbar {
   // Inyectar servicios usando inject()
   readonly themeService = inject(ThemeService);
   readonly i18nService = inject(I18nService);
+  readonly authService = inject(AuthService);
 
   // Exponer signals para el template
   readonly isDarkMode = this.themeService.isDark;
@@ -64,5 +66,13 @@ export class SideNavbar {
     if (this.drawer()) {
       this.drawer()!.open();
     }
+  }
+
+  /**
+   * Cierra sesión
+   */
+  logout(): void {
+    this.authService.logout();
+    this.closeDrawerIfMobile();
   }
 }

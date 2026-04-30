@@ -5,6 +5,7 @@ import { RouterOutlet } from '@angular/router';
 import { SideNavbar } from './shared/components/layout/side-navbar/side-navbar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthService } from './core/auth/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,7 @@ export class App {
   @ViewChild('drawer') drawer!: MatSidenav;
 
   private breakpointObserver = inject(BreakpointObserver);
+  public authService = inject(AuthService);
 
   // Signal to track if we're on mobile (max-width: 768px)
   isMobile = toSignal(

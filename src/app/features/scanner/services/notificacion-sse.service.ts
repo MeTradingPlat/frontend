@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Observable, Subject, EMPTY } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { NotificacionDTORespuesta } from '../models/notificacion.interface';
+import { AuthService } from '../../../core/auth/auth.service';
 
 /**
  * Servicio SSE para Notificaciones en tiempo real.
@@ -20,6 +21,7 @@ import { NotificacionDTORespuesta } from '../models/notificacion.interface';
 export class NotificacionSseService {
   private readonly ngZone = inject(NgZone);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly authService = inject(AuthService);
   private readonly apiUrl = `${environment.apiUrl}/notificaciones`;
 
   private eventSource: EventSource | null = null;
@@ -94,6 +96,10 @@ export class NotificacionSseService {
     const params: string[] = [];
     if (this.lastEventId) {
       params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
+    }
+    const token = this.authService.getToken();
+    if (token) {
+      params.push(`token=${encodeURIComponent(token)}`);
     }
     return params.length > 0 ? `${baseUrl}?${params.join('&')}` : baseUrl;
   }

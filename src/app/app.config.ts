@@ -4,6 +4,7 @@ import { provideHttpClient, withFetch, withInterceptors, withInterceptorsFromDi,
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { languageInterceptor } from './core/interceptors/language.interceptor';
+import { authInterceptor } from './core/auth/auth.interceptor';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
@@ -43,7 +44,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch(),
       withInterceptorsFromDi(),
-      withInterceptors([languageInterceptor])
+      withInterceptors([languageInterceptor, authInterceptor])
     ),
     importProvidersFrom(
       TranslateModule.forRoot({

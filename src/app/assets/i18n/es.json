@@ -141,5 +141,9 @@
     "RETRY": "Reintentar",
     "LOADING_CONTENT": "Cargando contenido",
     "LOADING": "Cargando..."
+  },
+  "AUTH": {
+    "LOGIN": "Iniciar sesión",
+    "LOGOUT": "Cerrar sesión"
   }
 }

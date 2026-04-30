@@ -141,5 +141,9 @@
     "RETRY": "Retry",
     "LOADING_CONTENT": "Loading content",
     "LOADING": "Loading..."
+  },
+  "AUTH": {
+    "LOGIN": "Login",
+    "LOGOUT": "Logout"
   }
 }

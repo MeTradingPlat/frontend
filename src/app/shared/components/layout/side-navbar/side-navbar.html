@@ -53,5 +53,18 @@
                 <span>{{ 'THEME.OSCURO' | translate }}</span>
             }
         </button>
+
+        <!-- Auth -->
+        @if (authService.currentUser()) {
+            <button mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="logout()">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>{{ 'AUTH.LOGOUT' | translate }}</span>
+            </button>
+        } @else {
+            <button routerLink="/login" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <span>{{ 'AUTH.LOGIN' | translate }}</span>
+            </button>
+        }
     </nav>
 }

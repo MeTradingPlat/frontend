@@ -4,28 +4,30 @@
   <mat-card-header>
     <mat-card-title>{{ scanner().nombre }}</mat-card-title>
     <div class="header-icons">
-      <i
-        class="bi bi-gear-fill"
-        routerLink="/escaneres/configuracion/{{scanner().idEscaner!}}"
-        (click)="$event.stopPropagation(); editScanner.emit(scanner().idEscaner!)"
-        [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner().idEscaner}"></i>
-      @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
-        <div class="button-with-spinner">
-          <span class="loader"></span>
+      @if (authService.isEditor()) {
+        <i
+          class="bi bi-gear-fill"
+          routerLink="/escaneres/configuracion/{{scanner().idEscaner!}}"
+          (click)="$event.stopPropagation(); editScanner.emit(scanner().idEscaner!)"
+          [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner().idEscaner}"></i>
+        @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
+          <div class="button-with-spinner">
+            <span class="loader"></span>
+            <i
+              class="bi bi-stop-fill"
+              role="button"
+              (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
+              [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
+            ></i>
+          </div>
+        } @else {
           <i
-            class="bi bi-stop-fill"
+            class="bi bi-play-fill"
             role="button"
             (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
-            [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
+            [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
           ></i>
-        </div>
-      } @else {
-        <i
-          class="bi bi-play-fill"
-          role="button"
-          (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
-          [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
-        ></i>
+        }
       }
       <i
         class="bi bi-fullscreen"

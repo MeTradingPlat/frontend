@@ -21,6 +21,7 @@ import { NotificationService } from '../../../../core/services/notification/noti
 import { ScannerApiService } from '../../services/scanner-api.service';
 import { NotificacionSseService } from '../../services/notificacion-sse.service';
 import { MetadatosEstadoEscaner } from '../../models/notificacion.interface';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-scanner-list',
@@ -50,6 +51,7 @@ export class ScannerList implements OnInit, OnDestroy {
   private readonly notificationService = inject(NotificationService);
   private readonly scannerApi = inject(ScannerApiService);
   private readonly notificacionSseService = inject(NotificacionSseService);
+  private readonly authService = inject(AuthService);
 
   private sseSubscription?: Subscription;
 
@@ -66,20 +68,26 @@ export class ScannerList implements OnInit, OnDestroy {
   readonly navButtons = computed((): NavbarButton[] => {
     // Hacer que el computed dependa del idioma actual
     const currentLang = this.i18nService.currentLocale();
-    return [
+    const buttons: NavbarButton[] = [
       {
         id: 1,
         icon: "bi bi-archive-fill",
         routerLink: "/escaneres/archivados",
         label: this.translate.instant('SCANNER.ARCHIVED')
-      },
-      {
+      }
+    ];
+
+    // Solo permitir crear escaneres si es EDITOR
+    if (this.authService.isEditor()) {
+      buttons.push({
         id: 2,
         icon: "bi bi-journal-plus",
         routerLink: "/escaneres/nuevo",
         label: this.translate.instant('SCANNER.NEW')
-      }
-    ];
+      });
+    }
+
+    return buttons;
   });
 
   ngOnInit(): void {

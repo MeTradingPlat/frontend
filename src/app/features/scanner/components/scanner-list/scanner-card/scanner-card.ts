@@ -19,6 +19,7 @@ import { ScannerRegistryTab } from '../scanner-card-tabs/scanner-registry-tab/sc
 import { ScannerFiltersTab } from '../scanner-card-tabs/scanner-filters-tab/scanner-filters-tab';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NotificacionSseService } from '../../../services/notificacion-sse.service';
+import { AuthService } from '../../../../../core/auth/auth.service';
 
 
 @Component({
@@ -57,6 +58,7 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
   private tabActivaIndex = 0;
   private readonly dialog = inject(MatDialog);
   private readonly sseService = inject(NotificacionSseService);
+  readonly authService = inject(AuthService);
   private sseSub?: Subscription;
 
   ngOnInit(): void {
