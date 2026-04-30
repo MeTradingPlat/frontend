@@ -39,19 +39,12 @@ export class ThemeService {
   readonly theme = signal<Theme>(this.getInitialTheme());
 
   /** Si el tema actual es oscuro */
-  readonly isDark = signal(this.theme() === 'dark');
+  readonly isDark = computed(() => this.theme() === 'dark');
 
   /** Si el tema actual es claro */
-  readonly isLight = signal(this.theme() === 'light');
+  readonly isLight = computed(() => this.theme() === 'light');
 
   constructor() {
-    // Effect para sincronizar isDark/isLight cuando cambie el tema
-    effect(() => {
-      const currentTheme = this.theme();
-      this.isDark.set(currentTheme === 'dark');
-      this.isLight.set(currentTheme === 'light');
-    });
-
     // Effect para aplicar el tema al DOM
     effect(() => {
       this.applyTheme(this.theme());

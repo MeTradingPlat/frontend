@@ -33,12 +33,9 @@ export class App {
     this.breakpointObserver.observe(['(max-width: 768px)'])
   );
 
-  isHandset = signal(false);
+  isHandset = computed(() => this.isMobile()?.matches || false);
 
   constructor() {
-    effect(() => {
-      this.isHandset.set(this.isMobile()?.matches || false);
-    });
   }
 
   toggleDrawer(): void {
