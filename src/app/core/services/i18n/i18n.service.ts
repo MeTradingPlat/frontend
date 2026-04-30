@@ -63,10 +63,9 @@ export class I18nService {
     // Establecer el idioma inicial
     const initialLocale = this.getInitialLocale();
 
-    // Cargar traducciones (tanto en servidor como en navegador)
-    this.translate.use(initialLocale).subscribe(() => {
-      this.currentLocale.set(initialLocale);
-    });
+    // Cargar traducciones inmediatamente
+    this.translate.use(initialLocale).subscribe();
+    this.currentLocale.set(initialLocale);
   }
 
   /**
