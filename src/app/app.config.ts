@@ -9,21 +9,11 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 
-// TranslateLoader para el navegador que ignora interceptores
-export class BrowserTranslateLoader implements TranslateLoader {
-  private http: HttpClient;
-  constructor(handler: HttpBackend) {
-    this.http = new HttpClient(handler);
-  }
-
-  getTranslation(lang: string): Observable<any> {
-    // Usar ruta absoluta para el navegador
-    return this.http.get(`/assets/i18n/${lang}.json`);
-  }
-}
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 export function HttpLoaderFactory(handler: HttpBackend) {
-  return new BrowserTranslateLoader(handler);
+  // Configuración estándar de ngx-translate para cargar desde /assets/i18n/
+  return new TranslateHttpLoader(new HttpClient(handler), './assets/i18n/', '.json');
 }
 
 export const appConfig: ApplicationConfig = {
