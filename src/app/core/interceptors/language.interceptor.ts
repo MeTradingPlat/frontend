@@ -19,12 +19,14 @@ import { I18nService } from '../services/i18n/i18n.service';
  * };
  */
 export const languageInterceptor: HttpInterceptorFn = (req, next) => {
-  const i18nService = inject(I18nService);
+  // Evitar dependencias circulares: no inyectar I18nService si la petición es para un archivo de traducción
+  if (req.url.includes('.json')) {
+    return next(req);
+  }
 
-  // Obtener el idioma actual del servicio
+  const i18nService = inject(I18nService);
   const currentLocale = i18nService.currentLocale();
 
-  // Clonar la petición y añadir el header Accept-Language
   const clonedRequest = req.clone({
     setHeaders: {
       'Accept-Language': currentLocale
