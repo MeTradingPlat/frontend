@@ -6,6 +6,8 @@ import { SideNavbar } from './shared/components/layout/side-navbar/side-navbar';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from './core/auth/auth.service';
+import { I18nService } from './core/services/i18n/i18n.service';
+import { ThemeService } from './core/services/theme/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +25,8 @@ export class App {
 
   private breakpointObserver = inject(BreakpointObserver);
   public authService = inject(AuthService);
+  private i18nService = inject(I18nService);
+  private themeService = inject(ThemeService);
 
   // Signal to track if we're on mobile (max-width: 768px)
   isMobile = toSignal(
