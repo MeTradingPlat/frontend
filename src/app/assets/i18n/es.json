@@ -144,6 +144,13 @@
   },
   "AUTH": {
     "LOGIN": "Iniciar sesión",
-    "LOGOUT": "Cerrar sesión"
+    "LOGOUT": "Cerrar sesión",
+    "WELCOME": "Bienvenido a Metradingplat",
+    "SUBTITLE": "Inicie sesión para continuar",
+    "USERNAME": "Usuario",
+    "USERNAME_PLACEHOLDER": "Ingrese su usuario",
+    "PASSWORD": "Contraseña",
+    "PASSWORD_PLACEHOLDER": "Ingrese su contraseña",
+    "SUBMIT": "Ingresar"
   }
 }
