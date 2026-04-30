@@ -18,8 +18,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(
-      withFetch(),
-      withInterceptors([languageInterceptor, authInterceptor])
+      withInterceptors([languageInterceptor, authInterceptor]),
+      withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' })
     ),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
