@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -42,7 +42,7 @@ export class LoginComponent {
         this.isLoading = false;
         this.router.navigate(['/']); // Navega al inicio tras el login
       },
-      error: err => {
+      error: (err: any) => {
         this.isLoading = false;
         // Usar clave de traducción para el error
         this.errorMessage = 'AUTH.ERROR_INVALID_CREDENTIALS';
