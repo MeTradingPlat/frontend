@@ -31,9 +31,9 @@
         {{ errorMessage() | translate }}
       </div>
 
-      <button type="submit" [disabled]="loginForm.invalid || isLoading" class="btn-primary">
-        <span *ngIf="isLoading" class="spinner"></span>
-        <span *ngIf="!isLoading">{{ 'AUTH.SUBMIT' | translate }}</span>
+      <button type="submit" [disabled]="loginForm.invalid || isLoading()" class="btn-primary">
+        <span *ngIf="isLoading()" class="spinner"></span>
+        <span *ngIf="!isLoading()">{{ 'AUTH.SUBMIT' | translate }}</span>
       </button>
     </form>
   </div>

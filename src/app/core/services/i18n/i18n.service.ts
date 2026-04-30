@@ -58,14 +58,31 @@ export class I18nService {
   constructor() {
     // Configurar idiomas disponibles
     this.translate.addLangs(Object.keys(SUPPORTED_LOCALES));
+    
+    // Establecer el idioma por defecto y el fallback
+    this.translate.setDefaultLang(I18N_CONSTANTS.DEFAULT_LOCALE);
     this.translate.setFallbackLang(I18N_CONSTANTS.DEFAULT_LOCALE);
 
     // Establecer el idioma inicial
     const initialLocale = this.getInitialLocale();
 
-    // Cargar traducciones inmediatamente
-    this.translate.use(initialLocale).subscribe();
-    this.currentLocale.set(initialLocale);
+    // En el servidor, establecemos el idioma inmediatamente para el renderizado inicial
+    // En el navegador, esperamos a que cargue el JSON para evitar el parpadeo de llaves
+    if (this.isBrowser) {
+      this.translate.use(initialLocale).subscribe({
+        next: () => {
+          this.currentLocale.set(initialLocale);
+        },
+        error: () => {
+          console.error('Error loading translations, falling back to default');
+          this.currentLocale.set(I18N_CONSTANTS.DEFAULT_LOCALE);
+        }
+      });
+    } else {
+      // SSR: Intentar usar el idioma sin esperar al subscribe (HttpClient en servidor puede ser síncrono o fallar)
+      this.translate.use(initialLocale);
+      this.currentLocale.set(initialLocale);
+    }
   }
 
   /**
