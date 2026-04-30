@@ -45,7 +45,7 @@ export class ThemeService {
   readonly isLight = computed(() => this.theme() === 'light');
 
   constructor() {
-    // Effect para aplicar el tema al DOM
+    // Effect para aplicar el tema al DOM cuando cambie el signal
     effect(() => {
       this.applyTheme(this.theme());
     });
@@ -53,6 +53,17 @@ export class ThemeService {
     // Escuchar cambios en las preferencias del sistema (solo en browser)
     if (this.isBrowser) {
       this.listenToSystemPreference();
+    }
+  }
+
+  /**
+   * Inicializa el tema de la aplicación
+   * Se usa en APP_INITIALIZER para evitar el parpadeo
+   */
+  init(): void {
+    if (this.isBrowser) {
+      // Aplicar el tema inicial inmediatamente al DOM
+      this.applyTheme(this.theme());
     }
   }
 

@@ -9,6 +9,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideAppInitializer, inject } from '@angular/core';
 import { I18nService } from './core/services/i18n/i18n.service';
+import { ThemeService } from './core/services/theme/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,6 +27,11 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json'
       })
     }),
-    provideAppInitializer(() => inject(I18nService).init())
+    provideAppInitializer(() => {
+      const i18n = inject(I18nService);
+      const theme = inject(ThemeService);
+      theme.init();
+      return i18n.init();
+    })
   ]
 };
