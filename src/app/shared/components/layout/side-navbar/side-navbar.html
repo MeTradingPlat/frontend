@@ -4,12 +4,14 @@
         <button routerLink="/inicio" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Inicio">
             <i class="bi bi-house-fill"></i>
         </button>
-        <button routerLink="/escaneres" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Escáner">
-            <i class="bi bi-clipboard-data-fill"></i>
-        </button>
-        <button routerLink="/noticias" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
-            <i class="bi bi-newspaper"></i>
-        </button>
+        @if (authService.currentUser()) {
+            <button routerLink="/escaneres" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Escáner">
+                <i class="bi bi-clipboard-data-fill"></i>
+            </button>
+            <button routerLink="/noticias" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
+                <i class="bi bi-newspaper"></i>
+            </button>
+        }
         <div class="flex-spacer"></div>
         <button mat-button class="nav-item" (click)="openDrawer()" aria-label="Más opciones">
             <i class="bi bi-three-dots"></i>
@@ -26,14 +28,17 @@
             <i class="bi bi-house-fill"></i>
             <span>{{ 'NAV.INICIO' | translate }}</span>
         </button>
-        <button routerLink="/escaneres" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
-            <i class="bi bi-clipboard-data-fill"></i>
-            <span>{{ 'NAV.ESCANER' | translate }}</span>
-        </button>
-        <button routerLink="/noticias" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
-            <i class="bi bi-newspaper"></i>
-            <span>{{ 'NAV.NOTICIAS' | translate }}</span>
-        </button>
+
+        @if (authService.currentUser()) {
+            <button routerLink="/escaneres" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+                <i class="bi bi-clipboard-data-fill"></i>
+                <span>{{ 'NAV.ESCANER' | translate }}</span>
+            </button>
+            <button routerLink="/noticias" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+                <i class="bi bi-newspaper"></i>
+                <span>{{ 'NAV.NOTICIAS' | translate }}</span>
+            </button>
+        }
 
         <div class="flex-spacer"></div>
 
