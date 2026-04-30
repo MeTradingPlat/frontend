@@ -4,7 +4,7 @@
         <button routerLink="/inicio" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Inicio">
             <i class="bi bi-house-fill"></i>
         </button>
-        @if (authService.currentUser()) {
+        @if (authService.currentUser() && authService.currentUser()?.token) {
             <button routerLink="/escaneres" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Escáner">
                 <i class="bi bi-clipboard-data-fill"></i>
             </button>
@@ -29,7 +29,7 @@
             <span>{{ 'NAV.INICIO' | translate }}</span>
         </button>
 
-        @if (authService.currentUser()) {
+        @if (authService.currentUser() && authService.currentUser()?.token) {
             <button routerLink="/escaneres" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
                 <i class="bi bi-clipboard-data-fill"></i>
                 <span>{{ 'NAV.ESCANER' | translate }}</span>
@@ -60,7 +60,7 @@
         </button>
 
         <!-- Auth -->
-        @if (authService.currentUser()) {
+        @if (authService.currentUser() && authService.currentUser()?.token) {
             <button mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="logout()">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>{{ 'AUTH.LOGOUT' | translate }}</span>

@@ -27,8 +27,20 @@ export class AuthService {
 
   private loadUserFromStorage() {
     const userData = localStorage.getItem('user');
-    if (userData) {
-      this.currentUser.set(JSON.parse(userData));
+    const token = localStorage.getItem('token');
+    if (userData && token) {
+      try {
+        const user = JSON.parse(userData);
+        if (user.token === token) {
+          this.currentUser.set(user);
+        } else {
+          this.logout();
+        }
+      } catch (e) {
+        this.logout();
+      }
+    } else {
+      this.currentUser.set(null);
     }
   }
 
