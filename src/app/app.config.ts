@@ -18,7 +18,24 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(
-      withInterceptors([languageInterceptor, authInterceptor]),
+      withInterceptors([
+        languageInterceptor, 
+        authInterceptor,
+        (req, next) => {
+          const { tap } = require('rxjs/operators');
+          return next(req).pipe(
+            tap({
+              error: (err: any) => {
+                console.group('HTTP ERROR DIAGNOSTIC');
+                console.log('URL:', req.url);
+                console.log('Status:', err.status);
+                console.log('Body:', err.error);
+                console.groupEnd();
+              }
+            })
+          );
+        }
+      ]),
       withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' })
     ),
     provideTranslateService({
