@@ -352,7 +352,7 @@ export class ScannerConfiguration implements OnInit {
    *   codigoError: "GC-0005",
    *   mensaje: "Error de validación en los filtros configurados",
    *   codigoHttp: 400,
-   *   url: "/api/escaner/filtro/escaner/123",
+   *   url: "/escaner/filtro/escaner/123",
    *   metodo: "POST",
    *   erroresValidacion: [
    *     {
@@ -398,7 +398,7 @@ export class ScannerConfiguration implements OnInit {
    *   codigoError: "GC-0005",
    *   mensaje: "nombre: El nombre del escáner es obligatorio; horaInicio: La hora de inicio debe ser anterior a la hora de fin",
    *   codigoHttp: 400,
-   *   url: "http://localhost:8080/api/escaner",
+   *   url: "http://localhost:8080/escaner",
    *   metodo: "POST"
    * }
    *
