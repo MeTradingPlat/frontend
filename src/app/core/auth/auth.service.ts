@@ -91,7 +91,8 @@ export class AuthService {
     if (!user || !user.roles) return false;
     return user.roles.some((r: any) => {
       const roleStr = typeof r === 'string' ? r : (r.authority || r.role || '');
-      return roleStr.toUpperCase().includes('ADMIN');
+      const upperRole = roleStr.toUpperCase();
+      return upperRole.includes('ADMIN') || upperRole.includes('EDITOR');
     });
   }
 }
