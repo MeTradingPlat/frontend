@@ -5,9 +5,37 @@ import { ScreenerService } from '../../services/screener.service';
 import { Market, SymbolSummary } from '../../models/screener.models';
 import { SymbolDetailsComponent } from '../../components/symbol-details/symbol-details.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-screener',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatTableModule,
+    MatInputModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatCardModule,
+    MatTooltipModule,
+    TranslateModule
+  ],
   templateUrl: './screener.component.html',
   styleUrls: ['./screener.component.scss']
 })

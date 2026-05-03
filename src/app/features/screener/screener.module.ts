@@ -18,10 +18,7 @@ import { ScreenerComponent } from './pages/screener/screener.component';
 import { SymbolDetailsComponent } from './components/symbol-details/symbol-details.component';
 
 @NgModule({
-  declarations: [
-    ScreenerComponent,
-    SymbolDetailsComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     ScreenerRoutingModule,
@@ -37,7 +34,9 @@ import { SymbolDetailsComponent } from './components/symbol-details/symbol-detai
     MatCardModule,
     MatDividerModule,
     MatDialogModule,
-    TranslateModule
+    TranslateModule,
+    ScreenerComponent,
+    SymbolDetailsComponent
   ]
 })
 export class ScreenerModule { }

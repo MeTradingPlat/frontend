@@ -2,9 +2,26 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
 import { SymbolDetails } from '../../models/screener.models';
+import { CommonModule } from '@angular/common';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-symbol-details',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatDividerModule,
+    TranslateModule
+  ],
   templateUrl: './symbol-details.component.html',
   styleUrls: ['./symbol-details.component.scss']
 })
