@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-screener',
@@ -34,7 +35,8 @@ import { TranslateModule } from '@ngx-translate/core';
     MatProgressSpinnerModule,
     MatCardModule,
     MatTooltipModule,
-    TranslateModule
+    TranslateModule,
+    ScrollingModule
   ],
   templateUrl: './screener.component.html',
   styleUrls: ['./screener.component.scss']

@@ -11,12 +11,15 @@
       <button mat-button (click)="close()">Cerrar</button>
     </div>
   } @else if (symbolDetails()) {
+    @let active = symbolDetails()?.activeEquity;
+    @let fund = symbolDetails()?.fundamentalData;
+    
     <header class="details-header">
       <div class="symbol-info">
-        <span class="symbol">{{ symbolDetails()?.activeEquity?.symbol }}</span>
-        <span class="market-chip">{{ symbolDetails()?.activeEquity?.listedMarket }}</span>
+        <span class="symbol">{{ active?.symbol }}</span>
+        <span class="market-chip">{{ active?.listedMarket }}</span>
       </div>
-      <h2 class="description">{{ symbolDetails()?.activeEquity?.description }}</h2>
+      <h2 class="description">{{ active?.description }}</h2>
       <button mat-icon-button class="close-btn" (click)="close()">
         <mat-icon>close</mat-icon>
       </button>
@@ -30,35 +33,35 @@
         <div class="metrics-grid">
           <div class="metric-item">
             <span class="label">Market Cap</span>
-            <span class="value">{{ formatNumber(symbolDetails()?.fundamentalData?.marketCap) }}</span>
+            <span class="value">{{ formatNumber(fund?.marketCap) }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Shares Outstanding</span>
-            <span class="value">{{ formatNumber(symbolDetails()?.fundamentalData?.sharesOutstanding) }}</span>
+            <span class="value">{{ formatNumber(fund?.sharesOutstanding) }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Float</span>
-            <span class="value">{{ formatNumber(symbolDetails()?.fundamentalData?.floatShares) }}</span>
+            <span class="value">{{ formatNumber(fund?.floatShares) }}</span>
           </div>
           <div class="metric-item">
             <span class="label">EPS</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.eps || 'N/A' }}</span>
+            <span class="value">{{ fund?.eps || 'N/A' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Short Interest</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.shortInterest ? (symbolDetails()?.fundamentalData?.shortInterest + '%') : 'N/A' }}</span>
+            <span class="value">{{ fund?.shortInterest ? (fund?.shortInterest + '%') : 'N/A' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Short Ratio</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.shortRatio || 'N/A' }}</span>
+            <span class="value">{{ fund?.shortRatio || 'N/A' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Beta</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.beta || 'N/A' }}</span>
+            <span class="value">{{ fund?.beta || 'N/A' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Volume (Daily)</span>
-            <span class="value">{{ formatNumber(symbolDetails()?.fundamentalData?.dayVolume) }}</span>
+            <span class="value">{{ formatNumber(fund?.dayVolume) }}</span>
           </div>
         </div>
       </section>
@@ -68,15 +71,15 @@
         <div class="metrics-grid">
           <div class="metric-item">
             <span class="label">Next Earnings Date</span>
-            <span class="value highlight">{{ symbolDetails()?.fundamentalData?.nextEarningsDate || 'TBD' }}</span>
+            <span class="value highlight">{{ fund?.nextEarningsDate || 'TBD' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Days Until Earnings</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.daysUntilEarnings ?? 'N/A' }}</span>
+            <span class="value">{{ fund?.daysUntilEarnings ?? 'N/A' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Last Report Date</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.occurredDate || 'N/A' }}</span>
+            <span class="value">{{ fund?.occurredDate || 'N/A' }}</span>
           </div>
         </div>
       </section>
@@ -86,24 +89,30 @@
         <div class="metrics-grid">
           <div class="metric-item">
             <span class="label">IV Index</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.impliedVolatilityIndex ? (symbolDetails()?.fundamentalData?.impliedVolatilityIndex * 100 | number:'1.2-2') + '%' : 'N/A' }}</span>
+            <span class="value">
+                @if (fund?.impliedVolatilityIndex; as iv) {
+                    {{ iv * 100 | number:'1.2-2' }}%
+                } @else {
+                    N/A
+                }
+            </span>
           </div>
           <div class="metric-item">
             <span class="label">IV Rank</span>
-            <span class="value">{{ symbolDetails()?.fundamentalData?.impliedVolatilityRank || 'N/A' }}</span>
+            <span class="value">{{ fund?.impliedVolatilityRank || 'N/A' }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Liquidity Rating</span>
             <span class="value">
                 @for (i of [1,2,3,4,5]; track i) {
-                    <mat-icon class="rating-icon" [class.active]="i <= (symbolDetails()?.fundamentalData?.liquidityRating || 0)">star</mat-icon>
+                    <mat-icon class="rating-icon" [class.active]="i <= (fund?.liquidityRating || 0)">star</mat-icon>
                 }
             </span>
           </div>
         </div>
       </section>
       
-      <p class="last-updated">Última actualización: {{ symbolDetails()?.fundamentalData?.lastUpdated | date:'short' }}</p>
+      <p class="last-updated">Última actualización: {{ fund?.lastUpdated | date:'short' }}</p>
     </div>
   }
 </div>
