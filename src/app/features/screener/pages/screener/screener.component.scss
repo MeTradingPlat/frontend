@@ -18,15 +18,13 @@
       font-size: 2.5rem;
       font-weight: 800;
       margin: 0;
-      background: linear-gradient(45deg, #3f51b5, #00bcd4);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      // Use Material Primary color instead of hardcoded gradient
+      color: var(--mat-sys-primary);
       letter-spacing: -1px;
     }
 
     .subtitle {
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--mat-sys-on-surface-variant);
       margin: 8px 0 0;
       font-size: 1.1rem;
     }
@@ -62,7 +60,8 @@
 .table-card {
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -93,14 +92,13 @@
   }
 
   .table-header {
-    background: rgba(245, 247, 250, 0.8);
-    backdrop-filter: blur(4px);
+    background: var(--mat-sys-surface-container-high);
     height: 56px;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
     position: sticky;
     top: 0;
     z-index: 2;
@@ -108,11 +106,11 @@
 
   .table-row {
     height: 72px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: rgba(63, 81, 181, 0.03);
+      background-color: var(--mat-sys-surface-container-highest);
     }
   }
 
@@ -121,8 +119,8 @@
   }
 
   .symbol-badge {
-    background: #e8eaf6;
-    color: #3f51b5;
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
     padding: 4px 10px;
     border-radius: 6px;
     font-weight: 700;
@@ -132,19 +130,19 @@
   .empty-state {
     padding: 48px;
     text-align: center;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--mat-sys-on-surface-variant);
     font-style: italic;
   }
 }
 
 .table-footer {
   padding: 16px 24px;
-  background: rgba(245, 247, 250, 0.5);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--mat-sys-surface-container-high);
+  border-top: 1px solid var(--mat-sys-outline-variant);
   display: flex;
   justify-content: space-between;
   font-size: 0.85rem;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--mat-sys-on-surface-variant);
 }
 
 .loading-overlay {
@@ -153,7 +151,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--mat-sys-surface-container);
+  opacity: 0.9;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -163,7 +162,7 @@
   
   p {
     font-weight: 500;
-    color: #3f51b5;
+    color: var(--mat-sys-primary);
   }
 }
 
@@ -174,43 +173,4 @@
 
 .rotating {
   animation: rotate 1.5s linear infinite;
-}
-
-// Dark mode adjustments
-:host-context(.dark-theme) {
-  .screener-header .title-section .subtitle {
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .table-card {
-    background: #1e1e1e;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  }
-
-  .table-header {
-    background: rgba(40, 40, 40, 0.8);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  
-  .table-row {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .symbol-badge {
-    background: #2c2c2c;
-    color: #9fa8da;
-  }
-
-  .clickable-row:hover {
-    background-color: rgba(255, 255, 255, 0.03);
-  }
-
-  .table-footer {
-    background: rgba(40, 40, 40, 0.5);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .loading-overlay {
-    background: rgba(30, 30, 30, 0.8);
-  }
 }

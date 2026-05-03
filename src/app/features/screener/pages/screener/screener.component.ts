@@ -97,9 +97,11 @@ export class ScreenerComponent implements OnInit {
     }
 
     if (selectedMarkets.length > 0) {
-      filtered = filtered.filter(s => 
-        selectedMarkets.includes(s.listedMarket.toLowerCase())
-      );
+      const selectedSet = new Set(selectedMarkets.map(m => m.toLowerCase()));
+      filtered = filtered.filter(s => {
+        if (!s.listedMarket) return false;
+        return selectedSet.has(s.listedMarket.toLowerCase());
+      });
     }
 
     this.filteredSymbols.set(filtered);

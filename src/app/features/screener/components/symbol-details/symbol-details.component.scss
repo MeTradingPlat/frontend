@@ -3,6 +3,8 @@
   display: flex;
   flex-direction: column;
   min-height: 400px;
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
 }
 
 .loading-state, .error-state {
@@ -18,6 +20,7 @@
 .details-header {
   padding: 24px;
   position: relative;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
   
   .symbol-info {
     display: flex;
@@ -29,12 +32,12 @@
       font-size: 2rem;
       font-weight: 800;
       font-family: 'Roboto Mono', monospace;
-      color: #3f51b5;
+      color: var(--mat-sys-primary);
     }
 
     .market-chip {
-      background: #e8eaf6;
-      color: #3f51b5;
+      background: var(--mat-sys-secondary-container);
+      color: var(--mat-sys-on-secondary-container);
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 0.8rem;
@@ -47,7 +50,7 @@
     font-size: 1.2rem;
     font-weight: 400;
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--mat-sys-on-surface-variant);
   }
 
   .close-btn {
@@ -62,16 +65,17 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  background: #fcfcfc;
+  background: var(--mat-sys-surface-container-low);
 
   h3 {
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--mat-sys-on-surface-variant);
     margin-bottom: 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
     padding-bottom: 8px;
+    opacity: 0.7;
   }
 }
 
@@ -88,17 +92,18 @@
 
   .label {
     font-size: 0.75rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--mat-sys-on-surface-variant);
     font-weight: 500;
+    opacity: 0.8;
   }
 
   .value {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--mat-sys-on-surface);
 
     &.highlight {
-      color: #3f51b5;
+      color: var(--mat-sys-primary);
     }
   }
 }
@@ -107,35 +112,17 @@
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: #e0e0e0;
+  color: var(--mat-sys-outline-variant);
   
   &.active {
-    color: #ffb300;
+    color: #ffb300; // Rating gold usually stays consistent
   }
 }
 
 .last-updated {
   font-size: 0.75rem;
-  color: rgba(0, 0, 0, 0.3);
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.5;
   text-align: right;
   margin-top: 16px;
-}
-
-// Dark mode
-:host-context(.dark-theme) {
-  .details-header {
-    .symbol { color: #9fa8da; }
-    .market-chip { background: #2c2c2c; color: #9fa8da; }
-    .description { color: rgba(255, 255, 255, 0.7); }
-  }
-
-  .details-content {
-    background: #1e1e1e;
-    h3 { color: rgba(255, 255, 255, 0.3); border-bottom-color: rgba(255, 255, 255, 0.05); }
-  }
-
-  .metric-item {
-    .label { color: rgba(255, 255, 255, 0.5); }
-    .value { color: #eee; &.highlight { color: #9fa8da; } }
-  }
 }
