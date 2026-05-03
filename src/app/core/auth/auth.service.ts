@@ -88,6 +88,10 @@ export class AuthService {
 
   isAdmin(): boolean {
     const user = this.currentUser();
-    return user ? user.roles.includes('ROLE_ADMIN') : false;
+    if (!user || !user.roles) return false;
+    return user.roles.some((r: any) => {
+      const roleStr = typeof r === 'string' ? r : (r.authority || r.role || '');
+      return roleStr.toUpperCase().includes('ADMIN');
+    });
   }
 }
