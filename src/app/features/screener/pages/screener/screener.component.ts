@@ -16,6 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
 import { TranslateModule } from '@ngx-translate/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
@@ -35,6 +37,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     MatProgressSpinnerModule,
     MatCardModule,
     MatTooltipModule,
+    MatCheckboxModule,
+    MatDividerModule,
     TranslateModule,
     ScrollingModule
   ],
@@ -69,6 +73,19 @@ export class ScreenerComponent implements OnInit {
 
   loadMarkets(): void {
     this.screenerService.getMarkets().subscribe(m => this.markets.set(m));
+  }
+
+  toggleAllMarkets(checked: boolean): void {
+    if (checked) {
+      this.marketControl.setValue(this.markets().map(m => m.id));
+    } else {
+      this.marketControl.setValue([]);
+    }
+  }
+
+  isAllSelected(): boolean {
+    const selected = this.marketControl.value || [];
+    return this.markets().length > 0 && selected.length === this.markets().length;
   }
 
   loadSymbols(): void {

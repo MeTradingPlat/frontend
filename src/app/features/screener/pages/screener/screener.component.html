@@ -15,6 +15,14 @@
       <mat-form-field appearance="outline" class="market-field">
         <mat-label>{{ 'SCREENER.MARKET_LABEL' | translate }}</mat-label>
         <mat-select [formControl]="marketControl" multiple>
+          <div class="select-all-container">
+            <mat-checkbox class="select-all-checkbox" 
+                          [checked]="isAllSelected()" 
+                          (change)="toggleAllMarkets($event.checked)">
+              Seleccionar Todos
+            </mat-checkbox>
+          </div>
+          <mat-divider></mat-divider>
           @for (market of markets(); track market.id) {
             <mat-option [value]="market.id">{{ market.nombre }}</mat-option>
           }
