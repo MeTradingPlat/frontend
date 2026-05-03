@@ -11,6 +11,11 @@
             <button routerLink="/noticias" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
                 <i class="bi bi-newspaper"></i>
             </button>
+            @if (authService.isAdmin()) {
+                <button routerLink="/screener" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Screener">
+                    <i class="bi bi-search"></i>
+                </button>
+            }
         }
         <div class="flex-spacer"></div>
         <button mat-button class="nav-item" (click)="openDrawer()" aria-label="Más opciones">
@@ -38,6 +43,12 @@
                 <i class="bi bi-newspaper"></i>
                 <span>{{ 'NAV.NOTICIAS' | translate }}</span>
             </button>
+            @if (authService.isAdmin()) {
+                <button routerLink="/screener" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+                    <i class="bi bi-search"></i>
+                    <span>{{ 'NAV.SCREENER' | translate }}</span>
+                </button>
+            }
         }
 
         <div class="flex-spacer"></div>

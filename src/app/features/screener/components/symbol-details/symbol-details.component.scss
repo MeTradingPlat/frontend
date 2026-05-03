@@ -1,0 +1,141 @@
+.details-container {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  gap: 16px;
+  text-align: center;
+}
+
+.details-header {
+  padding: 24px;
+  position: relative;
+  
+  .symbol-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+
+    .symbol {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: 'Roboto Mono', monospace;
+      color: #3f51b5;
+    }
+
+    .market-chip {
+      background: #e8eaf6;
+      color: #3f51b5;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+
+  .description {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+}
+
+.details-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  background: #fcfcfc;
+
+  h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(0, 0, 0, 0.4);
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 8px;
+  }
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .label {
+    font-size: 0.75rem;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 500;
+  }
+
+  .value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+
+    &.highlight {
+      color: #3f51b5;
+    }
+  }
+}
+
+.rating-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #e0e0e0;
+  
+  &.active {
+    color: #ffb300;
+  }
+}
+
+.last-updated {
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.3);
+  text-align: right;
+  margin-top: 16px;
+}
+
+// Dark mode
+:host-context(.dark-theme) {
+  .details-header {
+    .symbol { color: #9fa8da; }
+    .market-chip { background: #2c2c2c; color: #9fa8da; }
+    .description { color: rgba(255, 255, 255, 0.7); }
+  }
+
+  .details-content {
+    background: #1e1e1e;
+    h3 { color: rgba(255, 255, 255, 0.3); border-bottom-color: rgba(255, 255, 255, 0.05); }
+  }
+
+  .metric-item {
+    .label { color: rgba(255, 255, 255, 0.5); }
+    .value { color: #eee; &.highlight { color: #9fa8da; } }
+  }
+}

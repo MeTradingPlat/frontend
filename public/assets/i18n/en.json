@@ -3,6 +3,7 @@
     "INICIO": "Home",
     "ESCANER": "Scanner",
     "NOTICIAS": "News",
+    "SCREENER": "Screener",
     "MAS": "More"
   },
   "LANGUAGE": {
@@ -141,6 +142,20 @@
     "RETRY": "Retry",
     "LOADING_CONTENT": "Loading content",
     "LOADING": "Loading..."
+  },
+  "SCREENER": {
+    "TITLE": "Symbol Screener",
+    "SUBTITLE": "Explore all available assets in the Market Data Service with detailed fundamental information.",
+    "SEARCH_LABEL": "Search symbol or description",
+    "MARKET_LABEL": "Filter by Market",
+    "REFRESH": "Refresh",
+    "LOADING": "Fetching Market Data...",
+    "SYMBOL": "Symbol",
+    "DESCRIPTION": "Description",
+    "MARKET": "Market",
+    "NO_DATA": "No symbols found.",
+    "FUNDAMENTALS": "Fundamental Information",
+    "EARNINGS_INFO": "Earnings Information"
   },
   "AUTH": {
     "LOGIN": "Login",

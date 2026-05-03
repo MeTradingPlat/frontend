@@ -1,0 +1,87 @@
+<div class="screener-container">
+  <header class="screener-header">
+    <div class="title-section">
+      <h1>{{ 'SCREENER.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'SCREENER.SUBTITLE' | translate }}</p>
+    </div>
+
+    <div class="filter-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>{{ 'SCREENER.SEARCH_LABEL' | translate }}</mat-label>
+        <input matInput [formControl]="searchControl" placeholder="AAPL, TSLA, NVIDIA...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="market-field">
+        <mat-label>{{ 'SCREENER.MARKET_LABEL' | translate }}</mat-label>
+        <mat-select [formControl]="marketControl" multiple>
+          @for (market of markets(); track market.id) {
+            <mat-option [value]="market.id">{{ market.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      
+      <button mat-flat-button color="primary" class="refresh-btn" (click)="loadSymbols()" [disabled]="isLoading()">
+        <mat-icon [class.rotating]="isLoading()">refresh</mat-icon>
+        {{ 'SCREENER.REFRESH' | translate }}
+      </button>
+    </div>
+  </header>
+
+  <mat-card class="table-card">
+    @if (isLoading()) {
+      <div class="loading-overlay">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>{{ 'SCREENER.LOADING' | translate }}</p>
+      </div>
+    }
+
+    <div class="table-container">
+      <table mat-table [dataSource]="filteredSymbols()" class="premium-table">
+        
+        <ng-container matColumnDef="symbol">
+          <th mat-header-cell *matHeaderCellDef> {{ 'SCREENER.SYMBOL' | translate }} </th>
+          <td mat-cell *matCellDef="let element"> 
+            <span class="symbol-badge">{{ element.symbol }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef> {{ 'SCREENER.DESCRIPTION' | translate }} </th>
+          <td mat-cell *matCellDef="let element"> {{ element.description }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="listedMarket">
+          <th mat-header-cell *matHeaderCellDef> {{ 'SCREENER.MARKET' | translate }} </th>
+          <td mat-cell *matCellDef="let element"> 
+            <mat-chip-set>
+              <mat-chip>{{ element.listedMarket }}</mat-chip>
+            </mat-chip-set>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" class="actions-cell">
+            <button mat-icon-button (click)="viewDetails(element.symbol)" matTooltip="Ver detalles">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="viewDetails(row.symbol)" class="clickable-row"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell empty-cell" colspan="4">
+            {{ 'SCREENER.NO_DATA' | translate }}
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="table-footer">
+      <span>Total: {{ filteredSymbols().length }} symbols</span>
+    </div>
+  </mat-card>
+</div>

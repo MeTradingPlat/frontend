@@ -3,6 +3,7 @@
     "INICIO": "Inicio",
     "ESCANER": "Escáner",
     "NOTICIAS": "Noticias",
+    "SCREENER": "Screener",
     "MAS": "Más"
   },
   "LANGUAGE": {
@@ -141,6 +142,20 @@
     "RETRY": "Reintentar",
     "LOADING_CONTENT": "Cargando contenido",
     "LOADING": "Cargando..."
+  },
+  "SCREENER": {
+    "TITLE": "Screener de Símbolos",
+    "SUBTITLE": "Explora todos los activos disponibles en Market Data Service con información fundamental detallada.",
+    "SEARCH_LABEL": "Buscar símbolo o descripción",
+    "MARKET_LABEL": "Filtrar por Mercado",
+    "REFRESH": "Actualizar",
+    "LOADING": "Consultando Market Data...",
+    "SYMBOL": "Símbolo",
+    "DESCRIPTION": "Descripción",
+    "MARKET": "Mercado",
+    "NO_DATA": "No se encontraron símbolos.",
+    "FUNDAMENTALS": "Información Fundamental",
+    "EARNINGS_INFO": "Información de Earnings"
   },
   "AUTH": {
     "LOGIN": "Iniciar sesión",
