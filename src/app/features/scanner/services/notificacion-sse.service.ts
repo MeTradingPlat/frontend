@@ -97,8 +97,8 @@ export class NotificacionSseService {
     if (this.lastEventId) {
       params.push(`lastEventId=${encodeURIComponent(this.lastEventId)}`);
     }
-    const sseToken = environment.sseAuthToken || this.authService.getToken();
-    if (sseToken) {
+    const sseToken = environment.sseAuthToken;
+    if (sseToken && sseToken !== 'CHANGE_THIS_IN_PRODUCTION') {
       params.push(`token=${encodeURIComponent(sseToken)}`);
     }
     return params.length > 0 ? `${baseUrl}?${params.join('&')}` : baseUrl;

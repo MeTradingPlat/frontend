@@ -1,9 +1,6 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
-# Build argument para el token SSE
-ARG SSE_AUTH_TOKEN=CHANGE_THIS_IN_PRODUCTION
-
 # Set working directory
 WORKDIR /app
 
@@ -15,9 +12,6 @@ RUN npm ci --only=production=false
 
 # Copy source code
 COPY . .
-
-# Reemplazar el token en environment.prod.ts usando Node.js (maneja mejor caracteres especiales)
-RUN node -e "const fs=require('fs');const f='src/environments/environment.prod.ts';const t=process.env.SSE_AUTH_TOKEN||'CHANGE_THIS_IN_PRODUCTION';fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/sseAuthToken: 'CHANGE_THIS_IN_PRODUCTION'/g,\"sseAuthToken: '\"+t+\"'\"));"
 
 # Build the application with both locales (es and en)
 RUN npm run build
