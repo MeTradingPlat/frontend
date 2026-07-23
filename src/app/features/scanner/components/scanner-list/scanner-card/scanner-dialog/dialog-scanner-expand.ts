@@ -120,7 +120,6 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
   styles: [`
     mat-dialog-content {
       padding: 0 !important;
-      max-height: none !important;
     }
 
     .dialog-scanner-card {
@@ -212,10 +211,15 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         .mat-mdc-tab-body-wrapper {
           flex: 1;
           height: 100%;
+          overflow: visible !important;
         }
 
         .mat-mdc-tab-body {
           height: 100%;
+        }
+
+        .mat-mdc-tab-body-active {
+          overflow: visible !important;
         }
 
         .mat-mdc-tab-body-content {
