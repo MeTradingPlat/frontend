@@ -37,7 +37,6 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
     ScannerFiltersTab
   ],
   template: `
-    <mat-dialog-content>
     <mat-card appearance="outlined" class="dialog-scanner-card">
       <mat-card-header>
         <mat-card-title>{{ scanner.nombre }}</mat-card-title>
@@ -115,23 +114,29 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         </mat-tab>
       </mat-tab-group>
     </mat-card>
-  </mat-dialog-content>
   `,
   styles: [`
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     mat-dialog-content {
       padding: 0 !important;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .dialog-scanner-card {
-      height: 100%;
-      max-height: none;
-      display: flex;
-      flex-direction: column;
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       border: none;
       border-radius: 0;
-      overflow: visible;
 
       .mat-mdc-card-header {
         display: flex;
@@ -143,11 +148,11 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         flex-shrink: 0;
         border-radius: 0;
       }
-      
+
       .mat-mdc-card-title {
         color: var(--mat-sys-on-primary);
       }
-      
+
       .header-icons {
         width: auto;
         display: flex;
@@ -192,15 +197,15 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
           }
         }
       }
-      
+
       mat-tab-group {
         background-color: var(--mat-sys-surface-container-low);
         width: 100%;
-        height: 100%;
         flex: 1;
+        min-height: 0;
         display: flex;
-        border-radius: 0;
-        overflow: clip;
+        flex-direction: column;
+        overflow: hidden;
 
         @media (pointer: coarse) {
           overflow: hidden;
@@ -210,21 +215,12 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
       ::ng-deep {
         .mat-mdc-tab-body-wrapper {
           flex: 1;
-          height: 100%;
-          overflow: visible !important;
-        }
-
-        .mat-mdc-tab-body {
-          height: 100%;
-        }
-
-        .mat-mdc-tab-body-active {
-          overflow: visible !important;
+          min-height: 0;
+          overflow: hidden;
         }
 
         .mat-mdc-tab-body-content {
-          height: 100%;
-          overflow: auto;
+          overflow: auto !important;
         }
 
         @media (pointer: coarse) {
@@ -249,7 +245,7 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
         }
       }
     }
-    
+
     .tab-content {
       height: 100%;
       width: 100%;
@@ -271,9 +267,7 @@ export class DialogScannerExpand {
   private readonly facade = inject(ScannerFacadeService);
 
   onConfigureScanner(): void {
-    // Cerrar el diálogo antes de navegar
     this.dialogRef.close();
-    // Navegar a la configuración
     this.router.navigate(['/escaneres/configuracion', this.scanner.idEscaner]);
   }
 
@@ -291,7 +285,6 @@ export class DialogScannerExpand {
           : `${this.translate.instant('SCANNER.STARTED_SUCCESS').replace('{{name}}', this.scanner.nombre).replace('"{{name}}"', `"${this.scanner.nombre}"`)}`;
         this.notificationService.showSuccess(message);
 
-        // Cerrar el diálogo y recargar la lista
         this.dialogRef.close();
         this.facade.loadEscaners(true).subscribe();
       },
