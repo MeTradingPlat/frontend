@@ -1,14 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 import { Escaner } from '../../../../models/escaner.interface';
-import { LogApiService } from '../../../../services/log-api.service';
-import { NotificacionSseService } from '../../../../services/notificacion-sse.service';
+import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
 import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 
 interface SignalRow {
@@ -35,9 +33,8 @@ interface SignalRow {
   styleUrl: './scanner-signals-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerSignalsTab implements OnInit, OnDestroy {
-  private readonly logApiService = inject(LogApiService);
-  private readonly notificacionSseService = inject(NotificacionSseService);
+export class ScannerSignalsTab implements OnInit {
+  private readonly dataStore = inject(ScannerDataStore);
 
   scanner = input.required<Escaner>();
 
@@ -45,79 +42,19 @@ export class ScannerSignalsTab implements OnInit, OnDestroy {
   dataSource = signal<SignalRow[]>([]);
   loading = signal<boolean>(false);
 
-  private sseSubscription?: Subscription;
-
   ngOnInit(): void {
-    this.loadSignals();
-    this.subscribeToUpdates();
-  }
-
-  ngOnDestroy(): void {
-    this.sseSubscription?.unsubscribe();
-  }
-
-  loadSignals(): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
-
     this.loading.set(true);
 
-    // Cargar logs con categoría SIGNAL
-    this.logApiService.getLogsPorEscaner(scannerId).subscribe({
-      next: (logs) => {
-        // Filtrar solo los de categoría SIGNAL y mapear a SignalRow
-        const signals = logs
-          .filter(log => log.categoria === 'SIGNAL')
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .map(log => ({
-            id: log.idRegistroLog,
-            timestamp: log.timestamp,
-            symbol: log.symbol || '-',
-            tipo: this.extractTipoFromMensaje(log.mensaje),
-            mensaje: log.mensaje,
-            metadatos: log.metadatos
-          }));
-
-        this.dataSource.set(signals);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error cargando señales:', error);
-        this.dataSource.set([]);
-        this.loading.set(false);
-      }
+    this.dataStore.loadSignals(scannerId, (signals) => {
+      this.dataSource.set(signals);
+      this.loading.set(false);
     });
   }
 
-  /**
-   * Suscribirse a actualizaciones en tiempo real via SSE
-   */
-  private subscribeToUpdates(): void {
-    const scannerId = this.scanner().idEscaner;
-    if (!scannerId) return;
-
-    this.sseSubscription = this.notificacionSseService
-      .conectarPorEscaner(scannerId)
-      .subscribe({
-        next: (notificacion) => {
-          // Solo procesar notificaciones de tipo SIGNAL
-          if (notificacion.categoria === 'SIGNAL') {
-            const nuevaSenal: SignalRow = {
-              id: parseInt(notificacion.id) || 0,
-              timestamp: notificacion.timestamp,
-              symbol: notificacion.symbol || '-',
-              tipo: this.extractTipoFromMensaje(notificacion.mensaje),
-              mensaje: notificacion.mensaje
-            };
-
-            const currentSignals = this.dataSource();
-            this.dataSource.set([nuevaSenal, ...currentSignals.slice(0, 49)]); // Mantener máximo 50 señales
-          }
-        },
-        error: (error) => {
-          console.error('Error en SSE:', error);
-        }
-      });
+  loadSignals(): void {
+    // Para compatibilidad - el store ya maneja la carga
   }
 
   /**
