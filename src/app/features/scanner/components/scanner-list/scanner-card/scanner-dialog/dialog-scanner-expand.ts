@@ -121,11 +121,15 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
     mat-dialog-content {
       padding: 0 !important;
       max-height: calc(100vh - 32px) !important;
+      height: calc(100vh - 32px) !important;
+      display: flex !important;
+      flex-direction: column !important;
       overflow: hidden !important;
     }
 
     .dialog-scanner-card {
-      height: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       border: none;
