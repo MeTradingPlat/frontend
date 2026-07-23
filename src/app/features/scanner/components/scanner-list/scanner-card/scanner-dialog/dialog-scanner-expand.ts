@@ -116,18 +116,16 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
     </mat-card>
   `,
   styles: [`
+    ::ng-deep .scanner-dialog-panel .mat-mdc-dialog-surface {
+      display: flex;
+      flex-direction: column;
+    }
+
     :host {
       display: flex;
       flex-direction: column;
-      height: 100%;
-    }
-
-    mat-dialog-content {
-      padding: 0 !important;
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      min-height: 0;
     }
 
     .dialog-scanner-card {
