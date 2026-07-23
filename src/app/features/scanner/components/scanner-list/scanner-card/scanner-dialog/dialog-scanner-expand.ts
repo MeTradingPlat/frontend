@@ -135,6 +135,8 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
       flex-direction: column;
       border: none;
       border-radius: 0;
+      color: var(--mat-sys-on-surface);
+      background: var(--mat-sys-surface);
 
       .mat-mdc-card-header {
         display: flex;
