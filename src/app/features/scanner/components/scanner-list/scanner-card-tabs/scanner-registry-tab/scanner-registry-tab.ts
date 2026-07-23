@@ -1,12 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 import { Escaner } from '../../../../models/escaner.interface';
 import { LogApiService } from '../../../../services/log-api.service';
-import { NotificacionSseService } from '../../../../services/notificacion-sse.service';
+import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
 import { RegistroLog } from '../../../../models/registro-log.interface';
 import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 
@@ -23,9 +22,9 @@ import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime
   styleUrl: './scanner-registry-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerRegistryTab implements OnInit, OnDestroy {
+export class ScannerRegistryTab implements OnInit {
   private readonly logApiService = inject(LogApiService);
-  private readonly notificacionSseService = inject(NotificacionSseService);
+  private readonly dataStore = inject(ScannerDataStore);
 
   scanner = input.required<Escaner>();
 
@@ -33,71 +32,18 @@ export class ScannerRegistryTab implements OnInit, OnDestroy {
   dataSource = signal<RegistroLog[]>([]);
   loading = signal<boolean>(false);
 
-  private sseSubscription?: Subscription;
-
   ngOnInit(): void {
-    this.loadRegistry();
-    this.subscribeToUpdates();
-  }
-
-  ngOnDestroy(): void {
-    this.sseSubscription?.unsubscribe();
-  }
-
-  loadRegistry(): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
-
     this.loading.set(true);
 
-    this.logApiService.getLogsPorEscaner(scannerId).subscribe({
-      next: (logs) => {
-        // Ordenar por fecha descendente (más recientes primero)
-        const sortedLogs = logs.sort((a, b) =>
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        );
-        this.dataSource.set(sortedLogs);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error cargando registros:', error);
-        this.dataSource.set([]);
-        this.loading.set(false);
-      }
+    this.dataStore.loadLogs(scannerId, this.logApiService, (logs) => {
+      this.dataSource.set(logs);
+      this.loading.set(false);
     });
   }
 
-  /**
-   * Suscribirse a actualizaciones en tiempo real via SSE
-   */
-  private subscribeToUpdates(): void {
-    const scannerId = this.scanner().idEscaner;
-    if (!scannerId) return;
-
-    this.sseSubscription = this.notificacionSseService
-      .conectarPorEscaner(scannerId)
-      .subscribe({
-        next: (notificacion) => {
-          // Agregar nuevo log al inicio de la lista
-          const nuevoLog: RegistroLog = {
-            idRegistroLog: parseInt(notificacion.id) || 0,
-            servicioOrigen: 'notification-service',
-            nivel: notificacion.nivel,
-            mensaje: notificacion.mensaje,
-            idEscaner: notificacion.idEscaner,
-            symbol: notificacion.symbol,
-            categoria: notificacion.categoria,
-            timestamp: notificacion.timestamp
-          };
-
-          const currentLogs = this.dataSource();
-          this.dataSource.set([nuevoLog, ...currentLogs.slice(0, 99)]); // Mantener máximo 100 registros
-        },
-        error: (error) => {
-          console.error('Error en SSE:', error);
-        }
-      });
-  }
+  loadRegistry(): void {}
 
   getNivelColor(nivel: string): string {
     switch (nivel?.toUpperCase()) {
