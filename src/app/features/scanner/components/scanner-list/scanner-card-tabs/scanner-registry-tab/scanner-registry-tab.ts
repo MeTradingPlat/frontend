@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
@@ -14,6 +15,7 @@ import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime
   imports: [
     CommonModule,
     MatTableModule,
+    MatButtonModule,
     MatChipsModule,
     TranslatePipe,
     LocalDatetimePipe
@@ -31,16 +33,24 @@ export class ScannerRegistryTab implements OnInit {
   displayedColumns: string[] = ['timestamp', 'nivel', 'categoria', 'mensaje'];
   dataSource = signal<RegistroLog[]>([]);
   loading = signal<boolean>(false);
+  hasMore = signal<boolean>(false);
+  private loadMoreFn?: () => void;
 
   ngOnInit(): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
     this.loading.set(true);
 
-    this.dataStore.loadLogs(scannerId, this.logApiService, (logs) => {
+    const { loadMore } = this.dataStore.loadLogs(scannerId, this.logApiService, (logs, more) => {
       this.dataSource.set(logs);
+      this.hasMore.set(more);
       this.loading.set(false);
     });
+    this.loadMoreFn = loadMore;
+  }
+
+  onLoadMore(): void {
+    this.loadMoreFn?.();
   }
 
   loadRegistry(): void {}

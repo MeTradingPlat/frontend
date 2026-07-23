@@ -48,4 +48,9 @@
         [class.error-row]="row.nivel === 'ERROR'"
         [class.warn-row]="row.nivel === 'WARN'"></tr>
   </table>
+  @if (hasMore()) {
+    <button mat-button (click)="onLoadMore()" class="load-more-btn">
+      {{ 'SCANNER.LOAD_MORE' | translate }}
+    </button>
+  }
 }

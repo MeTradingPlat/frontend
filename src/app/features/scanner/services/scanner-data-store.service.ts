@@ -134,34 +134,49 @@ export class ScannerDataStore {
     }
   }
 
-  private logCache = new Map<number, { data: any[]; sub?: Subscription }>();
+  private logCache = new Map<number, { data: any[]; page: number; hasMore: boolean; sub?: Subscription }>();
 
-  loadLogs(scannerId: number, logApi: any, onUpdate: (data: any[]) => void, page = 0, size = 50): void {
-    const key = `${scannerId}:${page}`;
-    const cached = this.logCache.get(scannerId);
-    if (cached && page === 0) {
-      onUpdate(cached.data);
-      return;
-    }
+  loadLogs(scannerId: number, logApi: any, onUpdate: (data: any[], hasMore: boolean) => void): { loadMore: () => void } {
+    let page = 0;
+    const size = 50;
 
-    const fetchAndUpdate = () => {
-      logApi.getLogsPorEscanerPaginated(scannerId, 0, size).subscribe({
+    const fetchPage = (p: number) => {
+      logApi.getLogsPorEscanerPaginated(scannerId, p, size).subscribe({
         next: (logs: any[]) => {
-          const existing = this.logCache.get(scannerId);
-          this.logCache.set(scannerId, { data: logs, sub: existing?.sub! });
-          onUpdate(logs);
+          const hasMore = logs.length === size;
+          if (p === 0) {
+            this.logCache.set(scannerId, { data: logs, page: p, hasMore, sub: this.logCache.get(scannerId)?.sub! });
+            onUpdate(logs, hasMore);
+          } else {
+            const existing = this.logCache.get(scannerId);
+            const merged = [...(existing?.data || []), ...logs];
+            this.logCache.set(scannerId, { data: merged, page: p, hasMore, sub: existing?.sub! });
+            onUpdate(merged, hasMore);
+          }
         }
       });
     };
 
-    fetchAndUpdate();
+    const existing = this.logCache.get(scannerId);
+    if (existing && existing.page >= 0) {
+      onUpdate(existing.data, existing.hasMore);
+    } else {
+      fetchPage(0);
+    }
 
     if (!this.logCache.has(scannerId)) {
       const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-        next: () => fetchAndUpdate()
+        next: () => { page = 0; fetchPage(0); }
       });
-      this.logCache.set(scannerId, { data: [], sub });
+      this.logCache.set(scannerId, { data: [], page: -1, hasMore: true, sub });
     }
+
+    return {
+      loadMore: () => {
+        page++;
+        fetchPage(page);
+      }
+    };
   }
 
   release(scannerId: number): void {
