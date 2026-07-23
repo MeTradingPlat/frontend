@@ -121,14 +121,12 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
     mat-dialog-content {
       padding: 0 !important;
       height: 90vh !important;
-      max-height: 90vh !important;
       overflow: hidden !important;
     }
 
     .dialog-scanner-card {
-      height: 100% !important;
-      display: flex !important;
-      flex-direction: column !important;
+      height: 100%;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       border: none;
@@ -198,29 +196,30 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
       mat-tab-group {
         background-color: var(--mat-sys-surface-container-low);
         width: 100%;
+        height: 100%;
         flex: 1;
-        min-height: 0;
         display: flex;
-        flex-direction: column;
         border-radius: 0;
-        overflow: hidden;
+        overflow: clip;
+
+        @media (pointer: coarse) {
+          overflow: hidden;
+        }
       }
 
       ::ng-deep {
         .mat-mdc-tab-body-wrapper {
           flex: 1;
-          min-height: 0;
-          overflow: hidden;
+          height: 100%;
         }
 
         .mat-mdc-tab-body {
           height: 100%;
-          overflow: hidden;
         }
 
         .mat-mdc-tab-body-content {
           height: 100%;
-          overflow: auto !important;
+          overflow: auto;
         }
 
         @media (pointer: coarse) {
