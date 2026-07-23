@@ -136,32 +136,32 @@ export class ScannerDataStore {
 
   private logCache = new Map<number, { data: any[]; sub?: Subscription }>();
 
-  loadLogs(scannerId: number, logApi: any, onUpdate: (data: any[]) => void): void {
+  loadLogs(scannerId: number, logApi: any, onUpdate: (data: any[]) => void, page = 0, size = 50): void {
+    const key = `${scannerId}:${page}`;
     const cached = this.logCache.get(scannerId);
-    if (cached) {
+    if (cached && page === 0) {
       onUpdate(cached.data);
       return;
     }
 
     const fetchAndUpdate = () => {
-      logApi.getLogsPorEscaner(scannerId).subscribe({
+      logApi.getLogsPorEscanerPaginated(scannerId, 0, size).subscribe({
         next: (logs: any[]) => {
-          const sorted = [...logs].sort((a: any, b: any) =>
-            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          );
           const existing = this.logCache.get(scannerId);
-          this.logCache.set(scannerId, { data: sorted, sub: existing?.sub! });
-          onUpdate(sorted);
+          this.logCache.set(scannerId, { data: logs, sub: existing?.sub! });
+          onUpdate(logs);
         }
       });
     };
 
     fetchAndUpdate();
 
-    const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-      next: () => fetchAndUpdate()
-    });
-    this.logCache.set(scannerId, { data: [], sub });
+    if (!this.logCache.has(scannerId)) {
+      const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
+        next: () => fetchAndUpdate()
+      });
+      this.logCache.set(scannerId, { data: [], sub });
+    }
   }
 
   release(scannerId: number): void {

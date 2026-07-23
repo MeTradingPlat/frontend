@@ -41,4 +41,11 @@ export class LogApiService {
   getLogsPorEscaner(idEscaner: number): Observable<RegistroLogDTORespuesta[]> {
     return this.http.get<RegistroLogDTORespuesta[]>(`${this.apiUrl}/escaner/${idEscaner}`);
   }
+
+  /**
+   * Obtiene logs por ID de escaner con paginacion
+   */
+  getLogsPorEscanerPaginated(idEscaner: number, page: number = 0, size: number = 50): Observable<RegistroLogDTORespuesta[]> {
+    return this.http.get<RegistroLogDTORespuesta[]>(`${this.apiUrl}/escaner/${idEscaner}?page=${page}&size=${size}`);
+  }
 }
