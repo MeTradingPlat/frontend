@@ -69,11 +69,43 @@ export class ScannerDataStore {
     });
   }
 
+  private genericCache = new Map<string, { data: any; sub?: Subscription }>();
+
+  loadGeneric(key: string, fetch: () => Subscription, onUpdate: (data: any) => void): void {
+    const cached = this.genericCache.get(key);
+    if (cached) {
+      onUpdate(cached.data);
+      return;
+    }
+    const sub = fetch();
+    this.genericCache.set(key, { data: null, sub });
+    const checkData = () => {
+      const c = this.genericCache.get(key);
+      if (c?.data) onUpdate(c.data);
+    };
+    setTimeout(checkData, 100);
+  }
+
+  cacheGeneric(key: string, data: any): void {
+    const existing = this.genericCache.get(key);
+    if (existing) {
+      this.genericCache.set(key, { data, sub: existing.sub });
+    } else {
+      this.genericCache.set(key, { data });
+    }
+  }
+
   release(scannerId: number): void {
     const entry = this.signalsCache.get(scannerId);
     if (entry) {
       entry.sub?.unsubscribe();
       this.signalsCache.delete(scannerId);
+    }
+    for (const [key, val] of this.genericCache) {
+      if (key.startsWith(`${scannerId}:`)) {
+        val.sub?.unsubscribe();
+        this.genericCache.delete(key);
+      }
     }
   }
 
