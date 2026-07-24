@@ -1,7 +1,10 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LogApiService } from './log-api.service';
 import { NotificacionSseService } from './notificacion-sse.service';
+import { ActivoApiService } from './activo-api.service';
+import { RegistroLogDTORespuesta } from '../models/registro-log.interface';
+import { Activo } from '../models/activo.interface';
 
 interface SignalRow {
   id: number;
@@ -19,24 +22,24 @@ export class ScannerDataStore {
 
   private readonly signalsCache = new Map<number, { data: SignalRow[]; sub: Subscription }>();
 
-  getSignals(scannerId: number) {
+  getSignals(scannerId: number): SignalRow[] | null {
     const entry = this.signalsCache.get(scannerId);
-    if (entry) return entry.data;
-    return null;
+    return entry ? entry.data : null;
   }
 
   loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void): void {
     if (this.signalsCache.has(scannerId)) {
-      onUpdate(this.signalsCache.get(scannerId)!.data);
+      const cached = this.signalsCache.get(scannerId);
+      if (cached) onUpdate(cached.data);
       return;
     }
 
     this.logApi.getLogsPorEscaner(scannerId).subscribe({
-      next: (logs) => {
-        const signals = logs
-          .filter(l => l.categoria === 'SIGNAL')
-          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .map(l => ({
+      next: (logs: RegistroLogDTORespuesta[]) => {
+        const signals: SignalRow[] = logs
+          .filter((l: RegistroLogDTORespuesta) => l.categoria === 'SIGNAL')
+          .sort((a: RegistroLogDTORespuesta, b: RegistroLogDTORespuesta) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+          .map((l: RegistroLogDTORespuesta) => ({
             id: l.idRegistroLog,
             timestamp: l.timestamp,
             symbol: l.symbol || '-',
@@ -46,10 +49,10 @@ export class ScannerDataStore {
           }));
 
         const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-          next: (n) => {
+          next: (n: { categoria?: string; id?: string; timestamp: string; symbol?: string; mensaje: string }) => {
             if (n.categoria === 'SIGNAL') {
               const s: SignalRow = {
-                id: parseInt(n.id) || 0,
+                id: parseInt(n.id || '0') || 0,
                 timestamp: n.timestamp,
                 symbol: n.symbol || '-',
                 tipo: this.extractTipo(n.mensaje),
@@ -57,7 +60,8 @@ export class ScannerDataStore {
               };
               signals.unshift(s);
               if (signals.length > 50) signals.length = 50;
-              this.signalsCache.set(scannerId, { data: [...signals], sub: entry?.sub! });
+              const existing = this.signalsCache.get(scannerId);
+              this.signalsCache.set(scannerId, { data: [...signals], sub: existing?.sub ?? sub });
               onUpdate([...signals]);
             }
           }
@@ -69,50 +73,20 @@ export class ScannerDataStore {
     });
   }
 
-  private genericCache = new Map<string, { data: any; sub?: Subscription }>();
+  private assetCaches = new Map<number, { data: Activo[]; sub?: Subscription }>();
 
-  loadGeneric(key: string, fetch: () => Subscription, onUpdate: (data: any) => void): void {
-    const cached = this.genericCache.get(key);
-    if (cached) {
-      onUpdate(cached.data);
-      return;
-    }
-    const sub = fetch();
-    this.genericCache.set(key, { data: null, sub });
-    const checkData = () => {
-      const c = this.genericCache.get(key);
-      if (c?.data) onUpdate(c.data);
-    };
-    setTimeout(checkData, 100);
-  }
-
-  cacheGeneric(key: string, data: any): void {
-    const existing = this.genericCache.get(key);
-    if (existing) {
-      this.genericCache.set(key, { data, sub: existing.sub });
-    } else {
-      this.genericCache.set(key, { data });
-    }
-  }
-
-  private assetCaches = new Map<number, { data: any[]; sub?: Subscription }>();
-
-  loadAssets(scannerId: number, activoApi: any, onUpdate: (data: any[]) => void): void {
+  loadAssets(scannerId: number, activoApi: ActivoApiService, onUpdate: (data: Activo[]) => void): void {
     const cached = this.assetCaches.get(scannerId);
     if (cached) {
       onUpdate(cached.data);
       return;
     }
 
-    const fetchAndUpdate = () => {
+    const fetchAndUpdate = (): void => {
       activoApi.getActivosPorEscaner(scannerId).subscribe({
-        next: (activos: any[]) => {
+        next: (activos: Activo[]) => {
           const existing = this.assetCaches.get(scannerId);
-          if (existing) {
-            this.assetCaches.set(scannerId, { data: activos, sub: existing.sub });
-          } else {
-            this.assetCaches.set(scannerId, { data: activos });
-          }
+          this.assetCaches.set(scannerId, { data: activos, sub: existing?.sub });
           onUpdate(activos);
         }
       });
@@ -121,28 +95,25 @@ export class ScannerDataStore {
     fetchAndUpdate();
 
     const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-      next: (notificacion: any) => {
+      next: (notificacion: { categoria?: string; tipo?: string }) => {
         if (notificacion.categoria === 'SIGNAL' || notificacion.tipo === 'LOG') {
           fetchAndUpdate();
         }
       }
     });
 
-    const existing = this.assetCaches.get(scannerId);
-    if (existing) {
-      this.assetCaches.set(scannerId, { data: existing.data, sub });
-    }
+    this.assetCaches.set(scannerId, { data: [], sub });
   }
 
-  private logCache = new Map<number, { data: any[]; page: number; hasMore: boolean; sub?: Subscription }>();
+  private logCache = new Map<number, { data: RegistroLogDTORespuesta[]; page: number; hasMore: boolean; sub?: Subscription }>();
 
-  loadLogs(scannerId: number, logApi: any, onUpdate: (data: any[], hasMore: boolean) => void): { loadMore: () => void } {
+  loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void): { loadMore: () => void } {
     let page = 0;
     const size = 50;
 
-    const fetchPage = (p: number) => {
+    const fetchPage = (p: number): void => {
       logApi.getLogsPorEscanerPaginated(scannerId, p, size).subscribe({
-        next: (logs: any[]) => {
+        next: (logs: RegistroLogDTORespuesta[]) => {
           const hasMore = logs.length === size;
           if (p === 0) {
             this.logCache.set(scannerId, { data: logs, page: p, hasMore, sub: this.logCache.get(scannerId)?.sub! });
@@ -166,13 +137,13 @@ export class ScannerDataStore {
 
     if (!this.logCache.has(scannerId)) {
       const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-        next: () => { page = 0; fetchPage(0); }
+        next: (): void => { page = 0; fetchPage(0); }
       });
       this.logCache.set(scannerId, { data: [], page: -1, hasMore: true, sub });
     }
 
     return {
-      loadMore: () => {
+      loadMore: (): void => {
         page++;
         fetchPage(page);
       }
@@ -184,12 +155,6 @@ export class ScannerDataStore {
     if (entry) {
       entry.sub?.unsubscribe();
       this.signalsCache.delete(scannerId);
-    }
-    for (const [key, val] of this.genericCache) {
-      if (key.startsWith(`${scannerId}:`)) {
-        val.sub?.unsubscribe();
-        this.genericCache.delete(key);
-      }
     }
   }
 
