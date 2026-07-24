@@ -17,25 +17,6 @@ html {
     ),
     density: 0
   ));
-
-  @include mat.theme-overrides((
-    primary: #3C467B,
-    on-primary: #FFFFFF,
-    primary-container: #DDE0F5,
-    on-primary-container: #0A0E1F,
-    secondary: #50589C,
-    on-secondary: #FFFFFF,
-    tertiary: #636CCB,
-    on-tertiary: #FFFFFF,
-    surface: #0F1119,
-    surface-container-low: #1A1D28,
-    surface-container: #1E2130,
-    surface-container-high: #282B3D,
-    surface-container-highest: #333750,
-    on-surface: #E0E2F0,
-    outline: #6E7088,
-    outline-variant: #3E4055,
-  ));
 }
 
 html, body {
