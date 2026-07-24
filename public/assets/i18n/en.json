@@ -136,7 +136,8 @@
     "UPDATE_DATE": "Last Update",
     "LEVEL": "Level",
     "MESSAGE": "Message",
-    "TYPE": "Type"
+    "TYPE": "Type",
+    "LOAD_MORE": "Load more"
   },
   "COMMON": {
     "RETRY": "Retry",

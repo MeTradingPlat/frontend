@@ -136,7 +136,8 @@
     "UPDATE_DATE": "Última Actualización",
     "LEVEL": "Nivel",
     "MESSAGE": "Mensaje",
-    "TYPE": "Tipo"
+    "TYPE": "Tipo",
+    "LOAD_MORE": "Cargar más"
   },
   "COMMON": {
     "RETRY": "Reintentar",
