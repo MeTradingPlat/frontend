@@ -20,6 +20,12 @@
     z-index: 3;
     background-color: var(--mat-sys-surface-container);
 
+    .sidebar-logo {
+        width: 75px;
+        height: auto;
+        margin: 4px 0 8px 0;
+    }
+
     h1 {
         font: var(--mat-sys-display-small);
         color: var(--mat-sys-on-surface-variant);
