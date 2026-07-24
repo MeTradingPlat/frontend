@@ -40,6 +40,10 @@ body {
       surface-container: #18191a,
       surface-container-low: #18191a,
     ));
+
+    // Black shadows barely read against a near-black background, so dark
+    // mode needs a much stronger, more diffuse shadow than light mode
+    --app-card-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   &.light-mode{
@@ -51,7 +55,16 @@ body {
       surface-container: #ffffff,
       surface-container-low: #ffffff,
     ));
+
+    --app-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
   }
+}
+
+// Flat cards now match the app background, so elevation comes purely
+// from shadow instead of a tinted surface, giving a floating feel
+.mat-mdc-card {
+  box-shadow: var(--app-card-shadow) !important;
+  border: none !important;
 }
 
 @media (max-width: 768px) {
