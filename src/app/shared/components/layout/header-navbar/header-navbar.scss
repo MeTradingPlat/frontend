@@ -21,20 +21,6 @@
     flex-direction: column;
 }
 
-// Mobile logo (hidden on desktop)
-.mobile-logo {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 10px;
-    flex-shrink: 0;
-
-    .logo-img {
-        height: 32px;
-        width: auto;
-    }
-}
-
 // Header content
 .header-content {
     display: flex;
@@ -121,10 +107,6 @@
         height: var(--header-navbar-height);
         min-height: var(--header-navbar-min-height);
         z-index: 5;
-    }
-
-    .mobile-logo {
-        display: none;
     }
 
     .header-content {
