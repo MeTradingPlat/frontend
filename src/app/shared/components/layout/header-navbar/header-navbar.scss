@@ -124,17 +124,7 @@
     }
 
     .mobile-logo {
-        display: flex;
-        height: 40px;
-
-        h1 {
-            font: var(--mat-sys-display-small);
-            color: var(--mat-sys-on-surface-variant);
-            height: 75px;
-            display: flex;
-            align-items: center;
-            margin: 0;
-        }
+        display: none;
     }
 
     .header-content {

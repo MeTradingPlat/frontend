@@ -36,10 +36,6 @@ body {
   &.light-mode{
     color-scheme: light;
   }
-
-  @media(prefers-contrast: more) {
-    @include custom.high-contrast-overrides(color-scheme)
-  }
 }
 
 @media (max-width: 768px) {
