@@ -29,10 +29,9 @@
     padding: 5px 10px;
     flex-shrink: 0;
 
-    h1 {
-        font: var(--mat-sys-display-small);
-        color: var(--mat-sys-on-surface-variant);
-        margin: 0;
+    .logo-img {
+        height: 32px;
+        width: auto;
     }
 }
 
@@ -44,6 +43,12 @@
     padding: 10px;
     gap: 10px;
     flex: 1;
+
+    .logo-tipografico {
+        height: 28px;
+        width: auto;
+        margin-right: 8px;
+    }
 
     h3 {
         font: var(--mat-sys-headline-large);
