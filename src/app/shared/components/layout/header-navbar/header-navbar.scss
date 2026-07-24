@@ -21,6 +21,11 @@
     flex-direction: column;
 }
 
+// Mobile brand banner (hidden on desktop, replaces inline wordmark)
+.mobile-brand {
+    display: none;
+}
+
 // Header content
 .header-content {
     display: flex;
@@ -109,8 +114,25 @@
         z-index: 5;
     }
 
+    .mobile-brand {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px 10px;
+        flex-shrink: 0;
+
+        .mobile-brand-img {
+            height: 28px;
+            width: auto;
+        }
+    }
+
     .header-content {
         padding: 5px 10px;
+
+        .logo-tipografico {
+            display: none;
+        }
 
         h3 {
             font: var(--mat-sys-title-large);
