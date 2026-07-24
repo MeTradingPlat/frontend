@@ -35,6 +35,11 @@ body {
 
   &.light-mode{
     color-scheme: light;
+
+    @include mat.theme-overrides((
+      background: map.get(custom.$primary-palette, neutral, 96),
+      surface: map.get(custom.$primary-palette, neutral, 96),
+    ));
   }
 }
 
