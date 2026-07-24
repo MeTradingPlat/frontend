@@ -1,7 +1,9 @@
 <nav class="navbar-header">
     <!-- Mobile brand banner (hidden on desktop) -->
     <div class="mobile-brand">
-        <img src="logo-tipografico.png" alt="MeTradingPlat" class="mobile-brand-img" />
+        <span class="brand-wordmark brand-wordmark--banner">
+            <span class="brand-me">ME</span><span class="brand-rest">TRADINGPLAT</span>
+        </span>
     </div>
 
     <!-- Header content -->
@@ -17,7 +19,9 @@
                 </button>
             }
         </div>
-        <img src="logo-tipografico.png" alt="MeTradingPlat" class="logo-tipografico" />
+        <span class="brand-wordmark brand-wordmark--inline">
+            <span class="brand-me">ME</span><span class="brand-rest">TRADINGPLAT</span>
+        </span>
         <h3>{{title()}}</h3>
         <div class="flex-spacer"></div>
         @for (item of buttons(); track item.id) {

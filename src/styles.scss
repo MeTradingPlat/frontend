@@ -29,14 +29,15 @@ body {
   font-family: 'Manrope', sans-serif;
   font-optical-sizing: auto;
 
-  // Instagram/Meta-style neutrals: true black in dark mode, near-white in light mode
+  // Meta/Instagram design-system neutrals: bluish-black in dark mode (#18191a,
+  // same value Facebook/Instagram use), pure white in light mode
   &.dark-mode{
     color-scheme: dark;
 
     @include mat.theme-overrides((
-      background: #000000,
-      surface: #000000,
-      surface-container: #121212,
+      background: #18191a,
+      surface: #18191a,
+      surface-container: #18191a,
     ));
   }
 
@@ -44,9 +45,9 @@ body {
     color-scheme: light;
 
     @include mat.theme-overrides((
-      background: #fafafa,
-      surface: #fafafa,
-      surface-container: #f2f3f5,
+      background: #ffffff,
+      surface: #ffffff,
+      surface-container: #ffffff,
     ));
   }
 }

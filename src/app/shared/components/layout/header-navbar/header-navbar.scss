@@ -26,6 +26,29 @@
     display: none;
 }
 
+.brand-wordmark {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    white-space: nowrap;
+
+    .brand-me {
+        color: var(--mat-sys-primary);
+    }
+
+    .brand-rest {
+        color: var(--mat-sys-on-surface);
+    }
+}
+
+.brand-wordmark--banner {
+    font-size: 1.5rem;
+}
+
+.brand-wordmark--inline {
+    font-size: 1.125rem;
+    margin-right: 8px;
+}
+
 // Header content
 .header-content {
     display: flex;
@@ -34,12 +57,6 @@
     padding: 10px;
     gap: 10px;
     flex: 1;
-
-    .logo-tipografico {
-        height: 28px;
-        width: auto;
-        margin-right: 8px;
-    }
 
     h3 {
         font: var(--mat-sys-headline-large);
@@ -120,17 +137,12 @@
         align-items: center;
         padding: 8px 10px;
         flex-shrink: 0;
-
-        .mobile-brand-img {
-            height: 28px;
-            width: auto;
-        }
     }
 
     .header-content {
         padding: 5px 10px;
 
-        .logo-tipografico {
+        .brand-wordmark--inline {
             display: none;
         }
 
