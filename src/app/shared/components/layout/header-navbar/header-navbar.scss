@@ -30,6 +30,7 @@
     font-family: 'Manrope', sans-serif;
     font-weight: 700;
     white-space: nowrap;
+    text-decoration: none;
 
     .brand-me {
         color: var(--mat-sys-primary);
@@ -41,11 +42,11 @@
 }
 
 .brand-wordmark--banner {
-    font-size: 1.5rem;
+    font-size: var(--mat-sys-title-large-size);
 }
 
 .brand-wordmark--inline {
-    font-size: 1.125rem;
+    font-size: var(--mat-sys-headline-large-size);
     margin-right: 8px;
 }
 
