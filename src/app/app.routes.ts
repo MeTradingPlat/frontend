@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
-import { adminGuard } from './core/auth/admin.guard';
 import { LoginComponent } from './features/login/login.component';
 
 export const routes: Routes = [
@@ -24,7 +23,7 @@ export const routes: Routes = [
     },
     {
         path: 'screener',
-        canActivate: [adminGuard],
+        canActivate: [authGuard],
         loadChildren: () => import('./features/screener/screener.module').then(m => m.ScreenerModule)
     },
     { path: '', redirectTo: 'inicio', pathMatch: 'full' },
