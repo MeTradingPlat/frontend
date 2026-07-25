@@ -1,0 +1,37 @@
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+}
+
+.timeframe-toggle {
+  align-self: flex-start;
+}
+
+.chart-container-outer {
+  position: relative;
+  flex: 1;
+  min-height: 360px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.error-overlay {
+  color: var(--mat-sys-error, #ef5350);
+  text-align: center;
+  padding: 1rem;
+}

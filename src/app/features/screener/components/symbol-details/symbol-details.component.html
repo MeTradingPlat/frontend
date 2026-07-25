@@ -27,6 +27,11 @@
 
     <mat-divider></mat-divider>
 
+    <mat-tab-group class="details-tabs">
+    <mat-tab [label]="'SCREENER.TAB_CHART' | translate">
+      <app-symbol-chart [symbol]="active?.symbol ?? ''"></app-symbol-chart>
+    </mat-tab>
+    <mat-tab [label]="'SCREENER.TAB_FUNDAMENTALS' | translate">
     <div class="details-content">
       <section class="metrics-section">
         <h3>{{ 'SCREENER.FUNDAMENTALS' | translate }}</h3>
@@ -114,5 +119,7 @@
       
       <p class="last-updated">Última actualización: {{ fund?.lastUpdated | date:'short' }}</p>
     </div>
+    </mat-tab>
+    </mat-tab-group>
   }
 </div>

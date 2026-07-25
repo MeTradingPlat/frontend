@@ -1,0 +1,24 @@
+<div class="chart-wrapper">
+  <mat-button-toggle-group
+    class="timeframe-toggle"
+    [value]="selectedTimeframe()"
+    (change)="onTimeframeChange($event.value)">
+    @for (tf of timeframes; track tf.id) {
+      <mat-button-toggle [value]="tf.id">{{ tf.label }}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+
+  <div class="chart-container-outer">
+    @if (isLoading()) {
+      <div class="chart-overlay">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    }
+    @if (error()) {
+      <div class="chart-overlay error-overlay">
+        <span>{{ error() }}</span>
+      </div>
+    }
+    <div #chartContainer class="chart-container"></div>
+  </div>
+</div>

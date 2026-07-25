@@ -8,7 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
+import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
 
 @Component({
   selector: 'app-symbol-details',
@@ -20,7 +22,9 @@ import { TranslateModule } from '@ngx-translate/core';
     MatIconModule,
     MatProgressSpinnerModule,
     MatDividerModule,
-    TranslateModule
+    MatTabsModule,
+    TranslateModule,
+    SymbolChartComponent
   ],
   templateUrl: './symbol-details.component.html',
   styleUrls: ['./symbol-details.component.scss']

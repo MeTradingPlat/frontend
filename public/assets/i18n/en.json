@@ -156,7 +156,9 @@
     "MARKET": "Market",
     "NO_DATA": "No symbols found.",
     "FUNDAMENTALS": "Fundamental Information",
-    "EARNINGS_INFO": "Earnings Information"
+    "EARNINGS_INFO": "Earnings Information",
+    "TAB_CHART": "Chart",
+    "TAB_FUNDAMENTALS": "Fundamentals"
   },
   "AUTH": {
     "LOGIN": "Login",

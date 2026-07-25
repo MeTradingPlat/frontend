@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
-import { Market, SymbolSummary } from '../../models/screener.models';
+import { Market, Symbol } from '../../models/screener.models';
 import { SymbolDetailsComponent } from '../../components/symbol-details/symbol-details.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -50,14 +50,14 @@ export class ScreenerComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   markets = signal<Market[]>([]);
-  allSymbols = signal<SymbolSummary[]>([]);
-  filteredSymbols = signal<SymbolSummary[]>([]);
+  allSymbols = signal<Symbol[]>([]);
+  filteredSymbols = signal<Symbol[]>([]);
   isLoading = signal<boolean>(false);
 
   searchControl = new FormControl('');
   marketControl = new FormControl<string[]>([]);
 
-  displayedColumns: string[] = ['symbol', 'description', 'listedMarket', 'actions'];
+  displayedColumns: string[] = ['symbol', 'description', 'market', 'actions'];
 
   ngOnInit(): void {
     this.loadMarkets();
@@ -107,8 +107,8 @@ export class ScreenerComponent implements OnInit {
     let filtered = this.allSymbols();
 
     if (searchTerm) {
-      filtered = filtered.filter(s => 
-        s.symbol.toLowerCase().includes(searchTerm) || 
+      filtered = filtered.filter(s =>
+        s.symbol.toLowerCase().includes(searchTerm) ||
         s.description.toLowerCase().includes(searchTerm)
       );
     }

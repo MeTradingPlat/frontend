@@ -1,29 +1,52 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { Market, SymbolSummary, SymbolDetails } from '../models/screener.models';
+import { Market, Symbol, SymbolDetails, Timeframe } from '../models/screener.models';
 
+/**
+ * ScreenerService
+ *
+ * Servicio que comunica con MarketData Service (Java) como API Gateway/BFF.
+ * El Frontend NUNCA habla directamente con Tastytrade.
+ *
+ * Endpoints (MetadataController, expuestos por el gateway bajo /marketdata/**):
+ * - GET /marketdata/markets
+ * - GET /marketdata/symbols
+ * - GET /marketdata/symbols/{symbol}/details
+ * - GET /marketdata/timeframes
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class ScreenerService {
-  private apiUrl = environment.apiUrl + '/marketdata';
+  private marketDataUrl = environment.marketDataUrl;
+  private analysisUrl = environment.technicalAnalysisUrl;
   private http = inject(HttpClient);
 
   getMarkets(): Observable<Market[]> {
-    return this.http.get<Market[]>(`${this.apiUrl}/markets`);
+    return this.http.get<Market[]>(`${this.marketDataUrl}/markets`);
   }
 
-  getSymbols(markets?: string[]): Observable<SymbolSummary[]> {
-    let params = new HttpParams();
-    if (markets && markets.length > 0) {
-      params = params.set('markets', markets.join(','));
-    }
-    return this.http.get<SymbolSummary[]>(`${this.apiUrl}/symbols`, { params });
+  getSymbols(): Observable<Symbol[]> {
+    return this.http.get<Symbol[]>(`${this.marketDataUrl}/symbols`);
   }
 
   getSymbolDetails(symbol: string): Observable<SymbolDetails> {
-    return this.http.get<SymbolDetails>(`${this.apiUrl}/symbols/${symbol}/details`);
+    return this.http.get<SymbolDetails>(`${this.marketDataUrl}/symbols/${symbol}/details`);
+  }
+
+  getTimeframes(): Observable<Timeframe[]> {
+    return this.http.get<Timeframe[]>(`${this.marketDataUrl}/timeframes`);
+  }
+
+  /**
+   * GET /api/v1/analysis/{symbol}
+   * Obtiene indicadores técnicos desde Python (Signal Processing Service)
+   */
+  getTechnicalIndicators(symbol: string): Observable<any> {
+    return this.http.get<any>(`${this.analysisUrl}/${symbol}`)
+      .pipe(map(response => response.indicators));
   }
 }
