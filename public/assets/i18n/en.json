@@ -158,7 +158,8 @@
     "FUNDAMENTALS": "Fundamental Information",
     "EARNINGS_INFO": "Earnings Information",
     "TAB_CHART": "Chart",
-    "TAB_FUNDAMENTALS": "Fundamentals"
+    "TAB_FUNDAMENTALS": "Fundamentals",
+    "CHART_NO_DATA": "No historical bars available for this timeframe right now."
   },
   "AUTH": {
     "LOGIN": "Login",

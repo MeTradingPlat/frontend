@@ -54,6 +54,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly selectedTimeframe = signal<string>('M15');
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
+  readonly hasNoData = signal<boolean>(false);
 
   private readonly candleStream = inject(CandleStreamService);
   private chart: IChartApi | null = null;
@@ -114,6 +115,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.series = this.addCandlestickSeries();
     this.isLoading.set(true);
     this.error.set(null);
+    this.hasNoData.set(false);
 
     this.streamSubscription = this.candleStream
       .subscribe(this.symbol, this.selectedTimeframe())
@@ -127,9 +129,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (message.type === 'history') {
       this.series?.setData(message.bars.map(toCandlestickData));
       this.isLoading.set(false);
+      this.hasNoData.set(message.bars.length === 0);
     } else if (message.type === 'bar') {
       this.series?.update(toCandlestickData(message.bar));
       this.isLoading.set(false);
+      this.hasNoData.set(false);
     } else if (message.type === 'error') {
       this.error.set(message.message ?? 'Error en el stream de velas.');
     }
