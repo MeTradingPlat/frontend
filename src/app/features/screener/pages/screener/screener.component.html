@@ -60,7 +60,7 @@
           <div class="col-description">{{ element.description }}</div>
           <div class="col-market">
             <mat-chip-set>
-              <mat-chip>{{ element.listedMarket }}</mat-chip>
+              <mat-chip>{{ element.listedMarket | marketLabel }}</mat-chip>
             </mat-chip-set>
           </div>
           <div class="col-actions">

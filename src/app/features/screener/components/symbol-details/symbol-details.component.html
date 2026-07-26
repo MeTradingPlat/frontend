@@ -17,7 +17,7 @@
     <header class="details-header">
       <div class="symbol-info">
         <span class="symbol">{{ active?.symbol }}</span>
-        <span class="market-chip">{{ active?.listedMarket }}</span>
+        <span class="market-chip">{{ active?.listedMarket | marketLabel }}</span>
       </div>
       <h2 class="description">{{ active?.description }}</h2>
       <button mat-icon-button class="close-btn" (click)="close()">

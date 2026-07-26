@@ -20,6 +20,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { TranslateModule } from '@ngx-translate/core';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MarketLabelPipe } from '../../pipes/market-label.pipe';
 
 @Component({
   selector: 'app-screener',
@@ -40,7 +41,8 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     MatCheckboxModule,
     MatDividerModule,
     TranslateModule,
-    ScrollingModule
+    ScrollingModule,
+    MarketLabelPipe
   ],
   templateUrl: './screener.component.html',
   styleUrls: ['./screener.component.scss']

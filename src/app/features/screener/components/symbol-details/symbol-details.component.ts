@@ -11,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
+import { MarketLabelPipe } from '../../pipes/market-label.pipe';
 
 @Component({
   selector: 'app-symbol-details',
@@ -24,7 +25,8 @@ import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
     MatDividerModule,
     MatTabsModule,
     TranslateModule,
-    SymbolChartComponent
+    SymbolChartComponent,
+    MarketLabelPipe
   ],
   templateUrl: './symbol-details.component.html',
   styleUrls: ['./symbol-details.component.scss']
