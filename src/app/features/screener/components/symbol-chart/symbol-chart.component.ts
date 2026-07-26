@@ -89,7 +89,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       grid: { vertLines: { color: '#2a2e39' }, horzLines: { color: '#2a2e39' } },
       timeScale: { timeVisible: true, secondsVisible: false }
     });
-    this.series = this.chart.addSeries(CandlestickSeries, {
+    this.series = this.addCandlestickSeries();
+  }
+
+  private addCandlestickSeries(): ISeriesApi<'Candlestick'> {
+    return this.chart!.addSeries(CandlestickSeries, {
       upColor: '#26a69a',
       downColor: '#ef5350',
       borderVisible: false,
@@ -99,10 +103,15 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   }
 
   private resubscribe(): void {
-    if (!this.symbol || !this.series) return;
+    if (!this.symbol || !this.chart) return;
 
     this.streamSubscription?.unsubscribe();
-    this.series.setData([]);
+    // Recreate the series instead of series.setData([]): an empty array doesn't
+    // reliably reset a series that already has data, which left the previous
+    // timeframe's bars on screen when the new one had none (e.g. a thin M1
+    // history on a closed market) instead of showing an empty chart.
+    if (this.series) this.chart.removeSeries(this.series);
+    this.series = this.addCandlestickSeries();
     this.isLoading.set(true);
     this.error.set(null);
 
