@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
 import { SymbolDetails } from '../../models/screener.models';
@@ -12,6 +12,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
+import { Subscription, interval, startWith, switchMap, catchError, of } from 'rxjs';
+
+// Los fundamentales del backend se actualizan en vivo por push de DxLink
+// (FundamentalsConnectionPool) -- este polling es lo que hace que la UI
+// tambien se sienta en tiempo real, sin necesitar un canal de push propio.
+const POLL_INTERVAL_MS = 5000;
 
 @Component({
   selector: 'app-symbol-details',
@@ -31,7 +37,7 @@ import { MarketLabelPipe } from '../../pipes/market-label.pipe';
   templateUrl: './symbol-details.component.html',
   styleUrls: ['./symbol-details.component.scss']
 })
-export class SymbolDetailsComponent implements OnInit {
+export class SymbolDetailsComponent implements OnInit, OnDestroy {
   private screenerService = inject(ScreenerService);
   private dialogRef = inject(MatDialogRef<SymbolDetailsComponent>);
   data = inject(MAT_DIALOG_DATA);
@@ -40,23 +46,29 @@ export class SymbolDetailsComponent implements OnInit {
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
 
+  private pollSubscription?: Subscription;
+
   ngOnInit(): void {
-    this.loadDetails();
+    this.pollSubscription = interval(POLL_INTERVAL_MS).pipe(
+      startWith(0),
+      switchMap(() => this.screenerService.getSymbolDetails(this.data.symbol).pipe(
+        catchError((err) => {
+          console.error('Error loading symbol details:', err);
+          this.error.set('No se pudo cargar la información fundamental del símbolo.');
+          return of(null);
+        })
+      ))
+    ).subscribe((details) => {
+      if (details) {
+        this.symbolDetails.set(details);
+        this.error.set(null);
+      }
+      this.isLoading.set(false);
+    });
   }
 
-  loadDetails(): void {
-    this.isLoading.set(true);
-    this.screenerService.getSymbolDetails(this.data.symbol).subscribe({
-      next: (details) => {
-        this.symbolDetails.set(details);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error loading symbol details:', err);
-        this.error.set('No se pudo cargar la información fundamental del símbolo.');
-        this.isLoading.set(false);
-      }
-    });
+  ngOnDestroy(): void {
+    this.pollSubscription?.unsubscribe();
   }
 
   close(): void {

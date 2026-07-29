@@ -68,6 +68,52 @@
             <span class="label">Volume (Daily)</span>
             <span class="value">{{ formatNumber(fund?.dayVolume) }}</span>
           </div>
+          <div class="metric-item">
+            <span class="label">Pre-Market Volume</span>
+            <span class="value">{{ fund?.preMarketVolume ? formatNumber(fund?.preMarketVolume) : 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Post-Market Volume</span>
+            <span class="value">{{ fund?.postMarketVolume ? formatNumber(fund?.postMarketVolume) : 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Open Interest</span>
+            <span class="value">{{ fund?.openInterest ? formatNumber(fund?.openInterest) : 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Dividend</span>
+            <span class="value">{{ fund?.dividendAmount || 'N/A' }}{{ fund?.dividendFrequency ? ' (' + fund?.dividendFrequency + 'x/año)' : '' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Trading Status</span>
+            <span class="value">{{ fund?.tradingStatus || 'N/A' }}{{ fund?.statusReason ? ' — ' + fund?.statusReason : '' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Security Type</span>
+            <span class="value">{{ fund?.securityType || 'N/A' }}{{ fund?.isEtf ? ' (ETF)' : '' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="ohlc-section">
+        <h3>OHLC</h3>
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <span class="label">Open</span>
+            <span class="value">{{ fund?.open ?? 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">High</span>
+            <span class="value">{{ fund?.high ?? 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Low</span>
+            <span class="value">{{ fund?.low ?? 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Prev Close</span>
+            <span class="value">{{ fund?.prevClose ?? 'N/A' }}</span>
+          </div>
         </div>
       </section>
 
@@ -105,6 +151,16 @@
           <div class="metric-item">
             <span class="label">IV Rank</span>
             <span class="value">{{ fund?.impliedVolatilityRank || 'N/A' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">IV Percentile</span>
+            <span class="value">
+                @if (fund?.impliedVolatilityPercentile; as ivp) {
+                    {{ ivp * 100 | number:'1.2-2' }}%
+                } @else {
+                    N/A
+                }
+            </span>
           </div>
           <div class="metric-item">
             <span class="label">Liquidity Rating</span>
