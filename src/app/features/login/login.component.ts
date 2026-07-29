@@ -37,8 +37,12 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    if (this.loginForm.invalid) return;
-
+    // No se bloquea en loginForm.invalid: el autofill de contraseñas del
+    // navegador a veces rellena los inputs sin disparar el evento que
+    // Angular necesita para sincronizar el value del FormGroup, dejando el
+    // formulario "invalido" (y antes, el boton deshabilitado) aunque se vea
+    // lleno. El backend ya valida credenciales vacias/incorrectas via el
+    // error handler de abajo.
     this.isLoading.set(true);
     this.errorMessage.set('');
 
