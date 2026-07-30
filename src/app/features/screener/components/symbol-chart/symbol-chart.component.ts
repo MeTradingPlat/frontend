@@ -24,15 +24,31 @@ interface TimeframeOption {
   label: string;
 }
 
+// Mismo set de 21 timeframes que ya soportan marketdata-service y
+// scanner-management-service -- antes solo tenia estos 8, dejando fuera
+// 13 valores que el resto de la plataforma ya reconocia.
 const TIMEFRAMES: TimeframeOption[] = [
   { id: 'M1', label: '1m' },
+  { id: 'M2', label: '2m' },
+  { id: 'M3', label: '3m' },
   { id: 'M5', label: '5m' },
+  { id: 'M10', label: '10m' },
   { id: 'M15', label: '15m' },
   { id: 'M30', label: '30m' },
+  { id: 'M45', label: '45m' },
   { id: 'H1', label: '1h' },
+  { id: 'H2', label: '2h' },
+  { id: 'H3', label: '3h' },
+  { id: 'H4', label: '4h' },
+  { id: 'H12', label: '12h' },
   { id: 'D1', label: '1d' },
+  { id: 'D2', label: '2d' },
+  { id: 'D3', label: '3d' },
   { id: 'W1', label: '1w' },
-  { id: 'MO1', label: '1mo' }
+  { id: 'MO1', label: '1mo' },
+  { id: 'MO3', label: '3mo' },
+  { id: 'MO6', label: '6mo' },
+  { id: 'Y1', label: '1y' }
 ];
 
 function toCandlestickData(bar: CandleBar): CandlestickData<Time> {
