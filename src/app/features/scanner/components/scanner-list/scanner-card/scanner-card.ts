@@ -13,7 +13,6 @@ import { Escaner } from '../../../models/escaner.interface';
 import { DialogScannerExpand } from './scanner-dialog/dialog-scanner-expand';
 import { MatDialog } from '@angular/material/dialog';
 import { ScannerSignalsTab } from '../scanner-card-tabs/scanner-signals-tab/scanner-signals-tab';
-import { ScannerAssetsTab } from '../scanner-card-tabs/scanner-assets-tab/scanner-assets-tab';
 import { ScannerNewsTab } from '../scanner-card-tabs/scanner-news-tab/scanner-news-tab';
 import { ScannerRegistryTab } from '../scanner-card-tabs/scanner-registry-tab/scanner-registry-tab';
 import { ScannerFiltersTab } from '../scanner-card-tabs/scanner-filters-tab/scanner-filters-tab';
@@ -36,7 +35,6 @@ import { AuthService } from '../../../../../core/auth/auth.service';
     MatDialogModule,
     MatIconModule,
     ScannerSignalsTab,
-    ScannerAssetsTab,
     ScannerNewsTab,
     ScannerRegistryTab,
     ScannerFiltersTab

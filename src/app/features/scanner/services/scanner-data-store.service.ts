@@ -2,9 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { LogApiService } from './log-api.service';
 import { NotificacionSseService } from './notificacion-sse.service';
-import { ActivoApiService } from './activo-api.service';
 import { RegistroLogDTORespuesta } from '../models/registro-log.interface';
-import { Activo } from '../models/activo.interface';
 
 interface SignalRow {
   id: number;
@@ -71,38 +69,6 @@ export class ScannerDataStore {
         onUpdate(signals);
       }
     });
-  }
-
-  private assetCaches = new Map<number, { data: Activo[]; sub?: Subscription }>();
-
-  loadAssets(scannerId: number, activoApi: ActivoApiService, onUpdate: (data: Activo[]) => void): void {
-    const cached = this.assetCaches.get(scannerId);
-    if (cached) {
-      onUpdate(cached.data);
-      return;
-    }
-
-    const fetchAndUpdate = (): void => {
-      activoApi.getActivosPorEscaner(scannerId).subscribe({
-        next: (activos: Activo[]) => {
-          const existing = this.assetCaches.get(scannerId);
-          this.assetCaches.set(scannerId, { data: activos, sub: existing?.sub });
-          onUpdate(activos);
-        }
-      });
-    };
-
-    fetchAndUpdate();
-
-    const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-      next: (notificacion: { categoria?: string; tipo?: string }) => {
-        if (notificacion.categoria === 'SIGNAL' || notificacion.tipo === 'LOG') {
-          fetchAndUpdate();
-        }
-      }
-    });
-
-    this.assetCaches.set(scannerId, { data: [], sub });
   }
 
   private logCache = new Map<number, { data: RegistroLogDTORespuesta[]; page: number; hasMore: boolean; sub?: Subscription }>();

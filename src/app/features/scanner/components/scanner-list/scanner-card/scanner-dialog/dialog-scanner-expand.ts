@@ -8,7 +8,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ScannerSignalsTab } from "../../scanner-card-tabs/scanner-signals-tab/scanner-signals-tab";
-import { ScannerAssetsTab } from "../../scanner-card-tabs/scanner-assets-tab/scanner-assets-tab";
 import { ScannerNewsTab } from "../../scanner-card-tabs/scanner-news-tab/scanner-news-tab";
 import { ScannerRegistryTab } from "../../scanner-card-tabs/scanner-registry-tab/scanner-registry-tab";
 import { ScannerFiltersTab } from "../../scanner-card-tabs/scanner-filters-tab/scanner-filters-tab";
@@ -31,7 +30,6 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
     MatProgressSpinnerModule,
     TranslatePipe,
     ScannerSignalsTab,
-    ScannerAssetsTab,
     ScannerNewsTab,
     ScannerRegistryTab,
     ScannerFiltersTab
@@ -81,13 +79,6 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
           <ng-template matTabContent>
             <div class="tab-content">
               <app-scanner-signals-tab [scanner]="scanner" />
-            </div>
-          </ng-template>
-        </mat-tab>
-        <mat-tab [label]="'SCANNER.ASSETS' | translate">
-          <ng-template matTabContent>
-            <div class="tab-content">
-              <app-scanner-assets-tab [scanner]="scanner" />
             </div>
           </ng-template>
         </mat-tab>
