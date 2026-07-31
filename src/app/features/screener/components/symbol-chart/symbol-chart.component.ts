@@ -65,6 +65,23 @@ function toCandlestickData(bar: CandleBar): CandlestickData<Time> {
   return { time: bar.time as Time, open: bar.open, high: bar.high, low: bar.low, close: bar.close };
 }
 
+function isWellFormed(bar: CandleBar): boolean {
+  return [bar.time, bar.open, bar.high, bar.low, bar.close].every(v => v !== null && v !== undefined && Number.isFinite(v));
+}
+
+// El backend puede mandar OHLC nulo en una barra puntual (ej. sin trades en
+// ese periodo) -- lightweight-charts truena ("Value is null") si le llega
+// asi tal cual a setData/update. Se descarta esa barra en vez de romper todo
+// el grafico. Tambien deduplica por time (se queda con la ultima) ya que
+// setData exige tiempos estrictamente ascendentes y unicos.
+function sanitizeBars(bars: CandleBar[]): CandleBar[] {
+  const byTime = new Map<number, CandleBar>();
+  for (const bar of bars) {
+    if (isWellFormed(bar)) byTime.set(bar.time, bar);
+  }
+  return [...byTime.values()].sort((a, b) => a.time - b.time);
+}
+
 function fromHistoricalDto(dto: HistoricalCandleDTO): CandleBar {
   return {
     time: Math.floor(new Date(dto.timestamp).getTime() / 1000),
@@ -207,12 +224,13 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private handleMessage(message: CandleStreamMessage): void {
     if (message.type === 'history') {
-      this.allBars = [...message.bars].sort((a, b) => a.time - b.time);
+      this.allBars = sanitizeBars(message.bars);
       this.oldestTime = this.allBars.length ? this.allBars[0].time : null;
       this.series?.setData(this.allBars.map(toCandlestickData));
       this.isLoading.set(false);
       this.hasNoData.set(this.allBars.length === 0);
     } else if (message.type === 'bar') {
+      if (!isWellFormed(message.bar)) return;
       this.mergeLiveBar(message.bar);
       this.series?.update(toCandlestickData(message.bar));
       this.isLoading.set(false);
@@ -251,10 +269,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
             this.hasMoreHistory = false;
             return;
           }
-          const olderBars = older.map(fromHistoricalDto).sort((a, b) => a.time - b.time);
-          this.allBars = [...olderBars, ...this.allBars];
-          this.oldestTime = this.allBars[0].time;
-          this.series?.setData(this.allBars.map(toCandlestickData));
+          const olderBars = sanitizeBars(older.map(fromHistoricalDto));
+          this.allBars = sanitizeBars([...olderBars, ...this.allBars]);
+          if (this.allBars.length) {
+            this.oldestTime = this.allBars[0].time;
+            this.series?.setData(this.allBars.map(toCandlestickData));
+          }
           if (older.length < LOAD_MORE_BATCH_SIZE) this.hasMoreHistory = false;
         },
         error: () => { this.isLoadingMore = false; }
