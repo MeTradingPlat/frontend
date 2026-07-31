@@ -5,7 +5,7 @@ import { ScreenerService } from '../../services/screener.service';
 import { Market, Symbol } from '../../models/screener.models';
 import { SymbolDetailsComponent } from '../../components/symbol-details/symbol-details.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { merge } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -69,10 +69,15 @@ export class ScreenerComponent implements OnInit {
   ngOnInit(): void {
     this.loadMarkets();
 
-    combineLatest([
+    // merge (no combineLatest): con combineLatest, si un lado nunca emite
+    // (marketControl arranca con setValue({emitEvent:false}) para no disparar
+    // una busqueda redundante al cargar) el otro lado tampoco dispara nunca --
+    // asi quedaba bloqueada la busqueda por texto hasta tocar el filtro de
+    // mercado. Con merge cualquiera de los dos dispara por su cuenta.
+    merge(
       this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
       this.marketControl.valueChanges,
-    ]).subscribe(() => {
+    ).subscribe(() => {
       this.pageIndex.set(0);
       this.search();
     });
