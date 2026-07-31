@@ -18,17 +18,28 @@ export class ScannerDataStore {
   private readonly logApi = inject(LogApiService);
   private readonly sse = inject(NotificacionSseService);
 
-  private readonly signalsCache = new Map<number, { data: SignalRow[]; sub: Subscription }>();
+  private readonly signalsCache = new Map<number, {
+    data: SignalRow[]; sub: Subscription; onUpdate: (signals: SignalRow[]) => void;
+  }>();
 
   getSignals(scannerId: number): SignalRow[] | null {
     const entry = this.signalsCache.get(scannerId);
     return entry ? entry.data : null;
   }
 
+  // La conexion SSE se crea UNA sola vez por scannerId y vive mas alla de
+  // cualquier instancia particular del componente que la pidio -- si el tab
+  // se destruye y se recrea (cambiar de pestana y volver, etc.), loadSignals
+  // se vuelve a llamar con un onUpdate NUEVO. Reasignar entry.onUpdate en
+  // cada llamada (no solo la primera) es lo que evita que el evento SSE siga
+  // apuntando a un callback de una instancia ya destruida -- confirmado en
+  // vivo: sin esto, la peticion REST del refresco llegaba con datos
+  // correctos pero la tabla visible nunca se actualizaba.
   loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void): void {
-    if (this.signalsCache.has(scannerId)) {
-      const cached = this.signalsCache.get(scannerId);
-      if (cached) onUpdate(cached.data);
+    const cached = this.signalsCache.get(scannerId);
+    if (cached) {
+      cached.onUpdate = onUpdate;
+      onUpdate(cached.data);
       return;
     }
 
@@ -59,60 +70,68 @@ export class ScannerDataStore {
               };
               signals.unshift(s);
               if (signals.length > 50) signals.length = 50;
-              const existing = this.signalsCache.get(scannerId);
-              this.signalsCache.set(scannerId, { data: [...signals], sub: existing?.sub ?? sub });
-              onUpdate([...signals]);
+              const entry = this.signalsCache.get(scannerId);
+              if (entry) {
+                entry.data = [...signals];
+                entry.onUpdate(entry.data);
+              }
             }
           }
         });
 
-        this.signalsCache.set(scannerId, { data: signals, sub });
+        this.signalsCache.set(scannerId, { data: signals, sub, onUpdate });
         onUpdate(signals);
       }
     });
   }
 
-  private logCache = new Map<number, { data: RegistroLogDTORespuesta[]; page: number; hasMore: boolean; sub?: Subscription }>();
+  private logCache = new Map<number, {
+    data: RegistroLogDTORespuesta[]; page: number; hasMore: boolean; sub?: Subscription;
+    onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void;
+  }>();
 
+  // Mismo problema y misma solucion que loadSignals: la conexion SSE se crea
+  // una sola vez por scannerId, asi que fetchPage siempre debe llamar al
+  // onUpdate GUARDADO EN LA CACHE (reasignado en cada llamada a loadLogs),
+  // nunca al onUpdate cerrado sobre el en el momento de creacion -- si no,
+  // una instancia de componente destruida se queda "recibiendo" los refrescos
+  // en vivo mientras la visible en pantalla nunca se entera.
   loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void): { loadMore: () => void } {
-    let page = 0;
     const size = 50;
 
     const fetchPage = (p: number): void => {
       logApi.getLogsPorEscanerPaginated(scannerId, p, size).subscribe({
         next: (logs: RegistroLogDTORespuesta[]) => {
           const hasMore = logs.length === size;
-          if (p === 0) {
-            this.logCache.set(scannerId, { data: logs, page: p, hasMore, sub: this.logCache.get(scannerId)?.sub! });
-            onUpdate(logs, hasMore);
-          } else {
-            const existing = this.logCache.get(scannerId);
-            const merged = [...(existing?.data || []), ...logs];
-            this.logCache.set(scannerId, { data: merged, page: p, hasMore, sub: existing?.sub! });
-            onUpdate(merged, hasMore);
-          }
+          const entry = this.logCache.get(scannerId);
+          const data = p === 0 ? logs : [...(entry?.data || []), ...logs];
+          const currentOnUpdate = entry?.onUpdate ?? onUpdate;
+          this.logCache.set(scannerId, { data, page: p, hasMore, sub: entry?.sub, onUpdate: currentOnUpdate });
+          currentOnUpdate(data, hasMore);
         }
       });
     };
 
-    const existing = this.logCache.get(scannerId);
-    if (existing && existing.page >= 0) {
-      onUpdate(existing.data, existing.hasMore);
+    let entry = this.logCache.get(scannerId);
+    if (entry) {
+      entry.onUpdate = onUpdate;
+      if (entry.page >= 0) onUpdate(entry.data, entry.hasMore);
     } else {
+      entry = { data: [], page: -1, hasMore: true, onUpdate };
+      this.logCache.set(scannerId, entry);
       fetchPage(0);
     }
 
-    if (!this.logCache.has(scannerId)) {
-      const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-        next: (): void => { page = 0; fetchPage(0); }
+    if (!entry.sub) {
+      entry.sub = this.sse.conectarPorEscaner(scannerId).subscribe({
+        next: (): void => fetchPage(0)
       });
-      this.logCache.set(scannerId, { data: [], page: -1, hasMore: true, sub });
     }
 
     return {
       loadMore: (): void => {
-        page++;
-        fetchPage(page);
+        const current = this.logCache.get(scannerId);
+        fetchPage((current?.page ?? -1) + 1);
       }
     };
   }
