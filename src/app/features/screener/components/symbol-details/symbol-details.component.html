@@ -1,34 +1,31 @@
 <div class="details-container">
-  @if (isLoading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Consultando Market Data Service...</p>
-    </div>
-  } @else if (error()) {
-    <div class="error-state">
-      <mat-icon color="warn">error</mat-icon>
-      <p>{{ error() }}</p>
-      <button mat-button (click)="close()">Cerrar</button>
-    </div>
-  } @else if (symbolDetails()) {
-    @let active = symbolDetails()?.activeEquity;
-    @let fund = symbolDetails()?.fundamentalData;
-    
-    <header class="details-header">
-      <div class="symbol-info">
-        <span class="symbol">{{ active?.symbol }}</span>
+  @let active = symbolDetails()?.activeEquity;
+  @let fund = symbolDetails()?.fundamentalData;
+
+  <header class="details-header">
+    <div class="symbol-info">
+      <span class="symbol">{{ active?.symbol ?? data.symbol }}</span>
+      @if (active?.listedMarket) {
         <span class="market-chip">{{ active?.listedMarket | marketLabel }}</span>
-      </div>
+      }
+    </div>
+    @if (active?.description) {
       <h2 class="description">{{ active?.description }}</h2>
-      <button mat-icon-button class="close-btn" (click)="close()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </header>
+    }
+    <button mat-icon-button class="close-btn" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
 
-    <mat-divider></mat-divider>
+  <mat-divider></mat-divider>
 
-    <mat-tab-group class="details-tabs">
+  <mat-tab-group class="details-tabs">
     <mat-tab [label]="'ASSETS.TAB_CHART' | translate">
+      <!-- El grafico solo depende del symbol (velas), no de los fundamentales
+           -- antes vivia dentro del mismo @if que estos, asi que si la
+           consulta de fundamentales fallaba (confirmado en vivo: simbolo sin
+           datos en marketdata-service), el grafico tampoco se mostraba
+           aunque no tuviera nada que ver con esa falla. -->
       @if (timeframeOptions.length > 1) {
         <div class="signal-timeframe-chips">
           @for (opt of timeframeOptions; track opt.timeframe) {
@@ -39,12 +36,23 @@
         </div>
       }
       <app-symbol-chart
-        [symbol]="active?.symbol ?? ''"
+        [symbol]="data.symbol"
         [initialTimeframe]="activeMatch()?.timeframe"
         [markerTime]="markerTime()"
       ></app-symbol-chart>
     </mat-tab>
     <mat-tab [label]="'ASSETS.TAB_FUNDAMENTALS' | translate">
+      @if (isLoading()) {
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Consultando Market Data Service...</p>
+        </div>
+      } @else if (error()) {
+        <div class="error-state">
+          <mat-icon color="warn">error</mat-icon>
+          <p>{{ error() }}</p>
+        </div>
+      } @else if (symbolDetails()) {
     <div class="details-content">
       <section class="metrics-section">
         <h3>{{ 'ASSETS.FUNDAMENTALS' | translate }}</h3>
@@ -188,7 +196,7 @@
       
       <p class="last-updated">Última actualización: {{ fund?.lastUpdated | date:'short' }}</p>
     </div>
+      }
     </mat-tab>
-    </mat-tab-group>
-  }
+  </mat-tab-group>
 </div>
