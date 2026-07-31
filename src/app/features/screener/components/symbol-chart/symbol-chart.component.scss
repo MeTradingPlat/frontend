@@ -1,8 +1,19 @@
+// Sin display:block explicito, un elemento custom como <app-symbol-chart>
+// por defecto es "inline" -- el chart-wrapper de abajo (height:100%) queda
+// midiendose contra un host sin altura resuelta de verdad, lo cual con
+// autoSize:true (lightweight-charts) podia entrar en un ciclo de resize:
+// el canvas se dibuja, eso "infla" el contenedor, el ResizeObserver lo
+// detecta y redibuja mas grande, y asi indefinidamente hacia abajo --
+// confirmado en vivo al cambiar de temporalidad (donde la serie se
+// recrea y se vuelve a medir todo desde cero).
+:host {
+  display: block;
+}
+
 .chart-wrapper {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  height: 100%;
 }
 
 .chart-toolbar {
@@ -54,9 +65,12 @@
 }
 
 .chart-container-outer {
+  // Altura FIJA a proposito, no flex:1/height:100% -- esa es la pieza que
+  // rompe el ciclo de resize descrito arriba: con un valor fijo en px, el
+  // ResizeObserver de la libreria del grafico siempre reporta el mismo
+  // numero sin importar que tan grande se dibuje el canvas adentro.
   position: relative;
-  flex: 1;
-  min-height: 360px;
+  height: 500px;
 }
 
 .chart-container {
