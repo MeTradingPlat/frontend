@@ -275,7 +275,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
             this.oldestTime = this.allBars[0].time;
             this.series?.setData(this.allBars.map(toCandlestickData));
           }
-          if (older.length < LOAD_MORE_BATCH_SIZE) this.hasMoreHistory = false;
+          // Solo un batch vacio significa "no hay mas" -- un batch con MENOS
+          // de lo pedido no lo significa (confirmado en vivo: una respuesta
+          // de 442 barras fue seguida de otra 216 mas atras sin problema),
+          // asi que marcar hasMoreHistory=false aca cortaba toda carga futura
+          // despues del primer "cargar mas" con una pagina parcial.
         },
         error: () => { this.isLoadingMore = false; }
       });
