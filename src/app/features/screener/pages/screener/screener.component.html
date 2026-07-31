@@ -28,11 +28,6 @@
           }
         </mat-select>
       </mat-form-field>
-      
-      <button mat-flat-button color="primary" class="refresh-btn" (click)="search()" [disabled]="isLoading()">
-        <mat-icon [class.rotating]="isLoading()">refresh</mat-icon>
-        {{ 'ASSETS.REFRESH' | translate }}
-      </button>
     </div>
   </header>
 

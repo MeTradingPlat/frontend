@@ -146,7 +146,6 @@
     "SUBTITLE": "Explore all available assets in the Market Data Service with detailed fundamental information.",
     "SEARCH_LABEL": "Search symbol or description",
     "MARKET_LABEL": "Filter by Market",
-    "REFRESH": "Refresh",
     "LOADING": "Fetching Market Data...",
     "SYMBOL": "Symbol",
     "DESCRIPTION": "Description",

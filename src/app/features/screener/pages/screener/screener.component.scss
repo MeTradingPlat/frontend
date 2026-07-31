@@ -44,16 +44,6 @@
     .market-field {
       min-width: 250px;
     }
-
-    .refresh-btn {
-      height: 56px;
-      border-radius: 8px;
-      padding: 0 24px;
-      
-      mat-icon {
-        margin-right: 8px;
-      }
-    }
   }
 }
 
@@ -167,11 +157,3 @@
   }
 }
 
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.rotating {
-  animation: rotate 1.5s linear infinite;
-}

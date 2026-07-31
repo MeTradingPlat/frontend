@@ -81,7 +81,13 @@ export class ScreenerComponent implements OnInit {
   }
 
   loadMarkets(): void {
-    this.screenerService.getMarkets().subscribe(m => this.markets.set(m));
+    this.screenerService.getMarkets().subscribe(m => {
+      this.markets.set(m);
+      // Todos los mercados vienen seleccionados por defecto -- antes arrancaba
+      // vacio, que funcionalmente ya significaba "sin filtro" (ver search()),
+      // pero visualmente parecia que no habia nada elegido.
+      this.marketControl.setValue(m.map(market => market.id), { emitEvent: false });
+    });
   }
 
   toggleAllMarkets(checked: boolean): void {
