@@ -157,10 +157,12 @@
     "TAB_FUNDAMENTALS": "Fundamentals",
     "CHART_NO_DATA": "No historical bars available for this timeframe right now.",
     "MORE_TIMEFRAMES": "More",
-    "TOOL_CURSOR": "Cursor",
-    "TOOL_TRENDLINE": "Trend line",
-    "TOOL_HLINE": "Horizontal line",
-    "TOOL_DELETE": "Delete selected"
+    "TOOL_CURSOR": "Cursor (click a line to delete it)",
+    "TOOL_TRENDLINE_HINT": "Trend line: click two points on the chart to draw one",
+    "TOOL_HLINE_HINT": "Horizontal line: click anywhere on the chart to place one",
+    "HINT_TRENDLINE_START": "Click the starting point of the trend line",
+    "HINT_TRENDLINE_END": "Now click the ending point",
+    "HINT_HLINE": "Click on the chart to place a horizontal line"
   },
   "AUTH": {
     "LOGIN": "Login",

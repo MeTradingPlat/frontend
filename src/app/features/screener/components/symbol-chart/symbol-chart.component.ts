@@ -94,6 +94,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly error = signal<string | null>(null);
   readonly hasNoData = signal<boolean>(false);
   readonly drawingTool = signal<DrawingTool>('cursor');
+  readonly drawingHint = signal<string | null>(null);
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
@@ -137,6 +138,19 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   setDrawingTool(tool: DrawingTool): void {
     this.drawingTool.set(tool);
     this.drawingManager?.setMode(tool);
+    this.chartContainer.nativeElement.style.cursor = tool === 'cursor' ? 'default' : 'crosshair';
+    this.updateHint(false);
+  }
+
+  private updateHint(hasPending: boolean): void {
+    const tool = this.drawingTool();
+    if (tool === 'trendline') {
+      this.drawingHint.set(hasPending ? 'ASSETS.HINT_TRENDLINE_END' : 'ASSETS.HINT_TRENDLINE_START');
+    } else if (tool === 'hline') {
+      this.drawingHint.set('ASSETS.HINT_HLINE');
+    } else {
+      this.drawingHint.set(null);
+    }
   }
 
   private initChart(): void {
@@ -147,7 +161,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       timeScale: { timeVisible: true, secondsVisible: false }
     });
     this.series = this.addCandlestickSeries();
-    this.drawingManager = new ChartDrawingManager(this.chart);
+    this.drawingManager = new ChartDrawingManager(this.chart, hasPending => this.updateHint(hasPending));
     this.drawingManager.setSeries(this.series);
     this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => this.onVisibleRangeChange(range));
   }

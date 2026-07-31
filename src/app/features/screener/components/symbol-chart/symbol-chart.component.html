@@ -33,14 +33,18 @@
       <mat-button-toggle value="cursor" [matTooltip]="'ASSETS.TOOL_CURSOR' | translate">
         <mat-icon>near_me</mat-icon>
       </mat-button-toggle>
-      <mat-button-toggle value="trendline" [matTooltip]="'ASSETS.TOOL_TRENDLINE' | translate">
+      <mat-button-toggle value="trendline" [matTooltip]="'ASSETS.TOOL_TRENDLINE_HINT' | translate">
         <mat-icon>show_chart</mat-icon>
       </mat-button-toggle>
-      <mat-button-toggle value="hline" [matTooltip]="'ASSETS.TOOL_HLINE' | translate">
+      <mat-button-toggle value="hline" [matTooltip]="'ASSETS.TOOL_HLINE_HINT' | translate">
         <mat-icon>horizontal_rule</mat-icon>
       </mat-button-toggle>
     </mat-button-toggle-group>
   </div>
+
+  @if (drawingHint()) {
+    <div class="drawing-hint">{{ drawingHint() | translate }}</div>
+  }
 
   <div class="chart-container-outer">
     @if (isLoading()) {

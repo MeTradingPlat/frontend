@@ -157,10 +157,12 @@
     "TAB_FUNDAMENTALS": "Fundamentales",
     "CHART_NO_DATA": "No hay barras históricas disponibles para esta temporalidad en este momento.",
     "MORE_TIMEFRAMES": "Más",
-    "TOOL_CURSOR": "Cursor",
-    "TOOL_TRENDLINE": "Línea de tendencia",
-    "TOOL_HLINE": "Línea horizontal",
-    "TOOL_DELETE": "Eliminar seleccionada"
+    "TOOL_CURSOR": "Cursor (click sobre una línea para borrarla)",
+    "TOOL_TRENDLINE_HINT": "Línea de tendencia: click en dos puntos del gráfico para trazarla",
+    "TOOL_HLINE_HINT": "Línea horizontal: click en cualquier parte del gráfico para colocarla",
+    "HINT_TRENDLINE_START": "Haz click en el punto inicial de la línea",
+    "HINT_TRENDLINE_END": "Ahora haz click en el punto final",
+    "HINT_HLINE": "Haz click en el gráfico para colocar una línea horizontal"
   },
   "AUTH": {
     "LOGIN": "Iniciar sesión",

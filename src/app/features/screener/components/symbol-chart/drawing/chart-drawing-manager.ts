@@ -26,7 +26,7 @@ export class ChartDrawingManager {
   private pendingPoint: TrendLinePoint | null = null;
   private readonly clickHandler = (p: MouseEventParams<Time>) => this.onClick(p);
 
-  constructor(private readonly chart: IChartApi) {
+  constructor(private readonly chart: IChartApi, private readonly onPendingChange?: (hasPending: boolean) => void) {
     this.chart.subscribeClick(this.clickHandler);
   }
 
@@ -37,6 +37,7 @@ export class ChartDrawingManager {
   setMode(mode: DrawingTool): void {
     this.mode = mode;
     this.pendingPoint = null;
+    this.onPendingChange?.(false);
   }
 
   getMode(): DrawingTool {
@@ -47,6 +48,7 @@ export class ChartDrawingManager {
     for (const d of this.drawings) this.remove(d);
     this.drawings = [];
     this.pendingPoint = null;
+    this.onPendingChange?.(false);
   }
 
   destroy(): void {
@@ -80,12 +82,14 @@ export class ChartDrawingManager {
     if (!this.series) return;
     if (!this.pendingPoint) {
       this.pendingPoint = point;
+      this.onPendingChange?.(true);
       return;
     }
     const primitive = new TrendLinePrimitive(this.pendingPoint, point);
     this.series.attachPrimitive(primitive);
     this.drawings.push({ kind: 'trendline', primitive });
     this.pendingPoint = null;
+    this.onPendingChange?.(false);
   }
 
   private deleteNearest(x: number, y: number): void {

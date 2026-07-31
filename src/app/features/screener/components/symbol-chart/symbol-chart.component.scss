@@ -43,6 +43,15 @@
   }
 }
 
+.drawing-hint {
+  align-self: flex-start;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  background: var(--mat-sys-secondary-container, rgba(33, 150, 243, 0.15));
+  color: var(--mat-sys-on-secondary-container, #2196f3);
+  font-size: 0.8rem;
+}
+
 .chart-container-outer {
   position: relative;
   flex: 1;
