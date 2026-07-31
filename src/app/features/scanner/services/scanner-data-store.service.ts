@@ -47,14 +47,15 @@ export class ScannerDataStore {
           }));
 
         const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-          next: (n: { categoria?: string; id?: string; timestamp: string; symbol?: string; mensaje: string }) => {
+          next: (n: { categoria?: string; id?: string; timestamp: string; symbol?: string; mensaje: string; metadatos?: string }) => {
             if (n.categoria === 'SIGNAL') {
               const s: SignalRow = {
                 id: parseInt(n.id || '0') || 0,
                 timestamp: n.timestamp,
                 symbol: n.symbol || '-',
                 tipo: this.extractTipo(n.mensaje),
-                mensaje: n.mensaje
+                mensaje: n.mensaje,
+                metadatos: n.metadatos
               };
               signals.unshift(s);
               if (signals.length > 50) signals.length = 50;

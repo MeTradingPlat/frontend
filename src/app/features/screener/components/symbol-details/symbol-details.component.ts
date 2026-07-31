@@ -2,10 +2,12 @@ import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
 import { SymbolDetails } from '../../models/screener.models';
+import { SignalFilterMatch } from '../../models/candle.models';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -13,6 +15,23 @@ import { TranslateModule } from '@ngx-translate/core';
 import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
 import { Subscription, interval, startWith, switchMap, catchError, of } from 'rxjs';
+
+// Mismo orden de temporalidades que el backend (ver _TIMEFRAME_MINUTES en
+// signal-processing-service/app/scanner/timeframe.py) -- solo se usa aca para
+// elegir cual chip mostrar como default (la mas fina) cuando una senal
+// disparo en varias temporalidades a la vez.
+const TIMEFRAME_MINUTES: Record<string, number> = {
+  M1: 1, M2: 2, M3: 3, M5: 5, M10: 10, M15: 15, M30: 30, M45: 45,
+  H1: 60, H2: 120, H3: 180, H4: 240, H12: 720,
+  D1: 1440, D2: 2880, D3: 4320, W1: 10080,
+  MO1: 43200, MO3: 129600, MO6: 259200, Y1: 525600
+};
+
+function dedupeByTimeframe(matches: SignalFilterMatch[]): SignalFilterMatch[] {
+  const byTf = new Map<string, SignalFilterMatch>();
+  for (const m of matches) if (!byTf.has(m.timeframe)) byTf.set(m.timeframe, m);
+  return [...byTf.values()].sort((a, b) => (TIMEFRAME_MINUTES[a.timeframe] ?? 0) - (TIMEFRAME_MINUTES[b.timeframe] ?? 0));
+}
 
 // Los fundamentales del backend se actualizan en vivo por push de DxLink
 // (FundamentalsConnectionPool) -- este polling es lo que hace que la UI
@@ -27,6 +46,7 @@ const POLL_INTERVAL_MS = 5000;
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
+    MatChipsModule,
     MatProgressSpinnerModule,
     MatDividerModule,
     MatTabsModule,
@@ -45,6 +65,9 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
   symbolDetails = signal<SymbolDetails | null>(null);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
+
+  readonly timeframeOptions: SignalFilterMatch[] = dedupeByTimeframe(this.data.signalMatches ?? []);
+  readonly activeMatch = signal<SignalFilterMatch | undefined>(this.timeframeOptions[0]);
 
   private pollSubscription?: Subscription;
 
@@ -73,6 +96,15 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  selectTimeframe(match: SignalFilterMatch): void {
+    this.activeMatch.set(match);
+  }
+
+  markerTime(): number | undefined {
+    const vela = this.activeMatch()?.velaTimestamp;
+    return vela ? Math.floor(new Date(vela).getTime() / 1000) : undefined;
   }
 
   formatNumber(value: number | undefined): string {

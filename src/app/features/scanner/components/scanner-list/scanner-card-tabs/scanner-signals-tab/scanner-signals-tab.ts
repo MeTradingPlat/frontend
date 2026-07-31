@@ -4,10 +4,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
 import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
 import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
+import { SymbolDetailsComponent } from '../../../../../screener/components/symbol-details/symbol-details.component';
+import { SignalFilterMatch } from '../../../../../screener/models/candle.models';
 
 interface SignalRow {
   id: number;
@@ -35,10 +38,11 @@ interface SignalRow {
 })
 export class ScannerSignalsTab implements OnInit {
   private readonly dataStore = inject(ScannerDataStore);
+  private readonly dialog = inject(MatDialog);
 
   scanner = input.required<Escaner>();
 
-  displayedColumns: string[] = ['timestamp', 'symbol', 'tipo', 'mensaje', 'details'];
+  displayedColumns: string[] = ['timestamp', 'symbol', 'tipo', 'details'];
   dataSource = signal<SignalRow[]>([]);
   loading = signal<boolean>(false);
 
@@ -68,8 +72,28 @@ export class ScannerSignalsTab implements OnInit {
   }
 
   onViewDetails(signal: SignalRow): void {
-    console.log('Ver detalles de señal:', signal);
-    // TODO: Implementar modal para ver detalles y metadatos
+    this.dialog.open(SymbolDetailsComponent, {
+      data: { symbol: signal.symbol, signalMatches: this.parseSignalMatches(signal.metadatos) },
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'premium-dialog'
+    });
+  }
+
+  // Filas antiguas (o un parseo fallido) traen la forma plana previa o nada
+  // -- se abre igual el dialogo, solo sin timeframe/marcador preseleccionados.
+  private parseSignalMatches(metadatos?: string): SignalFilterMatch[] | undefined {
+    if (!metadatos) return undefined;
+    try {
+      const parsed = JSON.parse(metadatos);
+      if (Array.isArray(parsed) && parsed.every(m => typeof m?.timeframe === 'string' && typeof m?.velaTimestamp === 'string')) {
+        return parsed as SignalFilterMatch[];
+      }
+    } catch {
+      // ignorado -- ver comentario arriba
+    }
+    return undefined;
   }
 
   getTipoColor(tipo: string): string {

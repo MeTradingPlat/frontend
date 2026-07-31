@@ -29,7 +29,20 @@
 
     <mat-tab-group class="details-tabs">
     <mat-tab [label]="'ASSETS.TAB_CHART' | translate">
-      <app-symbol-chart [symbol]="active?.symbol ?? ''"></app-symbol-chart>
+      @if (timeframeOptions.length > 1) {
+        <div class="signal-timeframe-chips">
+          @for (opt of timeframeOptions; track opt.timeframe) {
+            <mat-chip [class.active]="activeMatch()?.timeframe === opt.timeframe" (click)="selectTimeframe(opt)">
+              {{ opt.timeframe }}
+            </mat-chip>
+          }
+        </div>
+      }
+      <app-symbol-chart
+        [symbol]="active?.symbol ?? ''"
+        [initialTimeframe]="activeMatch()?.timeframe"
+        [markerTime]="markerTime()"
+      ></app-symbol-chart>
     </mat-tab>
     <mat-tab [label]="'ASSETS.TAB_FUNDAMENTALS' | translate">
     <div class="details-content">

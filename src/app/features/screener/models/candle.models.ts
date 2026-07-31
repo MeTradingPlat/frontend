@@ -51,3 +51,14 @@ export interface HistoricalCandleDTO {
   volume: number;
   vwap?: number;
 }
+
+/**
+ * Un filtro tecnico que hizo match en una senal del escaner, con la
+ * temporalidad en la que se evaluo y la vela exacta que lo disparo (viene en
+ * `metadatos` de RegistroLog, ver signal-processing-service/kafka_producer.py).
+ */
+export interface SignalFilterMatch {
+  filtro: string;
+  timeframe: string;
+  velaTimestamp: string;
+}

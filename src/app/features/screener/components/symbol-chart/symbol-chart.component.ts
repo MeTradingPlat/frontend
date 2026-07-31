@@ -18,7 +18,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { CandlestickData, CandlestickSeries, IChartApi, ISeriesApi, LogicalRange, Time, createChart } from 'lightweight-charts';
+import {
+  CandlestickData, CandlestickSeries, IChartApi, ISeriesApi, ISeriesMarkersPluginApi,
+  LogicalRange, SeriesMarker, Time, createChart, createSeriesMarkers
+} from 'lightweight-charts';
 import { Subscription } from 'rxjs';
 import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
@@ -102,6 +105,8 @@ function fromHistoricalDto(dto: HistoricalCandleDTO): CandleBar {
 })
 export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input({ required: true }) symbol!: string;
+  @Input() initialTimeframe?: string;
+  @Input() markerTime?: number;
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef<HTMLDivElement>;
 
   readonly primaryTimeframes = PRIMARY_TIMEFRAMES;
@@ -117,6 +122,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private readonly screenerService = inject(ScreenerService);
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
+  private markersPlugin: ISeriesMarkersPluginApi<Time> | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
 
@@ -126,13 +132,21 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private isLoadingMore = false;
 
   ngAfterViewInit(): void {
+    if (this.initialTimeframe) this.selectedTimeframe.set(this.initialTimeframe);
     this.initChart();
     this.resubscribe();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['symbol'] && !changes['symbol'].firstChange && this.chart) {
+    if (!this.chart) return;
+    const symbolChanged = changes['symbol'] && !changes['symbol'].firstChange;
+    const timeframeChanged = changes['initialTimeframe'] && !changes['initialTimeframe'].firstChange
+      && this.initialTimeframe !== undefined && this.initialTimeframe !== this.selectedTimeframe();
+    if (symbolChanged || timeframeChanged) {
+      if (timeframeChanged) this.selectedTimeframe.set(this.initialTimeframe!);
       this.resubscribe();
+    } else if (changes['markerTime'] && !changes['markerTime'].firstChange) {
+      this.applyMarker();
     }
   }
 
@@ -178,6 +192,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       timeScale: { timeVisible: true, secondsVisible: false }
     });
     this.series = this.addCandlestickSeries();
+    this.markersPlugin = createSeriesMarkers(this.series, []);
     this.drawingManager = new ChartDrawingManager(this.chart, hasPending => this.updateHint(hasPending));
     this.drawingManager.setSeries(this.series);
     this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => this.onVisibleRangeChange(range));
@@ -209,6 +224,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // history on a closed market) instead of showing an empty chart.
     if (this.series) this.chart.removeSeries(this.series);
     this.series = this.addCandlestickSeries();
+    this.markersPlugin = createSeriesMarkers(this.series, []);
     this.drawingManager?.setSeries(this.series);
     this.isLoading.set(true);
     this.error.set(null);
@@ -229,6 +245,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.series?.setData(this.allBars.map(toCandlestickData));
       this.isLoading.set(false);
       this.hasNoData.set(this.allBars.length === 0);
+      this.applyMarker();
     } else if (message.type === 'bar') {
       if (!isWellFormed(message.bar)) return;
       this.mergeLiveBar(message.bar);
@@ -283,5 +300,42 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
         },
         error: () => { this.isLoadingMore = false; }
       });
+  }
+
+  // Marca la vela que disparo una senal del escaner (ver symbol-details) --
+  // busca coincidencia exacta y si no hay, la vela mas cercana, siempre que
+  // caiga dentro (o justo al borde) del rango ya cargado; fuera de eso no
+  // fuerza un marcador enganoso sobre una vela que no es. Centra la vista en
+  // la vela marcada para que no quede fuera de pantalla al abrir el dialogo.
+  private applyMarker(): void {
+    if (!this.markersPlugin) return;
+    if (this.markerTime === undefined || this.allBars.length === 0) {
+      this.markersPlugin.setMarkers([]);
+      return;
+    }
+    const first = this.allBars[0].time;
+    const last = this.allBars[this.allBars.length - 1].time;
+    const barSpacing = this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60;
+    if (this.markerTime < first - barSpacing || this.markerTime > last + barSpacing) {
+      this.markersPlugin.setMarkers([]);
+      return;
+    }
+    let nearestIdx = 0;
+    let bestDiff = Math.abs(this.allBars[0].time - this.markerTime);
+    for (let i = 1; i < this.allBars.length; i++) {
+      const diff = Math.abs(this.allBars[i].time - this.markerTime);
+      if (diff < bestDiff) { bestDiff = diff; nearestIdx = i; }
+    }
+    const bar = this.allBars[nearestIdx];
+    const marker: SeriesMarker<Time> = {
+      time: bar.time as Time,
+      position: 'aboveBar',
+      color: '#2196f3',
+      shape: 'arrowDown',
+      text: 'Señal'
+    };
+    this.markersPlugin.setMarkers([marker]);
+    const half = 30;
+    this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - half, to: nearestIdx + half });
   }
 }
