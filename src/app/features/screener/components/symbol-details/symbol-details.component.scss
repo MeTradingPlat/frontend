@@ -119,6 +119,13 @@
   }
 }
 
+.signal-mensaje {
+  margin: 0;
+  padding: 0 24px 16px;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+}
+
 .signal-timeframe-chips {
   display: flex;
   gap: 8px;

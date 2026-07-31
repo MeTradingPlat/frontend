@@ -72,8 +72,9 @@ export class ScannerSignalsTab implements OnInit {
   }
 
   onViewDetails(signal: SignalRow): void {
+    const { precio, matches } = this.parseMetadatos(signal.metadatos);
     this.dialog.open(SymbolDetailsComponent, {
-      data: { symbol: signal.symbol, signalMatches: this.parseSignalMatches(signal.metadatos) },
+      data: { symbol: signal.symbol, mensaje: signal.mensaje, buyPrice: precio, signalMatches: matches },
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
@@ -81,19 +82,28 @@ export class ScannerSignalsTab implements OnInit {
     });
   }
 
-  // Filas antiguas (o un parseo fallido) traen la forma plana previa o nada
-  // -- se abre igual el dialogo, solo sin timeframe/marcador preseleccionados.
-  private parseSignalMatches(metadatos?: string): SignalFilterMatch[] | undefined {
-    if (!metadatos) return undefined;
+  // Forma actual: {precio, matches: [...]}. Filas antiguas (de antes de
+  // agregar el precio) traen solo el array plano de matches, sin precio --
+  // se abre igual el dialogo, solo sin la linea de compra ni
+  // timeframe/marcador preseleccionados si tampoco hay matches.
+  private parseMetadatos(metadatos?: string): { precio?: number; matches?: SignalFilterMatch[] } {
+    if (!metadatos) return {};
     try {
       const parsed = JSON.parse(metadatos);
-      if (Array.isArray(parsed) && parsed.every(m => typeof m?.timeframe === 'string' && typeof m?.velaTimestamp === 'string')) {
-        return parsed as SignalFilterMatch[];
+      if (Array.isArray(parsed)) {
+        if (parsed.every(m => typeof m?.timeframe === 'string' && typeof m?.velaTimestamp === 'string')) {
+          return { matches: parsed as SignalFilterMatch[] };
+        }
+      } else if (parsed && Array.isArray(parsed.matches)) {
+        return {
+          precio: typeof parsed.precio === 'number' ? parsed.precio : undefined,
+          matches: parsed.matches as SignalFilterMatch[]
+        };
       }
     } catch {
       // ignorado -- ver comentario arriba
     }
-    return undefined;
+    return {};
   }
 
   getTipoColor(tipo: string): string {

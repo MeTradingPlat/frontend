@@ -19,7 +19,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import {
-  CandlestickData, CandlestickSeries, IChartApi, ISeriesApi, ISeriesMarkersPluginApi,
+  CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi, ISeriesMarkersPluginApi,
   LogicalRange, SeriesMarker, Time, createChart, createSeriesMarkers
 } from 'lightweight-charts';
 import { Subscription } from 'rxjs';
@@ -107,6 +107,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   @Input({ required: true }) symbol!: string;
   @Input() initialTimeframe?: string;
   @Input() markerTime?: number;
+  @Input() buyPriceLine?: number;
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef<HTMLDivElement>;
 
   readonly primaryTimeframes = PRIMARY_TIMEFRAMES;
@@ -123,6 +124,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
   private markersPlugin: ISeriesMarkersPluginApi<Time> | null = null;
+  private buyPriceLineRef: IPriceLine | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
 
@@ -145,8 +147,9 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (symbolChanged || timeframeChanged) {
       if (timeframeChanged) this.selectedTimeframe.set(this.initialTimeframe!);
       this.resubscribe();
-    } else if (changes['markerTime'] && !changes['markerTime'].firstChange) {
-      this.applyMarker();
+    } else {
+      if (changes['markerTime'] && !changes['markerTime'].firstChange) this.applyMarker();
+      if (changes['buyPriceLine'] && !changes['buyPriceLine'].firstChange) this.applyBuyPriceLine();
     }
   }
 
@@ -193,6 +196,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     });
     this.series = this.addCandlestickSeries();
     this.markersPlugin = createSeriesMarkers(this.series, []);
+    this.applyBuyPriceLine();
     this.drawingManager = new ChartDrawingManager(this.chart, hasPending => this.updateHint(hasPending));
     this.drawingManager.setSeries(this.series);
     this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => this.onVisibleRangeChange(range));
@@ -225,6 +229,8 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (this.series) this.chart.removeSeries(this.series);
     this.series = this.addCandlestickSeries();
     this.markersPlugin = createSeriesMarkers(this.series, []);
+    this.buyPriceLineRef = null; // se destruyo junto con la serie removida
+    this.applyBuyPriceLine();
     this.drawingManager?.setSeries(this.series);
     this.isLoading.set(true);
     this.error.set(null);
@@ -337,5 +343,28 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.markersPlugin.setMarkers([marker]);
     const half = 30;
     this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - half, to: nearestIdx + half });
+  }
+
+  // Linea horizontal de "precio de entrada simulado" para senales del
+  // escaner -- a diferencia del marcador de vela, no depende del timeframe
+  // (el precio es el mismo sin importar que tan de cerca se mire), asi que
+  // se mantiene visible al cambiar de chip. Morado a proposito: naranja ya
+  // lo usa la herramienta de dibujo de lineas horizontales del usuario, azul
+  // el marcador de vela -- necesitaba un tercer color que no se confundiera
+  // con esos dos ni con las velas verdes/rojas.
+  private applyBuyPriceLine(): void {
+    if (this.buyPriceLineRef) {
+      this.series?.removePriceLine(this.buyPriceLineRef);
+      this.buyPriceLineRef = null;
+    }
+    if (this.buyPriceLine === undefined || !this.series) return;
+    this.buyPriceLineRef = this.series.createPriceLine({
+      price: this.buyPriceLine,
+      color: '#ab47bc',
+      lineWidth: 2,
+      lineStyle: 2,
+      axisLabelVisible: true,
+      title: 'Compra (simulada)'
+    });
   }
 }

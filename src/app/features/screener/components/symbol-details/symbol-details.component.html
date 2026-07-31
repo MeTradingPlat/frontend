@@ -17,6 +17,10 @@
     </button>
   </header>
 
+  @if (data.mensaje) {
+    <p class="signal-mensaje">{{ data.mensaje }}</p>
+  }
+
   <mat-divider></mat-divider>
 
   <mat-tab-group class="details-tabs">
@@ -37,8 +41,9 @@
       }
       <app-symbol-chart
         [symbol]="data.symbol"
-        [initialTimeframe]="activeMatch()?.timeframe"
+        [initialTimeframe]="activeTimeframe()"
         [markerTime]="markerTime()"
+        [buyPriceLine]="data.buyPrice"
       ></app-symbol-chart>
     </mat-tab>
     <mat-tab [label]="'ASSETS.TAB_FUNDAMENTALS' | translate">
