@@ -45,11 +45,6 @@
     font-size: var(--mat-sys-headline-small-size);
 }
 
-.brand-wordmark--inline {
-    font-size: var(--mat-sys-display-small-size);
-    margin-right: 8px;
-}
-
 // Header content
 .header-content {
     display: flex;
@@ -142,10 +137,6 @@
 
     .header-content {
         padding: 5px 10px;
-
-        .brand-wordmark--inline {
-            display: none;
-        }
 
         h3 {
             font: var(--mat-sys-title-large);
