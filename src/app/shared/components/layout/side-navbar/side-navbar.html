@@ -11,7 +11,7 @@
             <button routerLink="/noticias" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Noticias">
                 <i class="bi bi-newspaper"></i>
             </button>
-            <button routerLink="/screener" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Screener">
+            <button routerLink="/activos" routerLinkActive="active" mat-button class="nav-item" (click)="closeDrawerIfMobile()" aria-label="Activos">
                 <i class="bi bi-search"></i>
             </button>
         }
@@ -41,9 +41,9 @@
                 <i class="bi bi-newspaper"></i>
                 <span>{{ 'NAV.NOTICIAS' | translate }}</span>
             </button>
-            <button routerLink="/screener" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
+            <button routerLink="/activos" routerLinkActive="active" mat-button [class]="isMobile() ? 'drawer-item' : 'nav-item'" (click)="closeDrawerIfMobile()">
                 <i class="bi bi-search"></i>
-                <span>{{ 'NAV.SCREENER' | translate }}</span>
+                <span>{{ 'NAV.ASSETS' | translate }}</span>
             </button>
         }
 

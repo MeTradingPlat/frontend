@@ -36,3 +36,18 @@ export interface CandleControlMessage {
 }
 
 export type CandleStreamMessage = CandleHistoryMessage | CandleBarMessage | CandleControlMessage;
+
+/**
+ * Wire format from HistoricalDataRestController (GET /marketdata/historical/{symbol}),
+ * used to backfill older bars when the user pans left past what the WS gave us.
+ */
+export interface HistoricalCandleDTO {
+  symbol: string;
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  vwap?: number;
+}

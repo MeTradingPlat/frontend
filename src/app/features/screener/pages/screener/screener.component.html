@@ -1,19 +1,19 @@
 <div class="screener-container">
   <header class="screener-header">
     <div class="title-section">
-      <h1>{{ 'SCREENER.TITLE' | translate }}</h1>
-      <p class="subtitle">{{ 'SCREENER.SUBTITLE' | translate }}</p>
+      <h1>{{ 'ASSETS.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'ASSETS.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="filter-section">
       <mat-form-field appearance="outline" class="search-field">
-        <mat-label>{{ 'SCREENER.SEARCH_LABEL' | translate }}</mat-label>
+        <mat-label>{{ 'ASSETS.SEARCH_LABEL' | translate }}</mat-label>
         <input matInput [formControl]="searchControl" placeholder="AAPL, TSLA, NVIDIA...">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="market-field">
-        <mat-label>{{ 'SCREENER.MARKET_LABEL' | translate }}</mat-label>
+        <mat-label>{{ 'ASSETS.MARKET_LABEL' | translate }}</mat-label>
         <mat-select [formControl]="marketControl" multiple>
           <div class="select-all-container">
             <mat-checkbox class="select-all-checkbox" 
@@ -29,9 +29,9 @@
         </mat-select>
       </mat-form-field>
       
-      <button mat-flat-button color="primary" class="refresh-btn" (click)="loadSymbols()" [disabled]="isLoading()">
+      <button mat-flat-button color="primary" class="refresh-btn" (click)="search()" [disabled]="isLoading()">
         <mat-icon [class.rotating]="isLoading()">refresh</mat-icon>
-        {{ 'SCREENER.REFRESH' | translate }}
+        {{ 'ASSETS.REFRESH' | translate }}
       </button>
     </div>
   </header>
@@ -40,46 +40,52 @@
     @if (isLoading()) {
       <div class="loading-overlay">
         <mat-spinner diameter="50"></mat-spinner>
-        <p>{{ 'SCREENER.LOADING' | translate }}</p>
+        <p>{{ 'ASSETS.LOADING' | translate }}</p>
       </div>
     }
 
     <div class="table-container">
       <div class="table-header">
-        <div class="col-symbol">{{ 'SCREENER.SYMBOL' | translate }}</div>
-        <div class="col-description">{{ 'SCREENER.DESCRIPTION' | translate }}</div>
-        <div class="col-market">{{ 'SCREENER.MARKET' | translate }}</div>
+        <div class="col-symbol">{{ 'ASSETS.SYMBOL' | translate }}</div>
+        <div class="col-description">{{ 'ASSETS.DESCRIPTION' | translate }}</div>
+        <div class="col-market">{{ 'ASSETS.MARKET' | translate }}</div>
         <div class="col-actions"></div>
       </div>
 
-      <cdk-virtual-scroll-viewport itemSize="72" class="viewport">
-        <div *cdkVirtualFor="let element of filteredSymbols()" class="table-row clickable-row" (click)="viewDetails(element.symbol)">
-          <div class="col-symbol">
-            <span class="symbol-badge">{{ element.symbol }}</span>
-          </div>
-          <div class="col-description">{{ element.description }}</div>
-          <div class="col-market">
-            <mat-chip-set>
-              <mat-chip>{{ element.listedMarket | marketLabel }}</mat-chip>
-            </mat-chip-set>
-          </div>
-          <div class="col-actions">
-            <button mat-icon-button (click)="viewDetails(element.symbol); $event.stopPropagation()" matTooltip="Ver detalles">
-              <mat-icon>visibility</mat-icon>
-            </button>
-          </div>
-        </div>
-
-        @if (filteredSymbols().length === 0 && !isLoading()) {
-          <div class="empty-state">
-            {{ 'SCREENER.NO_DATA' | translate }}
+      <div class="viewport">
+        @for (element of symbols(); track element.symbol) {
+          <div class="table-row clickable-row" (click)="viewDetails(element.symbol)">
+            <div class="col-symbol">
+              <span class="symbol-badge">{{ element.symbol }}</span>
+            </div>
+            <div class="col-description">{{ element.description }}</div>
+            <div class="col-market">
+              <mat-chip-set>
+                <mat-chip>{{ element.listedMarket | marketLabel }}</mat-chip>
+              </mat-chip-set>
+            </div>
+            <div class="col-actions">
+              <button mat-icon-button (click)="viewDetails(element.symbol); $event.stopPropagation()" matTooltip="Ver detalles">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
           </div>
         }
-      </cdk-virtual-scroll-viewport>
+
+        @if (symbols().length === 0 && !isLoading()) {
+          <div class="empty-state">
+            {{ 'ASSETS.NO_DATA' | translate }}
+          </div>
+        }
+      </div>
     </div>
-    
-    <div class="table-footer">
-      <span>Total: {{ filteredSymbols().length }} symbols</span>
-    </div>
+
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex()"
+      [hidePageSize]="true"
+      (page)="onPageChange($event)">
+    </mat-paginator>
   </mat-card>
 </div>

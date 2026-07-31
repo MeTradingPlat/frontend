@@ -3,7 +3,7 @@
     "INICIO": "Inicio",
     "ESCANER": "Escáner",
     "NOTICIAS": "Noticias",
-    "SCREENER": "Screener",
+    "ASSETS": "Activos",
     "MAS": "Más"
   },
   "LANGUAGE": {
@@ -141,8 +141,8 @@
     "LOADING_CONTENT": "Cargando contenido",
     "LOADING": "Cargando..."
   },
-  "SCREENER": {
-    "TITLE": "Screener de Símbolos",
+  "ASSETS": {
+    "TITLE": "Activos",
     "SUBTITLE": "Explora todos los activos disponibles en Market Data Service con información fundamental detallada.",
     "SEARCH_LABEL": "Buscar símbolo o descripción",
     "MARKET_LABEL": "Filtrar por Mercado",
@@ -156,7 +156,12 @@
     "EARNINGS_INFO": "Información de Earnings",
     "TAB_CHART": "Gráfica",
     "TAB_FUNDAMENTALS": "Fundamentales",
-    "CHART_NO_DATA": "No hay barras históricas disponibles para esta temporalidad en este momento."
+    "CHART_NO_DATA": "No hay barras históricas disponibles para esta temporalidad en este momento.",
+    "MORE_TIMEFRAMES": "Más",
+    "TOOL_CURSOR": "Cursor",
+    "TOOL_TRENDLINE": "Línea de tendencia",
+    "TOOL_HLINE": "Línea horizontal",
+    "TOOL_DELETE": "Eliminar seleccionada"
   },
   "AUTH": {
     "LOGIN": "Iniciar sesión",

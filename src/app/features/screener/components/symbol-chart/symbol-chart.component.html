@@ -1,12 +1,46 @@
 <div class="chart-wrapper">
-  <mat-button-toggle-group
-    class="timeframe-toggle"
-    [value]="selectedTimeframe()"
-    (change)="onTimeframeChange($event.value)">
-    @for (tf of timeframes; track tf.id) {
-      <mat-button-toggle [value]="tf.id">{{ tf.label }}</mat-button-toggle>
-    }
-  </mat-button-toggle-group>
+  <div class="chart-toolbar">
+    <mat-button-toggle-group
+      class="timeframe-toggle"
+      [value]="selectedTimeframe()"
+      (change)="onTimeframeChange($event.value)">
+      @for (tf of primaryTimeframes; track tf.id) {
+        <mat-button-toggle [value]="tf.id">{{ tf.label }}</mat-button-toggle>
+      }
+      @if (!isPrimaryTimeframe(selectedTimeframe())) {
+        <mat-button-toggle [value]="selectedTimeframe()">
+          {{ selectedTimeframe() }}
+        </mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <button mat-stroked-button [matMenuTriggerFor]="moreMenu" class="more-timeframes-btn">
+      {{ 'ASSETS.MORE_TIMEFRAMES' | translate }}
+      <mat-icon>expand_more</mat-icon>
+    </button>
+    <mat-menu #moreMenu="matMenu">
+      @for (group of moreTimeframeGroups; track group.label) {
+        <div class="menu-group-label">{{ group.label }}</div>
+        @for (tf of group.items; track tf.id) {
+          <button mat-menu-item (click)="onTimeframeChange(tf.id)">{{ tf.label }}</button>
+        }
+      }
+    </mat-menu>
+
+    <span class="toolbar-spacer"></span>
+
+    <mat-button-toggle-group class="drawing-toolbar" [value]="drawingTool()" (change)="setDrawingTool($event.value)">
+      <mat-button-toggle value="cursor" [matTooltip]="'ASSETS.TOOL_CURSOR' | translate">
+        <mat-icon>near_me</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="trendline" [matTooltip]="'ASSETS.TOOL_TRENDLINE' | translate">
+        <mat-icon>show_chart</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="hline" [matTooltip]="'ASSETS.TOOL_HLINE' | translate">
+        <mat-icon>horizontal_rule</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
 
   <div class="chart-container-outer">
     @if (isLoading()) {
@@ -21,7 +55,7 @@
     }
     @if (!isLoading() && hasNoData()) {
       <div class="chart-overlay">
-        <span>{{ 'SCREENER.CHART_NO_DATA' | translate }}</span>
+        <span>{{ 'ASSETS.CHART_NO_DATA' | translate }}</span>
       </div>
     }
     <div #chartContainer class="chart-container"></div>

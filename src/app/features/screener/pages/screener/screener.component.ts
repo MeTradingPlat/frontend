@@ -5,6 +5,7 @@ import { ScreenerService } from '../../services/screener.service';
 import { Market, Symbol } from '../../models/screener.models';
 import { SymbolDetailsComponent } from '../../components/symbol-details/symbol-details.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -18,9 +19,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { TranslateModule } from '@ngx-translate/core';
-import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
+
+const PAGE_SIZE = 50;
 
 @Component({
   selector: 'app-screener',
@@ -40,8 +43,8 @@ import { MarketLabelPipe } from '../../pipes/market-label.pipe';
     MatTooltipModule,
     MatCheckboxModule,
     MatDividerModule,
+    MatPaginatorModule,
     TranslateModule,
-    ScrollingModule,
     MarketLabelPipe
   ],
   templateUrl: './screener.component.html',
@@ -52,9 +55,11 @@ export class ScreenerComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   markets = signal<Market[]>([]);
-  allSymbols = signal<Symbol[]>([]);
-  filteredSymbols = signal<Symbol[]>([]);
+  symbols = signal<Symbol[]>([]);
+  totalElements = signal<number>(0);
   isLoading = signal<boolean>(false);
+  pageIndex = signal<number>(0);
+  readonly pageSize = PAGE_SIZE;
 
   searchControl = new FormControl('');
   marketControl = new FormControl<string[]>([]);
@@ -63,14 +68,16 @@ export class ScreenerComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMarkets();
-    this.loadSymbols();
 
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => this.applyFilters());
+    combineLatest([
+      this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
+      this.marketControl.valueChanges,
+    ]).subscribe(() => {
+      this.pageIndex.set(0);
+      this.search();
+    });
 
-    this.marketControl.valueChanges.subscribe(() => this.applyFilters());
+    this.search();
   }
 
   loadMarkets(): void {
@@ -90,40 +97,24 @@ export class ScreenerComponent implements OnInit {
     return this.markets().length > 0 && selected.length === this.markets().length;
   }
 
-  loadSymbols(): void {
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.search();
+  }
+
+  search(): void {
+    const query = this.searchControl.value || '';
+    const selectedMarkets = this.marketControl.value || [];
+
     this.isLoading.set(true);
-    this.screenerService.getSymbols().subscribe({
-      next: (s) => {
-        this.allSymbols.set(s);
-        this.applyFilters();
+    this.screenerService.searchSymbols(query, selectedMarkets, this.pageIndex(), this.pageSize).subscribe({
+      next: (res) => {
+        this.symbols.set(res.data);
+        this.totalElements.set(res.totalElements);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
     });
-  }
-
-  applyFilters(): void {
-    const searchTerm = this.searchControl.value?.toLowerCase() || '';
-    const selectedMarkets = this.marketControl.value || [];
-
-    let filtered = this.allSymbols();
-
-    if (searchTerm) {
-      filtered = filtered.filter(s =>
-        s.symbol.toLowerCase().includes(searchTerm) ||
-        s.description.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    if (selectedMarkets.length > 0) {
-      const selectedSet = new Set(selectedMarkets.map(m => m.toLowerCase()));
-      filtered = filtered.filter(s => {
-        if (!s.listedMarket) return false;
-        return selectedSet.has(s.listedMarket.toLowerCase());
-      });
-    }
-
-    this.filteredSymbols.set(filtered);
   }
 
   viewDetails(symbol: string): void {

@@ -28,13 +28,13 @@
     <mat-divider></mat-divider>
 
     <mat-tab-group class="details-tabs">
-    <mat-tab [label]="'SCREENER.TAB_CHART' | translate">
+    <mat-tab [label]="'ASSETS.TAB_CHART' | translate">
       <app-symbol-chart [symbol]="active?.symbol ?? ''"></app-symbol-chart>
     </mat-tab>
-    <mat-tab [label]="'SCREENER.TAB_FUNDAMENTALS' | translate">
+    <mat-tab [label]="'ASSETS.TAB_FUNDAMENTALS' | translate">
     <div class="details-content">
       <section class="metrics-section">
-        <h3>{{ 'SCREENER.FUNDAMENTALS' | translate }}</h3>
+        <h3>{{ 'ASSETS.FUNDAMENTALS' | translate }}</h3>
         <div class="metrics-grid">
           <div class="metric-item">
             <span class="label">Market Cap</span>
@@ -118,7 +118,7 @@
       </section>
 
       <section class="earnings-section">
-        <h3>{{ 'SCREENER.EARNINGS_INFO' | translate }}</h3>
+        <h3>{{ 'ASSETS.EARNINGS_INFO' | translate }}</h3>
         <div class="metrics-grid">
           <div class="metric-item">
             <span class="label">Next Earnings Date</span>

@@ -22,7 +22,7 @@ export const routes: Routes = [
         loadChildren: () => import('./features/news/news-routing-module').then(m => m.NewsRoutingModule)
     },
     {
-        path: 'screener',
+        path: 'activos',
         canActivate: [authGuard],
         loadChildren: () => import('./features/screener/screener.module').then(m => m.ScreenerModule)
     },
