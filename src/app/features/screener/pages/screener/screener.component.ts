@@ -4,8 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
 import { Market, Symbol } from '../../models/screener.models';
 import { SymbolDetailsComponent } from '../../components/symbol-details/symbol-details.component';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs/operators';
+import { merge, of, Subject } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -66,6 +66,8 @@ export class ScreenerComponent implements OnInit {
 
   displayedColumns: string[] = ['symbol', 'description', 'market', 'actions'];
 
+  private readonly searchTrigger$ = new Subject<void>();
+
   ngOnInit(): void {
     this.loadMarkets();
 
@@ -79,10 +81,27 @@ export class ScreenerComponent implements OnInit {
       this.marketControl.valueChanges,
     ).subscribe(() => {
       this.pageIndex.set(0);
-      this.search();
+      this.searchTrigger$.next();
     });
 
-    this.search();
+    // switchMap: si el usuario escribe rapido, cancela la peticion anterior
+    // en vuelo -- con un subscribe() suelto por busqueda, una respuesta vieja
+    // que llega tarde podia pisar a una mas nueva y mostrar resultados que no
+    // corresponden a lo que hay escrito ahora.
+    this.searchTrigger$.pipe(
+      tap(() => this.isLoading.set(true)),
+      switchMap(() => this.screenerService
+        .searchSymbols(this.searchControl.value || '', this.marketControl.value || [], this.pageIndex(), this.pageSize)
+        .pipe(catchError(() => of(null)))),
+    ).subscribe(res => {
+      this.isLoading.set(false);
+      if (res) {
+        this.symbols.set(res.data);
+        this.totalElements.set(res.totalElements);
+      }
+    });
+
+    this.searchTrigger$.next();
   }
 
   loadMarkets(): void {
@@ -110,22 +129,7 @@ export class ScreenerComponent implements OnInit {
 
   onPageChange(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
-    this.search();
-  }
-
-  search(): void {
-    const query = this.searchControl.value || '';
-    const selectedMarkets = this.marketControl.value || [];
-
-    this.isLoading.set(true);
-    this.screenerService.searchSymbols(query, selectedMarkets, this.pageIndex(), this.pageSize).subscribe({
-      next: (res) => {
-        this.symbols.set(res.data);
-        this.totalElements.set(res.totalElements);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false)
-    });
+    this.searchTrigger$.next();
   }
 
   viewDetails(symbol: string): void {
