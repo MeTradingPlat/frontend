@@ -7,6 +7,21 @@
   overflow: auto;
 }
 
+.signals-header {
+  margin-bottom: 16px;
+}
+
+.date-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.date-chip {
+  font-size: 0.8rem;
+  --mat-standard-button-toggle-height: 32px;
+}
+
 table {
   width: 100%;
   background-color: transparent;

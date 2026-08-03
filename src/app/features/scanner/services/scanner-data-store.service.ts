@@ -27,15 +27,16 @@ export class ScannerDataStore {
     return entry ? entry.data : null;
   }
 
-  // La conexion SSE se crea UNA sola vez por scannerId y vive mas alla de
-  // cualquier instancia particular del componente que la pidio -- si el tab
-  // se destruye y se recrea (cambiar de pestana y volver, etc.), loadSignals
-  // se vuelve a llamar con un onUpdate NUEVO. Reasignar entry.onUpdate en
-  // cada llamada (no solo la primera) es lo que evita que el evento SSE siga
-  // apuntando a un callback de una instancia ya destruida -- confirmado en
-  // vivo: sin esto, la peticion REST del refresco llegaba con datos
-  // correctos pero la tabla visible nunca se actualizaba.
-  loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void): void {
+  loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void, fecha?: string): void {
+    if (fecha) {
+      this.logApi.getLogsPorEscanerYFecha(scannerId, fecha).subscribe({
+        next: (logs: RegistroLogDTORespuesta[]) => {
+          onUpdate(this._logsToSignals(logs));
+        }
+      });
+      return;
+    }
+
     const cached = this.signalsCache.get(scannerId);
     if (cached) {
       cached.onUpdate = onUpdate;
@@ -45,17 +46,7 @@ export class ScannerDataStore {
 
     this.logApi.getLogsPorEscaner(scannerId).subscribe({
       next: (logs: RegistroLogDTORespuesta[]) => {
-        const signals: SignalRow[] = logs
-          .filter((l: RegistroLogDTORespuesta) => l.categoria === 'SIGNAL')
-          .sort((a: RegistroLogDTORespuesta, b: RegistroLogDTORespuesta) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-          .map((l: RegistroLogDTORespuesta) => ({
-            id: l.idRegistroLog,
-            timestamp: l.timestamp,
-            symbol: l.symbol || '-',
-            tipo: this.extractTipo(l.mensaje),
-            mensaje: l.mensaje,
-            metadatos: l.metadatos
-          }));
+        const signals: SignalRow[] = this._logsToSignals(logs);
 
         const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
           next: (n: { categoria?: string; id?: string; timestamp: string; symbol?: string; mensaje: string; metadatos?: string }) => {
@@ -83,6 +74,20 @@ export class ScannerDataStore {
         onUpdate(signals);
       }
     });
+  }
+
+  private _logsToSignals(logs: RegistroLogDTORespuesta[]): SignalRow[] {
+    return logs
+      .filter((l: RegistroLogDTORespuesta) => l.categoria === 'SIGNAL')
+      .sort((a: RegistroLogDTORespuesta, b: RegistroLogDTORespuesta) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .map((l: RegistroLogDTORespuesta) => ({
+        id: l.idRegistroLog,
+        timestamp: l.timestamp,
+        symbol: l.symbol || '-',
+        tipo: this.extractTipo(l.mensaje),
+        mensaje: l.mensaje,
+        metadatos: l.metadatos
+      }));
   }
 
   private logCache = new Map<number, {

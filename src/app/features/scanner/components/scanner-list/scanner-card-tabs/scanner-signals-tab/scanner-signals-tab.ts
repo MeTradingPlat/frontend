@@ -4,10 +4,12 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
 import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
+import { LogApiService } from '../../../../services/log-api.service';
 import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 import { SymbolDetailsComponent } from '../../../../../screener/components/symbol-details/symbol-details.component';
 import { SignalFilterMatch } from '../../../../../screener/models/candle.models';
@@ -21,6 +23,11 @@ interface SignalRow {
   metadatos?: string;
 }
 
+interface DateOption {
+  value: string;
+  label: string;
+}
+
 @Component({
   selector: 'app-scanner-signals-tab',
   imports: [
@@ -29,6 +36,7 @@ interface SignalRow {
     MatIconModule,
     MatTooltipModule,
     MatChipsModule,
+    MatButtonToggleModule,
     TranslatePipe,
     LocalDatetimePipe
   ],
@@ -38,6 +46,7 @@ interface SignalRow {
 })
 export class ScannerSignalsTab implements OnInit {
   private readonly dataStore = inject(ScannerDataStore);
+  private readonly logApi = inject(LogApiService);
   private readonly dialog = inject(MatDialog);
 
   scanner = input.required<Escaner>();
@@ -45,30 +54,55 @@ export class ScannerSignalsTab implements OnInit {
   displayedColumns: string[] = ['timestamp', 'symbol', 'tipo', 'details'];
   dataSource = signal<SignalRow[]>([]);
   loading = signal<boolean>(false);
+  availableDates = signal<DateOption[]>([]);
+  selectedDate = signal<string>('');
 
   ngOnInit(): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
     this.loading.set(true);
 
-    this.dataStore.loadSignals(scannerId, (signals) => {
-      this.dataSource.set(signals);
-      this.loading.set(false);
+    this.logApi.getFechasSenial(scannerId).subscribe({
+      next: (fechas: string[]) => {
+        const today = new Date().toISOString().split('T')[0];
+        const dates: DateOption[] = [
+          { value: today, label: 'Hoy' },
+          ...fechas
+            .filter(f => f !== today)
+            .map(f => ({ value: f, label: this._formatDateLabel(f) }))
+        ];
+        this.availableDates.set(dates);
+        this.selectedDate.set(today);
+        this._loadForDate(today);
+      },
+      error: () => {
+        const today = new Date().toISOString().split('T')[0];
+        this.availableDates.set([{ value: today, label: 'Hoy' }]);
+        this.selectedDate.set(today);
+        this._loadForDate(today);
+      }
     });
   }
 
-  loadSignals(): void {
-    // Para compatibilidad - el store ya maneja la carga
+  onDateChange(fecha: string): void {
+    this.selectedDate.set(fecha);
+    this.loading.set(true);
+    this._loadForDate(fecha);
   }
 
-  /**
-   * Extrae el tipo de señal del mensaje
-   */
-  private extractTipoFromMensaje(mensaje: string): string {
-    if (mensaje.toLowerCase().includes('entrada')) return 'ENTRADA';
-    if (mensaje.toLowerCase().includes('salida')) return 'SALIDA';
-    if (mensaje.toLowerCase().includes('generada')) return 'NUEVA';
-    return 'SIGNAL';
+  private _loadForDate(fecha: string): void {
+    const scannerId = this.scanner().idEscaner;
+    if (!scannerId) return;
+    const today = new Date().toISOString().split('T')[0];
+    this.dataStore.loadSignals(scannerId, (signals) => {
+      this.dataSource.set(signals);
+      this.loading.set(false);
+    }, fecha !== today ? fecha : undefined);
+  }
+
+  private _formatDateLabel(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
   onViewDetails(signal: SignalRow): void {
@@ -82,10 +116,6 @@ export class ScannerSignalsTab implements OnInit {
     });
   }
 
-  // Forma actual: {precio, matches: [...]}. Filas antiguas (de antes de
-  // agregar el precio) traen solo el array plano de matches, sin precio --
-  // se abre igual el dialogo, solo sin la linea de compra ni
-  // timeframe/marcador preseleccionados si tampoco hay matches.
   private parseMetadatos(metadatos?: string): { precio?: number; matches?: SignalFilterMatch[] } {
     if (!metadatos) return {};
     try {

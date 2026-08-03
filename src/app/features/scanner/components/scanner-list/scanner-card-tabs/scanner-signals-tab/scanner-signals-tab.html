@@ -1,3 +1,17 @@
+<div class="signals-header">
+  <mat-button-toggle-group
+    [value]="selectedDate()"
+    (change)="onDateChange($event.value)"
+    hideSingleSelectionIndicator
+    class="date-selector">
+    @for (date of availableDates(); track date.value) {
+      <mat-button-toggle [value]="date.value" class="date-chip">
+        {{ date.label }}
+      </mat-button-toggle>
+  }
+  </mat-button-toggle-group>
+</div>
+
 @if (loading()) {
   <div class="loading-container">
     <p>{{ 'SCANNER.LOADING_SIGNALS' | translate }}</p>
