@@ -1,28 +1,39 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 16px;
+  padding: 20px 24px;
   box-sizing: border-box;
   overflow: auto;
 }
 
 .signals-header {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant, #30363d);
+}
+
+.filter-icon {
+  font-size: 1.05rem;
+  color: var(--mat-sys-on-surface-variant, #8b949e);
 }
 
 .filter-label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: var(--mat-sys-outline, #8b949e);
+  color: var(--mat-sys-on-surface-variant, #8b949e);
   white-space: nowrap;
 }
 
 .date-field {
-  width: 200px;
+  width: 195px;
+  --mat-form-field-container-height: 44px;
+  --mat-form-field-container-vertical-padding: 8px;
 }
 
 table {
@@ -55,5 +66,6 @@ table {
 
   p {
     opacity: 0.7;
+    margin: 0;
   }
 }
