@@ -1,17 +1,19 @@
-<div class="signals-header">
-  <i class="bi bi-calendar3 filter-icon"></i>
-  <span class="filter-label">Señales del</span>
-  <mat-form-field appearance="outline" class="date-field">
-    <mat-select
-      [value]="selectedDate()"
-      (selectionChange)="onDateChange($event.value)">
-      @for (date of availableDates(); track date.value) {
-        <mat-option [value]="date.value">
-          {{ date.label }}
-        </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+<div class="signals-toolbar">
+  <div class="signals-header">
+    <i class="bi bi-calendar3 filter-icon"></i>
+    <span class="filter-label">{{ 'SCANNER.SIGNALS_FILTER_LABEL' | translate }}</span>
+    <mat-form-field appearance="outline" class="date-field">
+      <mat-select
+        [value]="selectedDate()"
+        (selectionChange)="onDateChange($event.value)">
+        @for (date of availableDates(); track date.value) {
+          <mat-option [value]="date.value">
+            {{ date.label }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
 </div>
 
 @if (loading()) {

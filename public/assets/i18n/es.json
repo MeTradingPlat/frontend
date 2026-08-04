@@ -115,6 +115,7 @@
     "EVENT": "Evento",
     "LOADING_SIGNALS": "Cargando señales...",
     "NO_SIGNALS": "No hay señales aún",
+    "SIGNALS_FILTER_LABEL": "Señales del",
     "ARCHIVED_TITLE": "Escáneres Archivados",
     "ARCHIVED_PLACEHOLDER": "Ej. Mi Escáner",
     "CREATION_DATE": "Fecha de Creación",

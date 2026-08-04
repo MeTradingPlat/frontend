@@ -8,14 +8,18 @@
   overflow: auto;
 }
 
-.signals-header {
+.signals-toolbar {
   display: flex;
-  align-items: baseline;
   justify-content: center;
-  gap: 12px;
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--mat-sys-outline-variant, #30363d);
+}
+
+.signals-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .filter-icon {

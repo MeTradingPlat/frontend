@@ -115,6 +115,7 @@
     "EVENT": "Event",
     "LOADING_SIGNALS": "Loading signals...",
     "NO_SIGNALS": "No signals yet",
+    "SIGNALS_FILTER_LABEL": "Signals from",
     "ARCHIVED_TITLE": "Archived Scanners",
     "ARCHIVED_PLACEHOLDER": "Ex. My Scanner",
     "CREATION_DATE": "Creation Date",
