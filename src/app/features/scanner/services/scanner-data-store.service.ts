@@ -44,7 +44,8 @@ export class ScannerDataStore {
       return;
     }
 
-    this.logApi.getLogsPorEscaner(scannerId).subscribe({
+    const hoy = this._localToday();
+    this.logApi.getLogsPorEscanerYFecha(scannerId, hoy).subscribe({
       next: (logs: RegistroLogDTORespuesta[]) => {
         const signals: SignalRow[] = this._logsToSignals(logs);
 
@@ -74,6 +75,11 @@ export class ScannerDataStore {
         onUpdate(signals);
       }
     });
+  }
+
+  private _localToday(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   private _logsToSignals(logs: RegistroLogDTORespuesta[]): SignalRow[] {

@@ -8,18 +8,11 @@
 }
 
 .signals-header {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-.date-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.date-chip {
-  font-size: 0.8rem;
-  --mat-standard-button-toggle-height: 32px;
+.date-field {
+  width: 220px;
 }
 
 table {

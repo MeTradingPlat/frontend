@@ -4,7 +4,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
@@ -36,7 +37,8 @@ interface DateOption {
     MatIconModule,
     MatTooltipModule,
     MatChipsModule,
-    MatButtonToggleModule,
+    MatFormFieldModule,
+    MatSelectModule,
     TranslatePipe,
     LocalDatetimePipe
   ],
@@ -62,24 +64,24 @@ export class ScannerSignalsTab implements OnInit {
     if (!scannerId) return;
     this.loading.set(true);
 
+    const localeToday = this._localToday();
     this.logApi.getFechasSenial(scannerId).subscribe({
       next: (fechas: string[]) => {
-        const today = new Date().toISOString().split('T')[0];
         const dates: DateOption[] = [
-          { value: today, label: 'Hoy' },
+          { value: localeToday, label: 'Hoy' },
           ...fechas
-            .filter(f => f !== today)
+            .filter(f => f !== localeToday)
+            .sort((a, b) => b.localeCompare(a))
             .map(f => ({ value: f, label: this._formatDateLabel(f) }))
         ];
         this.availableDates.set(dates);
-        this.selectedDate.set(today);
-        this._loadForDate(today);
+        this.selectedDate.set(localeToday);
+        this._loadForDate(localeToday);
       },
       error: () => {
-        const today = new Date().toISOString().split('T')[0];
-        this.availableDates.set([{ value: today, label: 'Hoy' }]);
-        this.selectedDate.set(today);
-        this._loadForDate(today);
+        this.availableDates.set([{ value: localeToday, label: 'Hoy' }]);
+        this.selectedDate.set(localeToday);
+        this._loadForDate(localeToday);
       }
     });
   }
@@ -93,11 +95,16 @@ export class ScannerSignalsTab implements OnInit {
   private _loadForDate(fecha: string): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
-    const today = new Date().toISOString().split('T')[0];
+    const localeToday = this._localToday();
     this.dataStore.loadSignals(scannerId, (signals) => {
       this.dataSource.set(signals);
       this.loading.set(false);
-    }, fecha !== today ? fecha : undefined);
+    }, fecha !== localeToday ? fecha : undefined);
+  }
+
+  private _localToday(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   private _formatDateLabel(dateStr: string): string {
