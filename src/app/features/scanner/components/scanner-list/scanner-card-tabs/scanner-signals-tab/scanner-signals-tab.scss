@@ -8,11 +8,21 @@
 }
 
 .signals-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
+.filter-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--mat-sys-outline, #8b949e);
+  white-space: nowrap;
+}
+
 .date-field {
-  width: 220px;
+  width: 200px;
 }
 
 table {
