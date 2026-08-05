@@ -67,12 +67,13 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
   error = signal<string | null>(null);
 
   readonly timeframeOptions: SignalFilterMatch[] = dedupeByTimeframe(this.data.signalMatches ?? []);
-  // El grafico siempre arranca en M1 -- la temporalidad en la que se disparo
-  // el filtro solo importa para la marca de la vela puntual, no para la
-  // vista inicial. Sin marca hasta que el usuario elija un chip: la vela
-  // matcheada no necesariamente existe en la serie de M1.
-  readonly activeTimeframe = signal<string>('M1');
-  readonly activeMatch = signal<SignalFilterMatch | undefined>(undefined);
+  // Arranca en la temporalidad mas fina donde se disparo la senal (primera del
+  // array ordenado por granularidad), con el marcador de vela activo desde el
+  // inicio. Sin esto, el marcador no aparecia hasta que el usuario hacia clic
+  // manualmente en un chip de timeframe -- confirmado: el usuario abria el
+  // dialogo y no veia ninguna barra marcada.
+  readonly activeTimeframe = signal<string>(this.timeframeOptions[0]?.timeframe ?? 'M1');
+  readonly activeMatch = signal<SignalFilterMatch | undefined>(this.timeframeOptions[0] ?? undefined);
 
   private pollSubscription?: Subscription;
 
