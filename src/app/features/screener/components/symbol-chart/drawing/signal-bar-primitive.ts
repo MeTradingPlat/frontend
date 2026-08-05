@@ -1,5 +1,6 @@
 import { CanvasRenderingTarget2D } from 'fancy-canvas';
 import {
+  IChartApi,
   IPrimitivePaneRenderer,
   IPrimitivePaneView,
   ISeriesApi,
