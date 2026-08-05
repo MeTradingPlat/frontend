@@ -309,7 +309,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private applyMarker(): void {
     this.signalBarX.set(null);
-    if (this.markerTime === undefined || this.allBars.length === 0 || !this.series || !this.chart) return;
+    if (this.markerTime === undefined || this.allBars.length === 0 || !this.chart) return;
 
     const first = this.allBars[0].time;
     const last = this.allBars[this.allBars.length - 1].time;
@@ -322,13 +322,20 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       const diff = Math.abs(this.allBars[i].time - this.markerTime);
       if (diff < bestDiff) { bestDiff = diff; nearestIdx = i; }
     }
-    const bar = this.allBars[nearestIdx];
+    const barTime = this.allBars[nearestIdx].time;
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
+    this._placeSignalLine(barTime);
+  }
 
-    requestAnimationFrame(() => {
-      const x = this.chart?.timeScale().timeToCoordinate(bar.time as Time);
-      if (x !== null && x !== undefined) this.signalBarX.set(x);
-    });
+  private _placeSignalLine(barTime: number, attempts: number = 0): void {
+    const x = this.chart?.timeScale().timeToCoordinate(barTime as Time);
+    if (x !== null && x !== undefined) {
+      this.signalBarX.set(x);
+      return;
+    }
+    if (attempts < 10) {
+      setTimeout(() => this._placeSignalLine(barTime, attempts + 1), 50);
+    }
   }
 
   // Linea horizontal de "precio de entrada simulado" para senales del
