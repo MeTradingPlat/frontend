@@ -63,5 +63,8 @@
       </div>
     }
     <div #chartContainer class="chart-container"></div>
+    @if (signalBarX() !== null) {
+      <div class="signal-vertical-line" [style.left.px]="signalBarX()"></div>
+    }
   </div>
 </div>

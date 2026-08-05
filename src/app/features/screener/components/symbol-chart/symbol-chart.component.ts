@@ -27,7 +27,6 @@ import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
-import { SignalLinePrimitive } from './drawing/signal-bar-primitive';
 
 interface TimeframeOption {
   id: string;
@@ -124,10 +123,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private readonly screenerService = inject(ScreenerService);
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
-  private signalLine: SignalLinePrimitive | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
+  readonly signalBarX = signal<number | null>(null);
 
   private allBars: CandleBar[] = [];
   private oldestTime: number | null = null;
@@ -309,8 +308,8 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   }
 
   private applyMarker(): void {
-    this.detachSignalBar();
-    if (this.markerTime === undefined || this.allBars.length === 0 || !this.series) return;
+    this.signalBarX.set(null);
+    if (this.markerTime === undefined || this.allBars.length === 0 || !this.series || !this.chart) return;
 
     const first = this.allBars[0].time;
     const last = this.allBars[this.allBars.length - 1].time;
@@ -324,19 +323,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       if (diff < bestDiff) { bestDiff = diff; nearestIdx = i; }
     }
     const bar = this.allBars[nearestIdx];
-    this.signalLine = new SignalLinePrimitive(
-      { time: bar.time as Time, price: bar.low },
-      { time: bar.time as Time, price: bar.high },
-    );
-    this.series.attachPrimitive(this.signalLine);
-    this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
-  }
+    this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
 
-  private detachSignalBar(): void {
-    if (this.signalLine && this.series) {
-      this.series.detachPrimitive(this.signalLine);
-    }
-    this.signalLine = null;
+    requestAnimationFrame(() => {
+      const x = this.chart?.timeScale().timeToCoordinate(bar.time as Time);
+      if (x !== null && x !== undefined) this.signalBarX.set(x);
+    });
   }
 
   // Linea horizontal de "precio de entrada simulado" para senales del
