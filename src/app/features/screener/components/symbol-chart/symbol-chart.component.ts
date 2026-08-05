@@ -327,9 +327,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.signalBarPrimitive = new SignalBarPrimitive(
       bar.time as Time, bar.high, bar.low,
     );
-    this.series.attachPrimitive(this.signalBarPrimitive);
-    const half = 30;
-    this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - half, to: nearestIdx + half });
+    requestAnimationFrame(() => {
+      if (!this.signalBarPrimitive || !this.series) return;
+      this.series.attachPrimitive(this.signalBarPrimitive);
+      this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
+    });
   }
 
   private detachSignalBar(): void {
