@@ -27,7 +27,7 @@ import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
-import { SignalBarPrimitive } from './drawing/signal-bar-primitive';
+import { SignalLinePrimitive } from './drawing/signal-bar-primitive';
 
 interface TimeframeOption {
   id: string;
@@ -124,7 +124,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private readonly screenerService = inject(ScreenerService);
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
-  private signalBarPrimitive: SignalBarPrimitive | null = null;
+  private signalLine: SignalLinePrimitive | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
@@ -324,21 +324,19 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       if (diff < bestDiff) { bestDiff = diff; nearestIdx = i; }
     }
     const bar = this.allBars[nearestIdx];
-    this.signalBarPrimitive = new SignalBarPrimitive(
-      bar.time as Time, bar.high, bar.low,
+    this.signalLine = new SignalLinePrimitive(
+      { time: bar.time as Time, price: bar.low },
+      { time: bar.time as Time, price: bar.high },
     );
-    requestAnimationFrame(() => {
-      if (!this.signalBarPrimitive || !this.series) return;
-      this.series.attachPrimitive(this.signalBarPrimitive);
-      this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
-    });
+    this.series.attachPrimitive(this.signalLine);
+    this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
   }
 
   private detachSignalBar(): void {
-    if (this.signalBarPrimitive && this.series) {
-      this.series.detachPrimitive(this.signalBarPrimitive);
+    if (this.signalLine && this.series) {
+      this.series.detachPrimitive(this.signalLine);
     }
-    this.signalBarPrimitive = null;
+    this.signalLine = null;
   }
 
   // Linea horizontal de "precio de entrada simulado" para senales del
