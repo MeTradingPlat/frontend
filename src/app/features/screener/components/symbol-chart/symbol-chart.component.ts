@@ -19,14 +19,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import {
-  CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi, ISeriesMarkersPluginApi,
-  LogicalRange, SeriesMarker, Time, createChart, createSeriesMarkers
+  CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
+  LogicalRange, Time, createChart
 } from 'lightweight-charts';
 import { Subscription } from 'rxjs';
 import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
+import { SignalBarPrimitive } from './drawing/signal-bar-primitive';
 
 interface TimeframeOption {
   id: string;
@@ -123,7 +124,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private readonly screenerService = inject(ScreenerService);
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
-  private markersPlugin: ISeriesMarkersPluginApi<Time> | null = null;
+  private signalBarPrimitive: SignalBarPrimitive | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
@@ -195,7 +196,6 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       timeScale: { timeVisible: true, secondsVisible: false }
     });
     this.series = this.addCandlestickSeries();
-    this.markersPlugin = createSeriesMarkers(this.series, []);
     this.applyBuyPriceLine();
     this.drawingManager = new ChartDrawingManager(this.chart, hasPending => this.updateHint(hasPending));
     this.drawingManager.setSeries(this.series);
@@ -228,7 +228,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // history on a closed market) instead of showing an empty chart.
     if (this.series) this.chart.removeSeries(this.series);
     this.series = this.addCandlestickSeries();
-    this.markersPlugin = createSeriesMarkers(this.series, []);
+    this.detachSignalBar();
     this.buyPriceLineRef = null; // se destruyo junto con la serie removida
     this.applyBuyPriceLine();
     this.drawingManager?.setSeries(this.series);
@@ -308,24 +308,15 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       });
   }
 
-  // Marca la vela que disparo una senal del escaner (ver symbol-details) --
-  // busca coincidencia exacta y si no hay, la vela mas cercana, siempre que
-  // caiga dentro (o justo al borde) del rango ya cargado; fuera de eso no
-  // fuerza un marcador enganoso sobre una vela que no es. Centra la vista en
-  // la vela marcada para que no quede fuera de pantalla al abrir el dialogo.
   private applyMarker(): void {
-    if (!this.markersPlugin) return;
-    if (this.markerTime === undefined || this.allBars.length === 0) {
-      this.markersPlugin.setMarkers([]);
-      return;
-    }
+    this.detachSignalBar();
+    if (this.markerTime === undefined || this.allBars.length === 0 || !this.series) return;
+
     const first = this.allBars[0].time;
     const last = this.allBars[this.allBars.length - 1].time;
     const barSpacing = this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60;
-    if (this.markerTime < first - barSpacing || this.markerTime > last + barSpacing) {
-      this.markersPlugin.setMarkers([]);
-      return;
-    }
+    if (this.markerTime < first - barSpacing || this.markerTime > last + barSpacing) return;
+
     let nearestIdx = 0;
     let bestDiff = Math.abs(this.allBars[0].time - this.markerTime);
     for (let i = 1; i < this.allBars.length; i++) {
@@ -333,16 +324,19 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       if (diff < bestDiff) { bestDiff = diff; nearestIdx = i; }
     }
     const bar = this.allBars[nearestIdx];
-    const marker: SeriesMarker<Time> = {
-      time: bar.time as Time,
-      position: 'aboveBar',
-      color: '#2196f3',
-      shape: 'arrowDown',
-      text: 'Señal'
-    };
-    this.markersPlugin.setMarkers([marker]);
+    this.signalBarPrimitive = new SignalBarPrimitive(
+      bar.time as Time, bar.high, bar.low,
+    );
+    this.series.attachPrimitive(this.signalBarPrimitive);
     const half = 30;
     this.chart?.timeScale().setVisibleLogicalRange({ from: nearestIdx - half, to: nearestIdx + half });
+  }
+
+  private detachSignalBar(): void {
+    if (this.signalBarPrimitive && this.series) {
+      this.series.detachPrimitive(this.signalBarPrimitive);
+    }
+    this.signalBarPrimitive = null;
   }
 
   // Linea horizontal de "precio de entrada simulado" para senales del
