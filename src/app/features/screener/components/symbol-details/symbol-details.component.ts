@@ -122,6 +122,10 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
     return Math.floor(new Date(utcIso).getTime() / 1000);
   }
 
+  uniqueFilters(): string {
+    return [...new Set((this.data.signalMatches ?? []).map((m: SignalFilterMatch) => m.filtro))].join(', ');
+  }
+
   formatNumber(value: number | undefined): string {
     if (value === undefined || value === null) return 'N/A';
     if (value >= 1e12) return (value / 1e12).toFixed(2) + 'T';

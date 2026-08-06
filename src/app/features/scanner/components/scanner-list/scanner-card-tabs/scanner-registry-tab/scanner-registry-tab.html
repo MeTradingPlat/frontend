@@ -40,7 +40,16 @@
     <!-- Mensaje Column -->
     <ng-container matColumnDef="mensaje">
       <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.MESSAGE' | translate }}</th>
-      <td mat-cell *matCellDef="let row" class="mensaje-cell">{{ row.mensaje }}</td>
+      <td mat-cell *matCellDef="let row" class="mensaje-cell">
+        @let event = parseEvent(row);
+        @if (event && event.type === 'signal') {
+          {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: row.symbol, scannerName: scanner().nombre, filters: event.filters } }}
+        } @else if (event && event.type === 'scanner') {
+          {{ ('SCANNER.EVENT_' + event.evento) | translate }}
+        } @else {
+          {{ row.mensaje }}
+        }
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

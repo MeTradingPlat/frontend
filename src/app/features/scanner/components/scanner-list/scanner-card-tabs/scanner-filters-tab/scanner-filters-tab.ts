@@ -1,22 +1,24 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
 import { Filtro } from '../../../../models/filtro.interface';
 import { ScannerFacadeService } from '../../../../services/scanner-facade.service';
+import { formatFilterParameters, FilterParamView } from '../../../../utils/format-filter-parameter.util';
+import { getCategoryFilterIcon, getCategoryFilterClass } from '../../../../utils/category-filter-icon.util';
 
 interface FilterRow {
   nombre: string;
-  categoria: string;
-  parametros: string;
+  categoriaEtiqueta: string;
+  categoriaIcon: string;
+  categoriaClass: string;
+  parametros: FilterParamView[];
 }
 
 @Component({
   selector: 'app-scanner-filters-tab',
   imports: [
     CommonModule,
-    MatTableModule,
     TranslatePipe
   ],
   templateUrl: './scanner-filters-tab.html',
@@ -28,7 +30,6 @@ export class ScannerFiltersTab implements OnInit {
 
   scanner = input.required<Escaner>();
 
-  displayedColumns: string[] = ['nombre', 'categoria', 'parametros'];
   dataSource = signal<FilterRow[]>([]);
   loading = signal<boolean>(false);
 
@@ -46,11 +47,7 @@ export class ScannerFiltersTab implements OnInit {
 
     this.facade.loadFiltrosEscanerSilent(scannerId).subscribe({
       next: (filtros: Filtro[]) => {
-        const rows: FilterRow[] = filtros.map(filtro => ({
-          nombre: filtro.etiquetaNombre || 'Sin nombre',
-          categoria: filtro.objCategoria?.etiqueta || '',
-          parametros: this.formatParameters(filtro)
-        }));
+        const rows: FilterRow[] = filtros.map(filtro => this.toRow(filtro));
         this.dataSource.set(rows);
         this.loading.set(false);
       },
@@ -62,29 +59,14 @@ export class ScannerFiltersTab implements OnInit {
     });
   }
 
-  private formatParameters(filtro: Filtro): string {
-    if (!filtro.parametros || filtro.parametros.length === 0) {
-      return 'Sin parámetros';
-    }
-
-    return filtro.parametros
-      .map(param => {
-        const valor = param.objValorSeleccionado;
-        if (!valor) return `${param.etiqueta}: -`;
-
-        switch (valor.enumTipoValor) {
-          case 'INTEGER':
-          case 'FLOAT':
-            return `${param.etiqueta}: ${(valor as any).valor}`;
-          case 'STRING':
-            return `${param.etiqueta}: ${valor.etiqueta}`;
-          case 'CONDICIONAL':
-            const cond = valor as any;
-            return `${param.etiqueta}: ${valor.etiqueta} ${cond.valor1}${cond.valor2 ? ` - ${cond.valor2}` : ''}`;
-          default:
-            return `${param.etiqueta}: ${valor.etiqueta}`;
-        }
-      })
-      .join(', ');
+  private toRow(filtro: Filtro): FilterRow {
+    const enumCategoria = filtro.objCategoria?.enumCategoriaFiltro || '';
+    return {
+      nombre: filtro.etiquetaNombre || '',
+      categoriaEtiqueta: filtro.objCategoria?.etiqueta || '',
+      categoriaIcon: getCategoryFilterIcon(enumCategoria),
+      categoriaClass: getCategoryFilterClass(enumCategoria),
+      parametros: formatFilterParameters(filtro)
+    };
   }
 }

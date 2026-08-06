@@ -17,7 +17,11 @@
     </button>
   </header>
 
-  @if (data.mensaje) {
+  @if (data.signalMatches?.length) {
+    <p class="signal-mensaje">
+      {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: data.symbol, scannerName: data.scannerName, filters: uniqueFilters() } }}
+    </p>
+  } @else if (data.mensaje) {
     <p class="signal-mensaje">{{ data.mensaje }}</p>
   }
 

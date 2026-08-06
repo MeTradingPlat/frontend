@@ -9,6 +9,7 @@ import { LogApiService } from '../../../../services/log-api.service';
 import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
 import { RegistroLog } from '../../../../models/registro-log.interface';
 import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
+import { parseLogEvent, ParsedSignalEvent, ParsedScannerEvent } from '../../../../utils/parse-log-event.util';
 
 @Component({
   selector: 'app-scanner-registry-tab',
@@ -54,6 +55,10 @@ export class ScannerRegistryTab implements OnInit {
   }
 
   loadRegistry(): void {}
+
+  parseEvent(row: RegistroLog): ParsedSignalEvent | ParsedScannerEvent | null {
+    return parseLogEvent(row.categoria, row.metadatos);
+  }
 
   getNivelColor(nivel: string): string {
     switch (nivel?.toUpperCase()) {

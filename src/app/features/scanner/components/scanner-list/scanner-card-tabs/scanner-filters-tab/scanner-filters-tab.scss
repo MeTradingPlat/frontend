@@ -7,15 +7,6 @@
   overflow: auto;
 }
 
-table {
-  width: 100%;
-  background-color: transparent;
-}
-
-.mat-mdc-cell {
-  vertical-align: middle;
-}
-
 .loading-container,
 .empty-state {
   text-align: center;
@@ -24,4 +15,81 @@ table {
   p {
     opacity: 0.7;
   }
+}
+
+.filters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-card {
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+}
+
+.filter-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.filter-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  --chip-hue: 220;
+  background: hsl(var(--chip-hue) 70% 50% / 15%);
+  color: hsl(var(--chip-hue) 70% 40%);
+
+  &.category-VOLUMEN { --chip-hue: 210; }
+  &.category-PRECIO_Y_MOVIMIENTO { --chip-hue: 150; }
+  &.category-MOMENTUM_E_INDICADORES_TECNICOS { --chip-hue: 30; }
+  &.category-CARACTERISTICAS_FUNDAMENTALES { --chip-hue: 265; }
+  &.category-TIEMPO_Y_PATRONES_DE_PRECIO { --chip-hue: 340; }
+}
+
+.filter-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.param-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  font-size: 0.82rem;
+}
+
+.param-label {
+  opacity: 0.65;
+}
+
+.param-value {
+  font-weight: 600;
+}
+
+.no-params {
+  opacity: 0.6;
+  font-size: 0.85rem;
+  margin: 0;
 }

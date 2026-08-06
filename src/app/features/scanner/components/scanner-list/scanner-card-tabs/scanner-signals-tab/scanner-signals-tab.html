@@ -8,7 +8,7 @@
         (selectionChange)="onDateChange($event.value)">
         @for (date of availableDates(); track date.value) {
           <mat-option [value]="date.value">
-            {{ date.label }}
+            {{ date.isToday ? ('SCANNER.TODAY' | translate) : date.label }}
           </mat-option>
         }
       </mat-select>

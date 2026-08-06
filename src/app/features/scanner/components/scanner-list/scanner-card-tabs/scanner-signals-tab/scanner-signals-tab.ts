@@ -27,6 +27,7 @@ interface SignalRow {
 interface DateOption {
   value: string;
   label: string;
+  isToday: boolean;
 }
 
 @Component({
@@ -68,18 +69,18 @@ export class ScannerSignalsTab implements OnInit {
     this.logApi.getFechasSenial(scannerId).subscribe({
       next: (fechas: string[]) => {
         const dates: DateOption[] = [
-          { value: localeToday, label: 'Hoy' },
+          { value: localeToday, label: '', isToday: true },
           ...fechas
             .filter(f => f !== localeToday)
             .sort((a, b) => b.localeCompare(a))
-            .map(f => ({ value: f, label: this._formatDateLabel(f) }))
+            .map(f => ({ value: f, label: this._formatDateLabel(f), isToday: false }))
         ];
         this.availableDates.set(dates);
         this.selectedDate.set(localeToday);
         this._loadForDate(localeToday);
       },
       error: () => {
-        this.availableDates.set([{ value: localeToday, label: 'Hoy' }]);
+        this.availableDates.set([{ value: localeToday, label: '', isToday: true }]);
         this.selectedDate.set(localeToday);
         this._loadForDate(localeToday);
       }
@@ -115,7 +116,7 @@ export class ScannerSignalsTab implements OnInit {
   onViewDetails(signal: SignalRow): void {
     const { precio, matches } = this.parseMetadatos(signal.metadatos);
     this.dialog.open(SymbolDetailsComponent, {
-      data: { symbol: signal.symbol, mensaje: signal.mensaje, buyPrice: precio, signalMatches: matches },
+      data: { symbol: signal.symbol, mensaje: signal.mensaje, buyPrice: precio, signalMatches: matches, scannerName: this.scanner().nombre },
       width: '800px',
       maxWidth: '95vw',
       maxHeight: '90vh',
