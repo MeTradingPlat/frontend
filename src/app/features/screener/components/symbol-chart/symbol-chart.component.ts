@@ -27,6 +27,7 @@ import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
+import { VerticalLinePrimitive } from './drawing/vertical-line-primitive';
 
 interface TimeframeOption {
   id: string;
@@ -124,9 +125,9 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
+  private signalLinePrimitive: VerticalLinePrimitive | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
-  readonly signalBarX = signal<number | null>(null);
 
   private allBars: CandleBar[] = [];
   private oldestTime: number | null = null;
@@ -227,7 +228,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // history on a closed market) instead of showing an empty chart.
     if (this.series) this.chart.removeSeries(this.series);
     this.series = this.addCandlestickSeries();
-    this.signalBarX.set(null);
+    this.signalLinePrimitive = null; // se destruyo junto con la serie removida
     this.buyPriceLineRef = null; // se destruyo junto con la serie removida
     this.applyBuyPriceLine();
     this.drawingManager?.setSeries(this.series);
@@ -308,8 +309,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   }
 
   private applyMarker(): void {
-    this.signalBarX.set(null);
-    if (this.markerTime === undefined || this.allBars.length === 0 || !this.chart) return;
+    if (this.signalLinePrimitive) {
+      this.series?.detachPrimitive(this.signalLinePrimitive);
+      this.signalLinePrimitive = null;
+    }
+    if (this.markerTime === undefined || this.allBars.length === 0 || !this.chart || !this.series) return;
 
     const first = this.allBars[0].time;
     const last = this.allBars[this.allBars.length - 1].time;
@@ -324,18 +328,13 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     }
     const barTime = this.allBars[nearestIdx].time;
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
-    this._placeSignalLine(barTime);
-  }
 
-  private _placeSignalLine(barTime: number, attempts: number = 0): void {
-    const x = this.chart?.timeScale().timeToCoordinate(barTime as Time);
-    if (x !== null && x !== undefined) {
-      this.signalBarX.set(x);
-      return;
-    }
-    if (attempts < 10) {
-      setTimeout(() => this._placeSignalLine(barTime, attempts + 1), 50);
-    }
+    // Puerto del plugin oficial de TradingView (ver drawing/vertical-line-primitive.ts)
+    // -- dibuja en el canvas del chart, recalcula su posicion X solo con
+    // timeToCoordinate en cada updateAllViews() que el chart llama por su
+    // cuenta en cada render. Nada de <div> superpuesto ni reintentos.
+    this.signalLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, barTime as Time);
+    this.series.attachPrimitive(this.signalLinePrimitive);
   }
 
   // Linea horizontal de "precio de entrada simulado" para senales del
