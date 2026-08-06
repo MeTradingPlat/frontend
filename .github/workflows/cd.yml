@@ -64,6 +64,7 @@ jobs:
             --name "frontend" \
             --network "metradingplat-network" \
             --restart "unless-stopped" \
+            --cpus "0.5" \
             --label project="metradingplat" \
             --label service="frontend" \
             virtud142/metradingplat_frontend:latest
