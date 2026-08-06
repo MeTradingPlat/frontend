@@ -3,6 +3,7 @@ name: CI Metradingplat Frontend
 on:
   push:
     branches: ['master']
+  workflow_dispatch:
 
 jobs:
   build:
