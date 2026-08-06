@@ -227,7 +227,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // history on a closed market) instead of showing an empty chart.
     if (this.series) this.chart.removeSeries(this.series);
     this.series = this.addCandlestickSeries();
-    this.detachSignalBar();
+    this.signalBarX.set(null);
     this.buyPriceLineRef = null; // se destruyo junto con la serie removida
     this.applyBuyPriceLine();
     this.drawingManager?.setSeries(this.series);
