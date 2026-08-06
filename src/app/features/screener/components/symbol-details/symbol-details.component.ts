@@ -109,9 +109,17 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
     this.activeTimeframe.set(match.timeframe);
   }
 
+  // El backend manda velaTimestamp en UTC pero sin sufijo de zona horaria
+  // (Python le quita el tzinfo antes de serializar) -- un ISO sin 'Z' ni
+  // offset lo interpreta JS como hora LOCAL del navegador, no UTC. Sin este
+  // ajuste, una vela de las 13:30 UTC se leia como 13:30 hora Colombia
+  // (18:30 UTC real), cayendo fuera del rango de velas cargadas y
+  // abortando el marcador silenciosamente por el guard de seguridad.
   markerTime(): number | undefined {
     const vela = this.activeMatch()?.velaTimestamp;
-    return vela ? Math.floor(new Date(vela).getTime() / 1000) : undefined;
+    if (!vela) return undefined;
+    const utcIso = vela.endsWith('Z') ? vela : vela + 'Z';
+    return Math.floor(new Date(utcIso).getTime() / 1000);
   }
 
   formatNumber(value: number | undefined): string {
