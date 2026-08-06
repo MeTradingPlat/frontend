@@ -297,6 +297,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
           if (this.allBars.length) {
             this.oldestTime = this.allBars[0].time;
             this.series?.setData(this.allBars.map(toCandlestickData));
+            // La vela real del marcador puede no estar en el lote inicial de
+            // historial (solo velas recientes) y llegar recien aqui -- sin
+            // esto el marcador se quedaba sin dibujar, o pegado al candidato
+            // "mas cercano" de ese momento (una barra equivocada) para siempre.
+            this.applyMarker();
           }
           // Solo un batch vacio significa "no hay mas" -- un batch con MENOS
           // de lo pedido no lo significa (confirmado en vivo: una respuesta

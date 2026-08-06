@@ -32,6 +32,16 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * /assets (i18n JSON, images, etc.) keeps its URL across builds -- unlike
+ * the hashed JS/CSS bundles below, a content change here is invisible to a
+ * browser holding a long-lived cache, so it gets a short one instead.
+ */
+app.use('/assets', express.static(join(browserDistFolder, 'assets'), {
+  maxAge: '5m',
+  index: false,
+}));
+
+/**
  * Serve static files from /browser directory
  */
 app.use(express.static(browserDistFolder, {
