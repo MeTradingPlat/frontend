@@ -145,6 +145,18 @@ body {
   }
 }
 
+// El dialogo MDC por defecto pone el scroll en .mdc-dialog__surface -- el
+// mismo elemento que tiene border-radius -- asi que la barra de scroll del
+// navegador queda pegada al borde y "corta" la esquina redondeada en vez de
+// quedar dentro. Se mueve el overflow al contenido interno del componente
+// (.details-container, ver symbol-details.component.scss) y esta superficie
+// solo recorta (overflow: hidden) para que el scroll quede inset dentro de
+// las esquinas curvas.
+.premium-dialog .mdc-dialog__surface,
+.premium-dialog .mat-mdc-dialog-surface {
+  overflow: hidden !important;
+}
+
 // Responsive adjustments for pages with header navbar
 @media (max-width: 768px) {
   // Adjust margin-top for pages that use header navbar

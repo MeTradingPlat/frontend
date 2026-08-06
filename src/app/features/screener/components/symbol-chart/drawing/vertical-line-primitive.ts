@@ -17,17 +17,10 @@ import {
 // automaticamente en cada render (pan/zoom/resize), asi que la posicion X
 // siempre se recalcula fresca via timeToCoordinate -- no hace falta
 // requestAnimationFrame ni reintentos.
-function centreOffset(lineBitmapWidth: number): number {
-  return Math.floor(lineBitmapWidth * 0.5);
-}
-
-function positionsLine(positionMedia: number, pixelRatio: number, desiredWidthMedia = 1) {
-  const scaledPosition = Math.round(pixelRatio * positionMedia);
-  const lineBitmapWidth = Math.round(desiredWidthMedia * pixelRatio);
-  const offset = centreOffset(lineBitmapWidth);
-  return { position: scaledPosition - offset, length: lineBitmapWidth };
-}
-
+//
+// stroke() con setLineDash() en vez del fillRect() solido del plugin
+// original -- para que se vea igual de punteada que la linea horizontal de
+// precio (series.createPriceLine con lineStyle: 2).
 class VertLineRenderer implements IPrimitivePaneRenderer {
   constructor(private readonly x: Coordinate | null, private readonly color: string, private readonly width: number) {}
 
@@ -35,9 +28,16 @@ class VertLineRenderer implements IPrimitivePaneRenderer {
     if (this.x === null) return;
     target.useBitmapCoordinateSpace(scope => {
       const ctx = scope.context;
-      const position = positionsLine(this.x!, scope.horizontalPixelRatio, this.width);
-      ctx.fillStyle = this.color;
-      ctx.fillRect(position.position, 0, position.length, scope.bitmapSize.height);
+      const scaledX = Math.round(this.x! * scope.horizontalPixelRatio) + 0.5;
+      ctx.save();
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = this.width * scope.horizontalPixelRatio;
+      ctx.setLineDash([6 * scope.horizontalPixelRatio, 4 * scope.horizontalPixelRatio]);
+      ctx.beginPath();
+      ctx.moveTo(scaledX, 0);
+      ctx.lineTo(scaledX, scope.bitmapSize.height);
+      ctx.stroke();
+      ctx.restore();
     });
   }
 }

@@ -3,6 +3,11 @@
   display: flex;
   flex-direction: column;
   min-height: 400px;
+  // El scroll vive aca, no en .mdc-dialog__surface (ver styles.scss global)
+  // -- asi la barra queda dentro de las esquinas redondeadas del dialogo en
+  // vez de pegada al borde exterior cuadrado.
+  max-height: 90vh;
+  overflow-y: auto;
   background-color: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
 }
