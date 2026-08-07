@@ -20,7 +20,7 @@
       <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.LEVEL' | translate }}</th>
       <td mat-cell *matCellDef="let row">
         <mat-chip [color]="getNivelColor(row.nivel)" selected>
-          {{ row.nivel }}
+          {{ ('SCANNER.LEVEL_' + row.nivel) | translate }}
         </mat-chip>
       </td>
     </ng-container>
@@ -30,7 +30,7 @@
       <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.CATEGORY' | translate }}</th>
       <td mat-cell *matCellDef="let row" class="categoria-cell">
         <i [class]="'bi ' + getCategoriaIcon(row.categoria)"></i>
-        {{ row.categoria }}
+        {{ ('SCANNER.CATEGORIA_' + row.categoria) | translate }}
         @if (row.symbol) {
           <span class="symbol-badge">{{ row.symbol }}</span>
         }

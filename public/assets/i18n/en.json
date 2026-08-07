@@ -143,7 +143,19 @@
     "LEVEL": "Level",
     "MESSAGE": "Message",
     "TYPE": "Type",
-    "LOAD_MORE": "Load more"
+    "LOAD_MORE": "Load more",
+    "TIPO_ENTRADA": "Entry",
+    "TIPO_SALIDA": "Exit",
+    "TIPO_NUEVA": "New",
+    "LEVEL_INFO": "Info",
+    "LEVEL_WARN": "Warning",
+    "LEVEL_ERROR": "Error",
+    "LEVEL_DEBUG": "Debug",
+    "CATEGORIA_SIGNAL": "Signal",
+    "CATEGORIA_SCANNER": "Scanner",
+    "CATEGORIA_ORDER": "Order",
+    "CATEGORIA_SYSTEM": "System",
+    "CATEGORIA_FILTER": "Filter"
   },
   "COMMON": {
     "RETRY": "Retry",
