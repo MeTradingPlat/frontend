@@ -320,16 +320,20 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     }
     if (this.markerTime === undefined || this.allBars.length === 0 || !this.chart || !this.series) return;
 
-    // timeToCoordinate() solo resuelve un tiempo que coincide EXACTO con una
-    // barra ya cargada en la serie -- no existe "la mas cercana" en la
-    // libreria (confirmado en la documentacion/issues oficiales de
-    // TradingView, github.com/tradingview/lightweight-charts#1716). Un hueco
-    // en los datos cargados (mercado cerrado, o un lote inicial que en un
-    // timeframe fino como M1 cubre muchas menos horas reales que uno grueso
-    // con el mismo numero de barras) puede dejar la barra "mas cercana" a
-    // horas de distancia del objetivo real -- por eso se exige coincidencia
-    // exacta en vez de buscar la mas cercana con una tolerancia inventada.
-    const nearestIdx = this.allBars.findIndex(b => b.time === this.markerTime);
+    // timeToCoordinate() solo resuelve el tiempo EXACTO de una barra ya
+    // cargada -- no existe "la mas cercana" en lightweight-charts
+    // (confirmado en la documentacion/issues oficiales de TradingView,
+    // github.com/tradingview/lightweight-charts#1716). Pero el objetivo
+    // (markerTime) es la vela donde disparo la senal en SU PROPIO timeframe
+    // (ej. M5 a las 13:30), que no coincide con el inicio exacto de una vela
+    // mas gruesa (H1 arranca en 13:00, D1 en 00:00) salvo que caiga justo en
+    // la hora/dia en punto -- por eso se busca la barra de ESTE timeframe
+    // cuya ventana [time, time+barSpacing) CONTIENE el objetivo, y se dibuja
+    // en el tiempo de esa barra encontrada (no en el markerTime crudo, que
+    // timeToCoordinate no reconoceria en un timeframe mas grueso que el de
+    // la senal).
+    const barSpacing = this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60;
+    const nearestIdx = this.allBars.findIndex(b => b.time <= this.markerTime! && this.markerTime! < b.time + barSpacing);
     if (nearestIdx === -1) {
       const first = this.allBars[0].time;
       if (this.markerTime < first && this.hasMoreHistory && !this.isLoadingMore) {
@@ -341,13 +345,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       return;
     }
 
+    const barTime = this.allBars[nearestIdx].time;
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
 
     // Puerto del plugin oficial de TradingView (ver drawing/vertical-line-primitive.ts)
     // -- dibuja en el canvas del chart, recalcula su posicion X solo con
     // timeToCoordinate en cada updateAllViews() que el chart llama por su
     // cuenta en cada render. Nada de <div> superpuesto ni reintentos.
-    this.signalLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, this.markerTime as Time);
+    this.signalLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, barTime as Time);
     this.series.attachPrimitive(this.signalLinePrimitive);
   }
 
