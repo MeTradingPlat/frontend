@@ -323,7 +323,21 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     const first = this.allBars[0].time;
     const last = this.allBars[this.allBars.length - 1].time;
     const barSpacing = this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60;
-    if (this.markerTime < first - barSpacing || this.markerTime > last + barSpacing) return;
+    // Si el objetivo es mas nuevo que lo cargado no hay nada que hacer (no
+    // deberia pasar, una senal siempre es pasada) -- no dibujar es mejor que
+    // "pegarla" a la ultima barra, que se veria como si fuera la vela actual.
+    if (this.markerTime > last + barSpacing) return;
+    if (this.markerTime < first - barSpacing) {
+      // El lote inicial de un timeframe fino (M1) cubre muchas menos horas
+      // reales que uno grueso (H1/D1) con la misma cantidad de barras -- la
+      // vela real de la senal queda fuera de la ventana con la que arranca
+      // el chart. Pedir mas historial en vez de rendirse; loadMoreHistory ya
+      // vuelve a llamar applyMarker() cuando llega, asi que termina
+      // encontrando la vela correcta en vez de quedar sin dibujar (o peor,
+      // "pegada" a un candidato equivocado si el guard de arriba fuera laxo).
+      if (this.hasMoreHistory && !this.isLoadingMore) this.loadMoreHistory();
+      return;
+    }
 
     let nearestIdx = 0;
     let bestDiff = Math.abs(this.allBars[0].time - this.markerTime);

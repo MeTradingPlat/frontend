@@ -14,6 +14,7 @@ import { LogApiService } from '../../../../services/log-api.service';
 import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
 import { SymbolDetailsComponent } from '../../../../../screener/components/symbol-details/symbol-details.component';
 import { SignalFilterMatch } from '../../../../../screener/models/candle.models';
+import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 
 interface SignalRow {
   id: number;
@@ -26,7 +27,6 @@ interface SignalRow {
 
 interface DateOption {
   value: string;
-  label: string;
   isToday: boolean;
 }
 
@@ -51,6 +51,7 @@ export class ScannerSignalsTab implements OnInit {
   private readonly dataStore = inject(ScannerDataStore);
   private readonly logApi = inject(LogApiService);
   private readonly dialog = inject(MatDialog);
+  private readonly i18n = inject(I18nService);
 
   scanner = input.required<Escaner>();
 
@@ -69,18 +70,18 @@ export class ScannerSignalsTab implements OnInit {
     this.logApi.getFechasSenial(scannerId).subscribe({
       next: (fechas: string[]) => {
         const dates: DateOption[] = [
-          { value: localeToday, label: '', isToday: true },
+          { value: localeToday, isToday: true },
           ...fechas
             .filter(f => f !== localeToday)
             .sort((a, b) => b.localeCompare(a))
-            .map(f => ({ value: f, label: this._formatDateLabel(f), isToday: false }))
+            .map(f => ({ value: f, isToday: false }))
         ];
         this.availableDates.set(dates);
         this.selectedDate.set(localeToday);
         this._loadForDate(localeToday);
       },
       error: () => {
-        this.availableDates.set([{ value: localeToday, label: '', isToday: true }]);
+        this.availableDates.set([{ value: localeToday, isToday: true }]);
         this.selectedDate.set(localeToday);
         this._loadForDate(localeToday);
       }
@@ -108,9 +109,10 @@ export class ScannerSignalsTab implements OnInit {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
-  private _formatDateLabel(dateStr: string): string {
+  formatDateLabel(dateStr: string): string {
     const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' });
+    const locale = this.i18n.currentLocale() === 'en' ? 'en-US' : 'es-CO';
+    return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
   onViewDetails(signal: SignalRow): void {

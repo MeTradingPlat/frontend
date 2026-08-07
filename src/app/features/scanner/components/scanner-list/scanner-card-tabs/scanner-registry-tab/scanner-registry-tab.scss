@@ -30,3 +30,26 @@ table {
   display: block;
   margin: 12px auto 0;
 }
+
+.log-signal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 0;
+}
+
+.log-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: color-mix(in srgb, var(--mat-sys-primary) 15%, transparent);
+  color: var(--mat-sys-primary);
+}

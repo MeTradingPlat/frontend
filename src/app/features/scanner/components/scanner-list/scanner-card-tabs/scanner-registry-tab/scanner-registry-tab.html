@@ -43,7 +43,16 @@
       <td mat-cell *matCellDef="let row" class="mensaje-cell">
         @let event = parseEvent(row);
         @if (event && event.type === 'signal') {
-          {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: row.symbol, scannerName: scanner().nombre, filters: event.filters } }}
+          <div class="log-signal">
+            <span class="log-signal-text">
+              {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: row.symbol, scannerName: scanner().nombre } }}
+            </span>
+            <span class="log-filter-chips">
+              @for (f of event.filters; track f) {
+                <span class="filter-chip">{{ f }}</span>
+              }
+            </span>
+          </div>
         } @else if (event && event.type === 'scanner') {
           {{ ('SCANNER.EVENT_' + event.evento) | translate }}
         } @else {

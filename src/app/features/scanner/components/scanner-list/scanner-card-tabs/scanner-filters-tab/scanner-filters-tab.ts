@@ -5,13 +5,12 @@ import { Escaner } from '../../../../models/escaner.interface';
 import { Filtro } from '../../../../models/filtro.interface';
 import { ScannerFacadeService } from '../../../../services/scanner-facade.service';
 import { formatFilterParameters, FilterParamView } from '../../../../utils/format-filter-parameter.util';
-import { getCategoryFilterIcon, getCategoryFilterClass } from '../../../../utils/category-filter-icon.util';
+import { getCategoryFilterIcon } from '../../../../utils/category-filter-icon.util';
 
 interface FilterRow {
   nombre: string;
   categoriaEtiqueta: string;
   categoriaIcon: string;
-  categoriaClass: string;
   parametros: FilterParamView[];
 }
 
@@ -65,7 +64,6 @@ export class ScannerFiltersTab implements OnInit {
       nombre: filtro.etiquetaNombre || '',
       categoriaEtiqueta: filtro.objCategoria?.etiqueta || '',
       categoriaIcon: getCategoryFilterIcon(enumCategoria),
-      categoriaClass: getCategoryFilterClass(enumCategoria),
       parametros: formatFilterParameters(filtro)
     };
   }

@@ -18,11 +18,19 @@
   </header>
 
   @if (data.signalMatches?.length) {
-    <p class="signal-mensaje">
-      {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: data.symbol, scannerName: data.scannerName, filters: uniqueFilters() } }}
-    </p>
+    <div class="signal-mensaje">
+      <p class="signal-mensaje-text">
+        {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: data.symbol, scannerName: data.scannerName } }}
+      </p>
+      <div class="signal-filters">
+        <span class="signal-filters-label">{{ 'SCANNER.FILTERS_MET' | translate }}:</span>
+        @for (f of uniqueFilters(); track f) {
+          <span class="filter-chip">{{ f }}</span>
+        }
+      </div>
+    </div>
   } @else if (data.mensaje) {
-    <p class="signal-mensaje">{{ data.mensaje }}</p>
+    <p class="signal-mensaje-text">{{ data.mensaje }}</p>
   }
 
   <mat-divider></mat-divider>

@@ -9,7 +9,3 @@ const ICONS: Record<string, string> = {
 export function getCategoryFilterIcon(enumCategoriaFiltro: string): string {
   return ICONS[enumCategoriaFiltro] ?? 'bi-funnel-fill';
 }
-
-export function getCategoryFilterClass(enumCategoriaFiltro: string): string {
-  return ICONS[enumCategoriaFiltro] ? `category-${enumCategoriaFiltro}` : 'category-default';
-}

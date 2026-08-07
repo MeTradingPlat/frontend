@@ -122,8 +122,8 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
     return Math.floor(new Date(utcIso).getTime() / 1000);
   }
 
-  uniqueFilters(): string {
-    return [...new Set((this.data.signalMatches ?? []).map((m: SignalFilterMatch) => m.filtro))].join(', ');
+  uniqueFilters(): string[] {
+    return [...new Set((this.data.signalMatches ?? []).map((m: SignalFilterMatch) => m.filtro))] as string[];
   }
 
   formatNumber(value: number | undefined): string {

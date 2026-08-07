@@ -1,6 +1,6 @@
 export interface ParsedSignalEvent {
   type: 'signal';
-  filters: string;
+  filters: string[];
 }
 
 export interface ParsedScannerEvent {
@@ -25,7 +25,7 @@ export function parseLogEvent(categoria: string, metadatos: string | null | unde
   }
 
   if (categoria === 'SIGNAL' && Array.isArray(parsed.matches)) {
-    const filters = [...new Set(parsed.matches.map((m: { filtro: string }) => m.filtro))].join(', ');
+    const filters = [...new Set(parsed.matches.map((m: { filtro: string }) => m.filtro))] as string[];
     return { type: 'signal', filters };
   }
 

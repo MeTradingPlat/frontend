@@ -44,6 +44,9 @@
   font-size: 1rem;
 }
 
+// Mismo tono para toda categoria, a proposito -- consistente con
+// .filter-category en dialog-add-filters.scss (creacion/edicion de
+// escaner), que usa un solo color de acento sin variar por categoria.
 .category-chip {
   display: inline-flex;
   align-items: center;
@@ -53,15 +56,8 @@
   font-size: 0.78rem;
   font-weight: 500;
   white-space: nowrap;
-  --chip-hue: 220;
-  background: hsl(var(--chip-hue) 70% 50% / 15%);
-  color: hsl(var(--chip-hue) 70% 40%);
-
-  &.category-VOLUMEN { --chip-hue: 210; }
-  &.category-PRECIO_Y_MOVIMIENTO { --chip-hue: 150; }
-  &.category-MOMENTUM_E_INDICADORES_TECNICOS { --chip-hue: 30; }
-  &.category-CARACTERISTICAS_FUNDAMENTALES { --chip-hue: 265; }
-  &.category-TIEMPO_Y_PATRONES_DE_PRECIO { --chip-hue: 340; }
+  background: color-mix(in srgb, var(--mat-sys-primary) 15%, transparent);
+  color: var(--mat-sys-primary);
 }
 
 .filter-params {
