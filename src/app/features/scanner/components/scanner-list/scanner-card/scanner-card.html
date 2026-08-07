@@ -10,24 +10,26 @@
           routerLink="/escaneres/configuracion/{{scanner().idEscaner!}}"
           (click)="$event.stopPropagation(); editScanner.emit(scanner().idEscaner!)"
           [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner().idEscaner}"></i>
-        @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
-          <div class="button-with-spinner">
-            <span class="loader"></span>
-            <i
-              class="bi bi-stop-fill"
-              role="button"
-              (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
-              [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
-            ></i>
-          </div>
-        } @else {
+      }
+      @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
+        <div class="button-with-spinner">
+          <span class="loader"></span>
           <i
-            class="bi bi-play-fill"
-            role="button"
-            (click)="$event.stopPropagation(); toggleScannerStatus.emit(scanner().idEscaner!)"
-            [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
+            class="bi bi-stop-fill"
+            [class.disabled]="!authService.isEditor()"
+            [attr.role]="authService.isEditor() ? 'button' : null"
+            (click)="onToggleClick($event)"
+            [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
           ></i>
-        }
+        </div>
+      } @else {
+        <i
+          class="bi bi-play-fill"
+          [class.disabled]="!authService.isEditor()"
+          [attr.role]="authService.isEditor() ? 'button' : null"
+          (click)="onToggleClick($event)"
+          [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
+        ></i>
       }
       <i
         class="bi bi-fullscreen"

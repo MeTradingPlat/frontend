@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ScannerApiService } from '../../../../services/scanner-api.service';
 import { NotificationService } from '../../../../../../core/services/notification/notification.service';
 import { ScannerFacadeService } from '../../../../services/scanner-facade.service';
+import { AuthService } from '../../../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-scanner-dialog',
@@ -39,19 +40,22 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
       <mat-card-header>
         <mat-card-title>{{ scanner.nombre }}</mat-card-title>
         <div class="header-icons">
-          <i
-            class="bi bi-gear-fill"
-            role="button"
-            (click)="onConfigureScanner()"
-            [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner.idEscaner}"
-          ></i>
+          @if (authService.isEditor()) {
+            <i
+              class="bi bi-gear-fill"
+              role="button"
+              (click)="onConfigureScanner()"
+              [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner.idEscaner}"
+            ></i>
+          }
 
           @if (scanner.objEstado?.enumEstadoEscaner === 'INICIADO') {
             <div class="button-with-spinner">
               <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="2"></mat-progress-spinner>
               <i
                 class="bi bi-stop-fill"
-                role="button"
+                [class.disabled]="!authService.isEditor()"
+                [attr.role]="authService.isEditor() ? 'button' : null"
                 (click)="onToggleScannerStatus()"
                 [matTooltip]="'SCANNER.STOP' | translate: {id: scanner.idEscaner}"
               ></i>
@@ -59,7 +63,8 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
           } @else {
             <i
               class="bi bi-play-fill"
-              role="button"
+              [class.disabled]="!authService.isEditor()"
+              [attr.role]="authService.isEditor() ? 'button' : null"
               (click)="onToggleScannerStatus()"
               [matTooltip]="'SCANNER.START' | translate: {id: scanner.idEscaner}"
             ></i>
@@ -186,6 +191,15 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
             transform: scale(1.1);
             opacity: 0.7;
           }
+
+          &.disabled {
+            cursor: default;
+
+            &:hover {
+              transform: none;
+              opacity: 1;
+            }
+          }
         }
       }
 
@@ -254,6 +268,7 @@ export class DialogScannerExpand {
   private readonly notificationService = inject(NotificationService);
   private readonly translate = inject(TranslateService);
   private readonly facade = inject(ScannerFacadeService);
+  readonly authService = inject(AuthService);
 
   onConfigureScanner(): void {
     this.dialogRef.close();
@@ -261,6 +276,7 @@ export class DialogScannerExpand {
   }
 
   onToggleScannerStatus(): void {
+    if (!this.authService.isEditor()) return;
     const isRunning = this.scanner.objEstado?.enumEstadoEscaner === 'INICIADO';
 
     const action$ = isRunning

@@ -86,6 +86,12 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
     }
   }
 
+  onToggleClick(event: Event): void {
+    if (!this.authService.isEditor()) return;
+    event.stopPropagation();
+    this.toggleScannerStatus.emit(this.scanner().idEscaner!);
+  }
+
   openScannerDialog(scanner: Escaner): void {
     this.dialog.open(DialogScannerExpand, {
       width: '90vw',
