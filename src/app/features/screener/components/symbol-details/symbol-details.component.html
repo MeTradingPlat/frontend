@@ -22,6 +22,16 @@
       <p class="signal-mensaje-text">
         {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: data.symbol, scannerName: data.scannerName } }}
       </p>
+      @if (activeMatch()?.velaTimestamp || data.buyPrice !== undefined) {
+        <div class="signal-meta">
+          @if (activeMatch()?.velaTimestamp; as vela) {
+            <span><i class="bi bi-clock"></i> {{ vela | localDatetime }}</span>
+          }
+          @if (data.buyPrice !== undefined) {
+            <span><i class="bi bi-currency-dollar"></i> {{ data.buyPrice | number:'1.2-4' }}</span>
+          }
+        </div>
+      }
       <div class="signal-filters">
         <span class="signal-filters-label">{{ 'SCANNER.FILTERS_MET' | translate }}:</span>
         @for (f of uniqueFilters(); track f) {

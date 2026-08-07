@@ -47,6 +47,16 @@
             <span class="log-signal-text">
               {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: row.symbol, scannerName: scanner().nombre } }}
             </span>
+            @if (event.velaTimestamp || event.precio !== undefined) {
+              <span class="log-signal-meta">
+                @if (event.velaTimestamp) {
+                  <span><i class="bi bi-clock"></i> {{ event.velaTimestamp | localDatetime }}</span>
+                }
+                @if (event.precio !== undefined) {
+                  <span><i class="bi bi-currency-dollar"></i> {{ event.precio | number:'1.2-4' }}</span>
+                }
+              </span>
+            }
             <span class="log-filter-chips">
               @for (f of event.filters; track f) {
                 <span class="filter-chip">{{ f }}</span>

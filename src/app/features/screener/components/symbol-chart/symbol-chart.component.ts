@@ -320,39 +320,34 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     }
     if (this.markerTime === undefined || this.allBars.length === 0 || !this.chart || !this.series) return;
 
-    const first = this.allBars[0].time;
-    const last = this.allBars[this.allBars.length - 1].time;
-    const barSpacing = this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60;
-    // Si el objetivo es mas nuevo que lo cargado no hay nada que hacer (no
-    // deberia pasar, una senal siempre es pasada) -- no dibujar es mejor que
-    // "pegarla" a la ultima barra, que se veria como si fuera la vela actual.
-    if (this.markerTime > last + barSpacing) return;
-    if (this.markerTime < first - barSpacing) {
-      // El lote inicial de un timeframe fino (M1) cubre muchas menos horas
-      // reales que uno grueso (H1/D1) con la misma cantidad de barras -- la
-      // vela real de la senal queda fuera de la ventana con la que arranca
-      // el chart. Pedir mas historial en vez de rendirse; loadMoreHistory ya
-      // vuelve a llamar applyMarker() cuando llega, asi que termina
-      // encontrando la vela correcta en vez de quedar sin dibujar (o peor,
-      // "pegada" a un candidato equivocado si el guard de arriba fuera laxo).
-      if (this.hasMoreHistory && !this.isLoadingMore) this.loadMoreHistory();
+    // timeToCoordinate() solo resuelve un tiempo que coincide EXACTO con una
+    // barra ya cargada en la serie -- no existe "la mas cercana" en la
+    // libreria (confirmado en la documentacion/issues oficiales de
+    // TradingView, github.com/tradingview/lightweight-charts#1716). Un hueco
+    // en los datos cargados (mercado cerrado, o un lote inicial que en un
+    // timeframe fino como M1 cubre muchas menos horas reales que uno grueso
+    // con el mismo numero de barras) puede dejar la barra "mas cercana" a
+    // horas de distancia del objetivo real -- por eso se exige coincidencia
+    // exacta en vez de buscar la mas cercana con una tolerancia inventada.
+    const nearestIdx = this.allBars.findIndex(b => b.time === this.markerTime);
+    if (nearestIdx === -1) {
+      const first = this.allBars[0].time;
+      if (this.markerTime < first && this.hasMoreHistory && !this.isLoadingMore) {
+        // El objetivo es mas viejo que lo cargado -- probablemente el lote
+        // inicial no llega tan atras todavia. Pedir mas y reintentar cuando
+        // llegue (loadMoreHistory ya vuelve a llamar applyMarker()).
+        this.loadMoreHistory();
+      }
       return;
     }
 
-    let nearestIdx = 0;
-    let bestDiff = Math.abs(this.allBars[0].time - this.markerTime);
-    for (let i = 1; i < this.allBars.length; i++) {
-      const diff = Math.abs(this.allBars[i].time - this.markerTime);
-      if (diff < bestDiff) { bestDiff = diff; nearestIdx = i; }
-    }
-    const barTime = this.allBars[nearestIdx].time;
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
 
     // Puerto del plugin oficial de TradingView (ver drawing/vertical-line-primitive.ts)
     // -- dibuja en el canvas del chart, recalcula su posicion X solo con
     // timeToCoordinate en cada updateAllViews() que el chart llama por su
     // cuenta en cada render. Nada de <div> superpuesto ni reintentos.
-    this.signalLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, barTime as Time);
+    this.signalLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, this.markerTime as Time);
     this.series.attachPrimitive(this.signalLinePrimitive);
   }
 

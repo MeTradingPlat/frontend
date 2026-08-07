@@ -134,6 +134,20 @@
   font-size: 0.9rem;
 }
 
+.signal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.8;
+
+  i {
+    margin-right: 3px;
+  }
+}
+
 .signal-filters {
   display: flex;
   align-items: center;

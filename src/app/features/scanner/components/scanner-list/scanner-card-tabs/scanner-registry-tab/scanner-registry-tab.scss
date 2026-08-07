@@ -38,6 +38,18 @@ table {
   padding: 6px 0;
 }
 
+.log-signal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.75rem;
+  opacity: 0.7;
+
+  i {
+    margin-right: 3px;
+  }
+}
+
 .log-filter-chips {
   display: flex;
   flex-wrap: wrap;

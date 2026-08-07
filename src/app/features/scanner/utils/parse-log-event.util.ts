@@ -1,6 +1,8 @@
 export interface ParsedSignalEvent {
   type: 'signal';
   filters: string[];
+  precio?: number;
+  velaTimestamp?: string;
 }
 
 export interface ParsedScannerEvent {
@@ -26,7 +28,9 @@ export function parseLogEvent(categoria: string, metadatos: string | null | unde
 
   if (categoria === 'SIGNAL' && Array.isArray(parsed.matches)) {
     const filters = [...new Set(parsed.matches.map((m: { filtro: string }) => m.filtro))] as string[];
-    return { type: 'signal', filters };
+    const precio = typeof parsed.precio === 'number' ? parsed.precio : undefined;
+    const velaTimestamp = parsed.matches[0]?.velaTimestamp as string | undefined;
+    return { type: 'signal', filters, precio, velaTimestamp };
   }
 
   if (categoria === 'SCANNER' && typeof parsed.evento === 'string') {
