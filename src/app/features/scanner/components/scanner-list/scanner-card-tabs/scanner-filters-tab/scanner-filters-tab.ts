@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
@@ -6,6 +6,7 @@ import { Filtro } from '../../../../models/filtro.interface';
 import { ScannerFacadeService } from '../../../../services/scanner-facade.service';
 import { formatFilterParameters, FilterParamView } from '../../../../utils/format-filter-parameter.util';
 import { getCategoryFilterIcon } from '../../../../utils/category-filter-icon.util';
+import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 
 interface FilterRow {
   nombre: string;
@@ -24,16 +25,23 @@ interface FilterRow {
   styleUrl: './scanner-filters-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerFiltersTab implements OnInit {
+export class ScannerFiltersTab {
   private readonly facade = inject(ScannerFacadeService);
+  private readonly i18n = inject(I18nService);
 
   scanner = input.required<Escaner>();
 
   dataSource = signal<FilterRow[]>([]);
   loading = signal<boolean>(false);
 
-  ngOnInit(): void {
-    this.loadFilters();
+  constructor() {
+    // Las etiquetas de filtro/categoria las traduce el backend segun el
+    // header Accept-Language al momento de la peticion (no ngx-translate) --
+    // sin esto, cambiar de idioma no refrescaba lo ya cargado en esta pestana.
+    effect(() => {
+      this.i18n.currentLocale();
+      this.loadFilters();
+    });
   }
 
   loadFilters(): void {
