@@ -43,6 +43,26 @@ app.get('/version.json', (req, res) => {
 });
 
 /**
+ * Push channel for near-instant deploy detection: a deploy kills this
+ * process (docker rm -f), which drops every open connection here -- the
+ * browser's EventSource auto-reconnects, and whichever container answers
+ * next writes ITS OWN buildId immediately on connect. No polling delay:
+ * detection latency is just the reconnect + new container start time.
+ * version.json stays as the periodic fallback for proxies that mishandle SSE.
+ */
+app.get('/version-events', (req, res) => {
+  res.set({
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-store',
+    Connection: 'keep-alive',
+  });
+  res.flushHeaders();
+  res.write(`data: ${JSON.stringify({ buildId })}\n\n`);
+  const ping = setInterval(() => res.write(':ping\n\n'), 30000);
+  req.on('close', () => clearInterval(ping));
+});
+
+/**
  * /assets (i18n JSON, images, etc.) keeps its URL across builds -- unlike
  * the hashed JS/CSS bundles below, a content change here is invisible to a
  * browser holding a long-lived cache, so it gets a short one instead.
