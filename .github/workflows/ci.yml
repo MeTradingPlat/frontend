@@ -27,5 +27,6 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build --no-cache \
+            --build-arg BUILD_ID="${{ github.sha }}" \
             -t virtud142/metradingplat_frontend:latest .
           docker push virtud142/metradingplat_frontend:latest

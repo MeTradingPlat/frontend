@@ -8,6 +8,7 @@ import express from 'express';
 import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
+const buildId = process.env['BUILD_ID'] || String(Date.now());
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -32,6 +33,16 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * Lets the running app detect a newer deploy while a tab stays open on an
+ * old computer that never gets restarted -- BUILD_ID changes every deploy
+ * (see Dockerfile/CI), this never does, so it must never be cached.
+ */
+app.get('/version.json', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ buildId });
+});
+
+/**
  * /assets (i18n JSON, images, etc.) keeps its URL across builds -- unlike
  * the hashed JS/CSS bundles below, a content change here is invisible to a
  * browser holding a long-lived cache, so it gets a short one instead.
@@ -50,9 +61,13 @@ app.use(express.static(browserDistFolder, {
 }));
 
 /**
- * Handle all other requests by rendering the Angular application
+ * Handle all other requests by rendering the Angular application.
+ * no-store on the shell HTML itself: old browsers/corporate proxies that
+ * heuristically cache unlabeled responses are exactly the ones stranding
+ * non-technical users on a stale build.
  */
 app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store');
   angularApp
     .handle(req)
     .then((response) =>

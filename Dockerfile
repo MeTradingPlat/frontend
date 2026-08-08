@@ -21,6 +21,11 @@ FROM node:20-alpine AS production
 LABEL project="metradingplat"
 LABEL service="frontend"
 
+# Unique per deploy (CI passes the commit SHA) -- lets the running app tell
+# a stale build apart from the one just deployed, see /version.json.
+ARG BUILD_ID=dev
+ENV BUILD_ID=$BUILD_ID
+
 # Set working directory
 WORKDIR /app
 
