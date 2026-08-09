@@ -133,6 +133,13 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private oldestTime: number | null = null;
   private hasMoreHistory = true;
   private isLoadingMore = false;
+  // Una vez que applyMarker() encuentra y dibuja la vela objetivo, la linea
+  // se mantiene sola (VerticalLinePrimitive recalcula su posicion por
+  // tiempo, no por indice) -- no hace falta re-centrar la vista cada vez
+  // que loadMoreHistory() trae mas barras viejas por el scroll normal del
+  // usuario. Sin esto, navegar lejos de la senal la traia de vuelta a la
+  // fuerza en cuanto llegaba la siguiente pagina de historial.
+  private markerFound = false;
 
   ngAfterViewInit(): void {
     if (this.initialTimeframe) this.selectedTimeframe.set(this.initialTimeframe);
@@ -149,7 +156,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       if (timeframeChanged) this.selectedTimeframe.set(this.initialTimeframe!);
       this.resubscribe();
     } else {
-      if (changes['markerTime'] && !changes['markerTime'].firstChange) this.applyMarker();
+      if (changes['markerTime'] && !changes['markerTime'].firstChange) {
+        this.markerFound = false;
+        this.applyMarker();
+      }
       if (changes['buyPriceLine'] && !changes['buyPriceLine'].firstChange) this.applyBuyPriceLine();
     }
   }
@@ -221,6 +231,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.oldestTime = null;
     this.hasMoreHistory = true;
     this.isLoadingMore = false;
+    this.markerFound = false;
 
     // Recreate the series instead of series.setData([]): an empty array doesn't
     // reliably reset a series that already has data, which left the previous
@@ -301,7 +312,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
             // historial (solo velas recientes) y llegar recien aqui -- sin
             // esto el marcador se quedaba sin dibujar, o pegado al candidato
             // "mas cercano" de ese momento (una barra equivocada) para siempre.
-            this.applyMarker();
+            // Pero solo mientras todavia no se encontro: una vez dibujada, la
+            // linea se mantiene sola por tiempo (no por indice), asi que re-
+            // centrar la vista en cada pagina de historial que llega por el
+            // scroll normal del usuario lo arrastraba de vuelta a la senal a
+            // la fuerza aunque estuviera navegando lejos a proposito.
+            if (!this.markerFound) this.applyMarker();
           }
           // Solo un batch vacio significa "no hay mas" -- un batch con MENOS
           // de lo pedido no lo significa (confirmado en vivo: una respuesta
@@ -345,6 +361,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       return;
     }
 
+    this.markerFound = true;
     const barTime = this.allBars[nearestIdx].time;
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
 
