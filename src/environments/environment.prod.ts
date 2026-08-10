@@ -30,12 +30,6 @@ export const environment = {
     balances: 'https://api.metradingplat.net/api/v1/accounts'
   },
   
-  // Option chain endpoints
-  optionEndpoints: {
-    baseUrl: 'https://api.metradingplat.net/api/v1/option-chains',
-    nested: 'https://api.metradingplat.net/api/v1/option-chains'
-  },
-  
   // Technical Analysis Service
   technicalAnalysisUrl: 'https://api.metradingplat.net/api/v1/analysis',
   

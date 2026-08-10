@@ -33,12 +33,6 @@ export const environment = {
     balances: 'http://localhost:8080/api/v1/accounts'
   },
   
-  // Option chain endpoints
-  optionEndpoints: {
-    baseUrl: 'http://localhost:8080/api/v1/option-chains',
-    nested: 'http://localhost:8080/api/v1/option-chains'
-  },
-  
   // Technical Analysis Service (if applicable)
   technicalAnalysisUrl: 'http://localhost:8000/api/v1/analysis',
   
