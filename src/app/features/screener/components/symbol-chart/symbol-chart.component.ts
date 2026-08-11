@@ -25,6 +25,7 @@ import {
 import { Subscription } from 'rxjs';
 import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
+import { TimezoneService } from '../../../../core/services/timezone.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
 import { VerticalLinePrimitive } from './drawing/vertical-line-primitive';
@@ -65,8 +66,14 @@ const MORE_TIMEFRAME_GROUPS: { label: string; items: TimeframeOption[] }[] = [
 const LOAD_MORE_THRESHOLD_BARS = 20;
 const LOAD_MORE_BATCH_SIZE = 500;
 
-function toCandlestickData(bar: CandleBar): CandlestickData<Time> {
-  return { time: bar.time as Time, open: bar.open, high: bar.high, low: bar.low, close: bar.close };
+// shiftSeconds desplaza el tiempo real (UTC) al "tiempo falso" que hace que
+// lightweight-charts, al formatearlo con el reloj local del navegador, lo
+// muestre como hora de mercado (Nueva York) -- unico truco soportado por la
+// libreria, ver TimezoneService.getMarketDisplayShiftSeconds(). bar.time en
+// si sigue siendo UTC real en todo el resto del componente (paginacion,
+// comparaciones con markerTime, etc.), el desplazamiento es solo visual.
+function toCandlestickData(bar: CandleBar, shiftSeconds: number): CandlestickData<Time> {
+  return { time: (bar.time + shiftSeconds) as Time, open: bar.open, high: bar.high, low: bar.low, close: bar.close };
 }
 
 function isWellFormed(bar: CandleBar): boolean {
@@ -122,6 +129,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
+  // Se calcula una sola vez (no cambia mientras la pestaña siga abierta en
+  // el mismo horario de verano/invierno) en vez de recalcularlo en cada
+  // vela -- ver toCandlestickData().
+  private readonly marketShiftSeconds = inject(TimezoneService).getMarketDisplayShiftSeconds();
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
@@ -259,14 +270,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (message.type === 'history') {
       this.allBars = sanitizeBars(message.bars);
       this.oldestTime = this.allBars.length ? this.allBars[0].time : null;
-      this.series?.setData(this.allBars.map(toCandlestickData));
+      this.series?.setData(this.allBars.map(bar => toCandlestickData(bar, this.marketShiftSeconds)));
       this.isLoading.set(false);
       this.hasNoData.set(this.allBars.length === 0);
       this.applyMarker();
     } else if (message.type === 'bar') {
       if (!isWellFormed(message.bar)) return;
       this.mergeLiveBar(message.bar);
-      this.series?.update(toCandlestickData(message.bar));
+      this.series?.update(toCandlestickData(message.bar, this.marketShiftSeconds));
       this.isLoading.set(false);
       this.hasNoData.set(false);
     } else if (message.type === 'error') {
@@ -307,7 +318,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
           this.allBars = sanitizeBars([...olderBars, ...this.allBars]);
           if (this.allBars.length) {
             this.oldestTime = this.allBars[0].time;
-            this.series?.setData(this.allBars.map(toCandlestickData));
+            this.series?.setData(this.allBars.map(bar => toCandlestickData(bar, this.marketShiftSeconds)));
             // La vela real del marcador puede no estar en el lote inicial de
             // historial (solo velas recientes) y llegar recien aqui -- sin
             // esto el marcador se quedaba sin dibujar, o pegado al candidato
@@ -362,7 +373,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     }
 
     this.markerFound = true;
-    const barTime = this.allBars[nearestIdx].time;
+    // + marketShiftSeconds: el eje del chart esta en tiempo "de mercado"
+    // (ver toCandlestickData), asi que timeToCoordinate necesita el mismo
+    // tiempo desplazado para encontrar la barra, no el UTC real.
+    const barTime = this.allBars[nearestIdx].time + this.marketShiftSeconds;
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
 
     // Puerto del plugin oficial de TradingView (ver drawing/vertical-line-primitive.ts)

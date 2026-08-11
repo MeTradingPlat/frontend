@@ -8,7 +8,7 @@ import { Escaner } from '../../../../models/escaner.interface';
 import { LogApiService } from '../../../../services/log-api.service';
 import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
 import { RegistroLog } from '../../../../models/registro-log.interface';
-import { LocalDatetimePipe } from '../../../../../../shared/pipes/local-datetime.pipe';
+import { MarketDatetimePipe } from '../../../../../../shared/pipes/market-datetime.pipe';
 import { parseLogEvent, ParsedSignalEvent, ParsedScannerEvent } from '../../../../utils/parse-log-event.util';
 
 @Component({
@@ -19,7 +19,7 @@ import { parseLogEvent, ParsedSignalEvent, ParsedScannerEvent } from '../../../.
     MatButtonModule,
     MatChipsModule,
     TranslatePipe,
-    LocalDatetimePipe
+    MarketDatetimePipe
   ],
   templateUrl: './scanner-registry-tab.html',
   styleUrl: './scanner-registry-tab.scss',

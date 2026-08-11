@@ -115,6 +115,21 @@ export class TimezoneService {
     return this.convertLocalToUTC(this.convertNewYorkToLocal(nyTime));
   }
 
+  /**
+   * Segundos a sumarle a un Unix timestamp UTC real para que, al leerlo con
+   * los metodos de fecha del navegador (que siempre usan la zona local),
+   * se vea como la hora de mercado (Nueva York) en vez de la hora local --
+   * lightweight-charts no soporta zonas horarias de forma nativa (confirmado
+   * en su documentacion oficial: tradingview.github.io/lightweight-charts/
+   * docs/time-zones), asi que la forma soportada es ajustar el timestamp
+   * antes de dárselo al grafico, no un formateador.
+   */
+  getMarketDisplayShiftSeconds(): number {
+    const nyOffset = this.getNewYorkOffsetMinutes();
+    const localOffset = new Date().getTimezoneOffset();
+    return (localOffset - nyOffset) * 60;
+  }
+
   private formatMinutes(totalMinutes: number, seconds = 0): string {
     const normalized = ((totalMinutes % 1440) + 1440) % 1440;
     const hh = Math.floor(normalized / 60).toString().padStart(2, '0');

@@ -14,7 +14,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
 import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
-import { LocalDatetimePipe } from '../../../../shared/pipes/local-datetime.pipe';
+import { MarketDatetimePipe } from '../../../../shared/pipes/market-datetime.pipe';
 import { Subscription, interval, startWith, switchMap, catchError, of } from 'rxjs';
 
 // Mismo orden de temporalidades que el backend (ver _TIMEFRAME_MINUTES en
@@ -54,7 +54,7 @@ const POLL_INTERVAL_MS = 5000;
     TranslateModule,
     SymbolChartComponent,
     MarketLabelPipe,
-    LocalDatetimePipe
+    MarketDatetimePipe
   ],
   templateUrl: './symbol-details.component.html',
   styleUrls: ['./symbol-details.component.scss']

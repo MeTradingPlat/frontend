@@ -12,7 +12,7 @@
     <!-- Timestamp Column -->
     <ng-container matColumnDef="timestamp">
       <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>
-      <td mat-cell *matCellDef="let row" class="timestamp-cell">{{ row.timestamp | localDatetime : true }}</td>
+      <td mat-cell *matCellDef="let row" class="timestamp-cell">{{ row.timestamp | marketDatetime : true }}</td>
     </ng-container>
 
     <!-- Nivel Column -->
@@ -50,7 +50,7 @@
             @if (event.velaTimestamp || event.precio !== undefined) {
               <span class="log-signal-meta">
                 @if (event.velaTimestamp) {
-                  <span><i class="bi bi-clock"></i> {{ event.velaTimestamp | localDatetime }}</span>
+                  <span><i class="bi bi-clock"></i> {{ event.velaTimestamp | marketDatetime }}</span>
                 }
                 @if (event.precio !== undefined) {
                   <span><i class="bi bi-currency-dollar"></i> {{ event.precio | number:'1.2-4' }}</span>
