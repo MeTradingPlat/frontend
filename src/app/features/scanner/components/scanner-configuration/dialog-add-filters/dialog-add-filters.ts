@@ -12,7 +12,11 @@ import { Categoria } from '../../../models/categoria.interface';
 import { Filtro } from '../../../models/filtro.interface';
 import { MatDividerModule } from '@angular/material/divider';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
+import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
+
+const TIPOS_FILTRO = ['ESTATICO', 'DINAMICO', 'TECNICO'] as const;
 
 @Component({
   selector: 'app-dialog-add-filters',
@@ -26,6 +30,7 @@ import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refr
     MatDividerModule,
     ReactiveFormsModule,
     TranslatePipe,
+    MatTooltipModule,
     I18nRefreshDirective
   ],
   templateUrl: './dialog-add-filters.html',
@@ -41,18 +46,27 @@ export class DialogAddFilters {
   categories = signal<Categoria[]>([]);
   filters = signal<Filtro[]>([]);
   selectedCategory = signal<string>('TODOS');
+  selectedTipo = signal<string>('TODOS');
   searchControl = new FormControl('');
   searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
 
-  // Filtros filtrados por búsqueda y excluyendo los ya seleccionados
+  readonly tiposFiltro = TIPOS_FILTRO;
+  readonly getFilterTypeIcon = getFilterTypeIcon;
+
+  // Filtros filtrados por búsqueda, tipo, y excluyendo los ya seleccionados
   filteredFilters = computed(() => {
     const search = this.searchTerm()?.toLowerCase() || '';
     const excludedFilters = this.data.excludedFilters || [];
+    const tipo = this.selectedTipo();
 
     let filtered = this.filters();
 
     // Excluir filtros ya seleccionados
     filtered = filtered.filter(filtro => !excludedFilters.includes(filtro.enumFiltro));
+
+    if (tipo !== 'TODOS') {
+      filtered = filtered.filter(filtro => filtro.enumTipoFiltro === tipo);
+    }
 
     // Filtrar por búsqueda
     if (search) {
@@ -85,6 +99,10 @@ export class DialogAddFilters {
   onCategorySelected(category: Categoria): void {
     this.selectedCategory.set(category.enumCategoriaFiltro);
     this.loadFiltersByCategory(category.enumCategoriaFiltro);
+  }
+
+  onTipoSelected(tipo: string): void {
+    this.selectedTipo.set(tipo);
   }
 
   private loadFiltersByCategory(categoria: string): void {

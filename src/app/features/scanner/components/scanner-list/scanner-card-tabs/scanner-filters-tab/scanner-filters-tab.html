@@ -16,6 +16,10 @@
             <i [class]="'bi ' + row.categoriaIcon"></i>
             {{ row.categoriaEtiqueta }}
           </span>
+          <span class="tipo-chip">
+            <i [class]="'bi ' + row.tipoIcon"></i>
+            {{ row.tipoEtiqueta }}
+          </span>
         </div>
         @if (row.parametros.length) {
           <div class="filter-params">

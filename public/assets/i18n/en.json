@@ -160,7 +160,14 @@
     "CATEGORIA_SCANNER": "Scanner",
     "CATEGORIA_ORDER": "Order",
     "CATEGORIA_SYSTEM": "System",
-    "CATEGORIA_FILTER": "Filter"
+    "CATEGORIA_FILTER": "Filter",
+    "FILTER_TYPE": "Filter type",
+    "FILTER_TYPE_ALL": "All",
+    "FILTER_TYPE_ESTATICO": "Static",
+    "FILTER_TYPE_DINAMICO": "Dynamic",
+    "FILTER_TYPE_TECNICO": "Technical",
+    "FILTER_TYPE_INFO": "Static: evaluated once using fundamental data (float, market cap, etc.) to narrow the symbol universe. Dynamic: evaluated every cycle using real-time market data (price, volume), without needing historical candles. Technical: requires computed candles/indicators (EMA, VWAP, RSI, etc.) and is evaluated on the symbols that already passed the static and dynamic filters.",
+    "FILTER_TYPE_ONLY_TECHNICAL_WARNING": "This scanner only has technical filters: every symbol in the market will reach this stage, which can make it slower."
   },
   "COMMON": {
     "RETRY": "Retry",

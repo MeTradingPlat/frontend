@@ -60,6 +60,19 @@
   color: var(--mat-sys-primary);
 }
 
+.tipo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  opacity: 0.85;
+}
+
 .filter-params {
   display: flex;
   flex-wrap: wrap;

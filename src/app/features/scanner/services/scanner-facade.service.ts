@@ -566,6 +566,8 @@ export class ScannerFacadeService {
         enumCategoriaFiltro: dto.objCategoria.enumCategoriaFiltro,
         etiqueta: dto.objCategoria.etiqueta
       } : undefined,
+      enumTipoFiltro: dto.enumTipoFiltro,
+      etiquetaTipoFiltro: dto.etiquetaTipoFiltro,
       parametros: (dto.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
         etiqueta: param.etiqueta,

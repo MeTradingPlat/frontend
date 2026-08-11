@@ -160,7 +160,14 @@
     "CATEGORIA_SCANNER": "Escáner",
     "CATEGORIA_ORDER": "Orden",
     "CATEGORIA_SYSTEM": "Sistema",
-    "CATEGORIA_FILTER": "Filtro"
+    "CATEGORIA_FILTER": "Filtro",
+    "FILTER_TYPE": "Tipo de filtro",
+    "FILTER_TYPE_ALL": "Todos",
+    "FILTER_TYPE_ESTATICO": "Estático",
+    "FILTER_TYPE_DINAMICO": "Dinámico",
+    "FILTER_TYPE_TECNICO": "Técnico",
+    "FILTER_TYPE_INFO": "Estático: se evalúa una sola vez con datos fundamentales (float, capitalización, etc.) para reducir el universo de símbolos. Dinámico: se evalúa en cada ciclo con datos de mercado en tiempo real (precio, volumen), sin necesitar velas históricas. Técnico: requiere velas e indicadores calculados (EMA, VWAP, RSI, etc.) y se evalúa sobre los símbolos que ya pasaron los filtros estáticos y dinámicos.",
+    "FILTER_TYPE_ONLY_TECHNICAL_WARNING": "Este escáner solo tiene filtros técnicos: todos los símbolos del mercado pasarán a esta etapa, lo que puede hacerla más lenta."
   },
   "COMMON": {
     "RETRY": "Reintentar",

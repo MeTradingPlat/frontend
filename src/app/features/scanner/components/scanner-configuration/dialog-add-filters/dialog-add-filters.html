@@ -3,6 +3,10 @@
     <mat-card-header>
         <mat-card-title>{{ 'SCANNER.ADD_FILTER_TITLE' | translate }}</mat-card-title>
         <div class="header-icons">
+          <i
+            class="bi bi-info-circle-fill"
+            [matTooltip]="'SCANNER.FILTER_TYPE_INFO' | translate"
+          ></i>
           <i mat-dialog-close class="bi bi-x-circle-fill"></i>
         </div>
     </mat-card-header>
@@ -30,6 +34,23 @@
           </button>
         }
       </div>
+      <div class="card-content-2 tipo-filtro-row">
+        <button
+          mat-button
+          [class.selected]="selectedTipo() === 'TODOS'"
+          (click)="onTipoSelected('TODOS')">
+          <span>{{ 'SCANNER.FILTER_TYPE_ALL' | translate }}</span>
+        </button>
+        @for (tipo of tiposFiltro; track tipo) {
+          <button
+            mat-button
+            [class.selected]="selectedTipo() === tipo"
+            (click)="onTipoSelected(tipo)">
+            <i class="bi" [class]="getFilterTypeIcon(tipo)"></i>
+            <span>{{ 'SCANNER.FILTER_TYPE_' + tipo | translate }}</span>
+          </button>
+        }
+      </div>
       <mat-divider/>
       <div class="card-content-3">
           @if (filteredFilters().length === 0) {
@@ -45,6 +66,10 @@
                     <h3 class="filter-name">{{filter.etiquetaNombre}}</h3>
                     <p class="filter-description">{{filter.etiquetaDescripcion}}</p>
                     <span class="filter-category">{{filter.objCategoria?.etiqueta}}</span>
+                    <span class="filter-tipo">
+                      <i class="bi" [class]="getFilterTypeIcon(filter.enumTipoFiltro)"></i>
+                      {{filter.etiquetaTipoFiltro}}
+                    </span>
                   </div>
                   <button
                     mat-raised-button

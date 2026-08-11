@@ -2,10 +2,17 @@
   <mat-card-header class="scanner-card-header">
     <mat-card-title class="scanner-card-title">{{ 'SCANNER.FILTERS' | translate }}</mat-card-title>
     <div class="header-icons">
+      <i class="bi bi-info-circle-fill" [matTooltip]="'SCANNER.FILTER_TYPE_INFO' | translate"></i>
       <i class="bi bi-plus-circle-fill" (click)="onAddFilter()" [matTooltip]="'SCANNER.ADD_FILTER' | translate"></i>
     </div>
   </mat-card-header>
   <mat-card-content class="scanner-card-content">
+    @if (soloTecnicos()) {
+      <div class="solo-tecnicos-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>{{ 'SCANNER.FILTER_TYPE_ONLY_TECHNICAL_WARNING' | translate }}</span>
+      </div>
+    }
     <div class="filters-grid">
       @for (filtro of filtros(); track $index) {
         <mat-card class="filter-card" appearance="outlined">
@@ -43,6 +50,10 @@
           </mat-card-content>
           <mat-card-footer class="filter-card-footer">
             <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
+            <span class="filter-card-tipo">
+              <i class="bi" [class]="getFilterTypeIcon(filtro.enumTipoFiltro)"></i>
+              {{filtro.etiquetaTipoFiltro}}
+            </span>
           </mat-card-footer>
         </mat-card>
       }

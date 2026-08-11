@@ -7,6 +7,8 @@ export interface Filtro{
     etiquetaDescripcion?: string;
     objCategoria?: Categoria;
     parametros: Parametro[];
+    enumTipoFiltro?: string;
+    etiquetaTipoFiltro?: string;
 }
 
 export interface FiltroDtoRespuesta {
@@ -15,6 +17,8 @@ export interface FiltroDtoRespuesta {
     etiquetaDescripcion: string;
     objCategoria: CategoriaDTORespuesta;
     parametros: ParametroDTORespuesta[];
+    enumTipoFiltro?: string;
+    etiquetaTipoFiltro?: string;
 }
 
 export interface FiltroDtoPeticion {
