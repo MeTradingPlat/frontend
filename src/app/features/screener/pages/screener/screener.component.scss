@@ -140,3 +140,39 @@
     color: var(--mat-sys-primary);
   }
 }
+
+// El navbar se achica en movil (ver header-navbar.scss), y styles.scss ya
+// baja el margin-top del host a 100px acorde -- esta altura acotada tiene
+// que seguirlo o queda un hueco/recorte de ~15px. Los campos del filtro
+// tambien pasan al mismo ancho compacto que ya usan los toolbars de
+// Senales/Registro (search-field/date-field) en vez del min-width pensado
+// para escritorio, que en un telefono forzaba un wrap feo o desbordaba. La
+// columna de mercado se oculta -- en una fila tan angosta no cabe junto al
+// simbolo y la descripcion sin apretar todo.
+@media (max-width: 768px) {
+  .screener-container {
+    padding: 0 12px 12px;
+    height: calc(100vh - 100px);
+  }
+
+  .filter-section {
+    padding: 12px 16px;
+
+    .search-field {
+      min-width: 160px;
+    }
+
+    .market-field {
+      min-width: 140px;
+    }
+  }
+
+  .table-card {
+    .table-header, .table-row {
+      padding: 0 12px;
+
+      .col-market { display: none; }
+      .col-description { min-width: 0; }
+    }
+  }
+}

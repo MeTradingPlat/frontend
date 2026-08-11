@@ -152,8 +152,12 @@ export class ScreenerComponent implements OnInit {
   viewDetails(symbol: string): void {
     this.dialog.open(SymbolDetailsComponent, {
       data: { symbol },
-      width: '800px',
-      maxWidth: '95vw',
+      // width en vw como medida principal (no un px fijo con vw solo de
+      // tope) -- igual que dialog-scanner-expand, para que en movil ocupe
+      // el mismo ancho proporcional que en escritorio en vez de quedar mas
+      // angosto de lo esperado.
+      width: '90vw',
+      maxWidth: '900px',
       maxHeight: '90vh',
       panelClass: 'premium-dialog'
     });
