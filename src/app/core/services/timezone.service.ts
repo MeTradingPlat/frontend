@@ -116,18 +116,23 @@ export class TimezoneService {
   }
 
   /**
-   * Segundos a sumarle a un Unix timestamp UTC real para que, al leerlo con
-   * los metodos de fecha del navegador (que siempre usan la zona local),
-   * se vea como la hora de mercado (Nueva York) en vez de la hora local --
-   * lightweight-charts no soporta zonas horarias de forma nativa (confirmado
-   * en su documentacion oficial: tradingview.github.io/lightweight-charts/
-   * docs/time-zones), asi que la forma soportada es ajustar el timestamp
-   * antes de dárselo al grafico, no un formateador.
+   * Segundos a sumarle a un Unix timestamp UTC real para que lightweight-charts
+   * lo muestre como hora de mercado (Nueva York). La libreria NO usa la zona
+   * horaria del navegador para nada -- interpreta y formatea todo timestamp
+   * como si fuera UTC directamente (confirmado en su documentacion oficial:
+   * tradingview.github.io/lightweight-charts/docs/time-zones). Por eso el
+   * shift debe depender SOLO de la diferencia UTC<->Nueva York, nunca de la
+   * zona horaria de quien mira la pantalla.
+   *
+   * Bug real que esto reemplaza: la formula anterior restaba tambien el
+   * offset del navegador (asumiendo que la libreria SI formatea en hora
+   * local), asi que solo daba la hora correcta quien tuviera el navegador en
+   * UTC -- para cualquier otro huso mostraba una hora sin sentido (ni la UTC
+   * real ni la de Nueva York), confirmado en vivo con una senal de GRI donde
+   * la barra real era a las 14:20 UTC pero el grafico mostraba otra hora.
    */
   getMarketDisplayShiftSeconds(): number {
-    const nyOffset = this.getNewYorkOffsetMinutes();
-    const localOffset = new Date().getTimezoneOffset();
-    return (localOffset - nyOffset) * 60;
+    return -this.getNewYorkOffsetMinutes() * 60;
   }
 
   private formatMinutes(totalMinutes: number, seconds = 0): string {
