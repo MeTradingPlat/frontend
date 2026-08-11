@@ -1,6 +1,7 @@
 import { Injectable, NgZone, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable, Subject, EMPTY } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
+import { filter, share } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { NotificacionDTORespuesta } from '../models/notificacion.interface';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -8,6 +9,17 @@ import { AuthService } from '../../../core/auth/auth.service';
 /**
  * Servicio SSE para Notificaciones en tiempo real.
  * Conecta con notification-service via Server-Sent Events.
+ *
+ * Una sola conexion compartida para toda la app (share + resetOnRefCountZero):
+ * se abre con el primer subscriber y se cierra cuando el ultimo se va. Antes
+ * cada consumidor (lista de escaneres, cada tarjeta, cada pestana de
+ * Senales/Registro) abria su propia conexion, y como el EventSource vivia en
+ * un solo campo de instancia, cada conexion nueva cerraba la anterior --
+ * "el ultimo que llama, gana". Con multiples escaneres visibles a la vez,
+ * solo el ultimo en inicializar seguia recibiendo eventos en vivo; el resto
+ * (incluida la lista, para cambios de estado) se quedaba congelado sin
+ * ningun error visible. El filtrado por escaner ahora es solo del lado del
+ * cliente (filter operator) sobre el mismo stream compartido.
  *
  * Características:
  * - Heartbeat del servidor cada 30s mantiene la conexión viva con Cloudflare
@@ -25,7 +37,6 @@ export class NotificacionSseService {
   private readonly apiUrl = `${environment.apiUrl}/notificaciones`;
 
   private eventSource: EventSource | null = null;
-  private notificacionSubject = new Subject<NotificacionDTORespuesta>();
   private lastEventId: string | null = null;
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -33,48 +44,46 @@ export class NotificacionSseService {
   private static readonly BASE_DELAY = 3000;
   private static readonly MAX_DELAY = 30000;
 
+  private readonly stream$: Observable<NotificacionDTORespuesta> = new Observable<NotificacionDTORespuesta>(subscriber => {
+    if (!isPlatformBrowser(this.platformId)) {
+      subscriber.complete();
+      return;
+    }
+    this.abrirConexion(subscriber);
+    return () => this.cerrarConexion();
+  }).pipe(share({ resetOnRefCountZero: true }));
+
   /**
-   * Conecta al stream SSE de todas las notificaciones
+   * Stream de todas las notificaciones, sin filtrar.
    */
   conectar(): Observable<NotificacionDTORespuesta> {
-    if (!isPlatformBrowser(this.platformId)) {
-      return EMPTY;
-    }
+    return this.stream$;
+  }
 
-    this.desconectar();
+  /**
+   * Mismo stream compartido, filtrado del lado del cliente por escaner.
+   */
+  conectarPorEscaner(idEscaner: number): Observable<NotificacionDTORespuesta> {
+    return this.stream$.pipe(filter(n => n.idEscaner === idEscaner));
+  }
 
+  /**
+   * Alias de conectar() para consumidores pasivos que solo quieren escuchar
+   * sin ser ellos mismos quienes disparan la conexion.
+   */
+  get notificaciones$(): Observable<NotificacionDTORespuesta> {
+    return this.stream$;
+  }
+
+  private abrirConexion(subscriber: Subscriber<NotificacionDTORespuesta>): void {
     this.ngZone.runOutsideAngular(() => {
       const url = this.buildUrl(`${this.apiUrl}/stream`);
       this.eventSource = new EventSource(url);
-      this.configurarEventSource(() => this.conectar());
+      this.configurarEventSource(subscriber, () => this.abrirConexion(subscriber));
     });
-
-    return this.notificacionSubject.asObservable();
   }
 
-  /**
-   * Conecta al stream SSE filtrado por escaner
-   */
-  conectarPorEscaner(idEscaner: number): Observable<NotificacionDTORespuesta> {
-    if (!isPlatformBrowser(this.platformId)) {
-      return EMPTY;
-    }
-
-    this.desconectar();
-
-    this.ngZone.runOutsideAngular(() => {
-      const url = this.buildUrl(`${this.apiUrl}/stream/escaner/${idEscaner}`);
-      this.eventSource = new EventSource(url);
-      this.configurarEventSource(() => this.conectarPorEscaner(idEscaner));
-    });
-
-    return this.notificacionSubject.asObservable();
-  }
-
-  /**
-   * Desconecta el stream SSE
-   */
-  desconectar(): void {
+  private cerrarConexion(): void {
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -83,13 +92,7 @@ export class NotificacionSseService {
       this.eventSource.close();
       this.eventSource = null;
     }
-  }
-
-  /**
-   * Observable del stream de notificaciones
-   */
-  get notificaciones$(): Observable<NotificacionDTORespuesta> {
-    return this.notificacionSubject.asObservable();
+    this.reconnectAttempts = 0;
   }
 
   private buildUrl(baseUrl: string): string {
@@ -121,7 +124,7 @@ export class NotificacionSseService {
    * - onmessage: procesa notificaciones y guarda el lastEventId
    * - onerror: cierra EventSource y reconecta con backoff exponencial
    */
-  private configurarEventSource(reconectarFn: () => void): void {
+  private configurarEventSource(subscriber: Subscriber<NotificacionDTORespuesta>, reconectarFn: () => void): void {
     if (!this.eventSource) return;
 
     this.eventSource.onopen = () => {
@@ -136,7 +139,7 @@ export class NotificacionSseService {
       this.ngZone.run(() => {
         try {
           const notificacion: NotificacionDTORespuesta = JSON.parse(event.data);
-          this.notificacionSubject.next(notificacion);
+          subscriber.next(notificacion);
         } catch (error) {
           console.error('Error parseando notificación SSE:', error);
         }

@@ -99,7 +99,6 @@ export class ScannerList implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sseSubscription?.unsubscribe();
-    this.notificacionSseService.desconectar();
   }
 
   private subscribeToStateChanges(): void {
