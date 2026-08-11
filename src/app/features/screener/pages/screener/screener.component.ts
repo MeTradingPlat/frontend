@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
@@ -77,6 +77,8 @@ export class ScreenerComponent implements OnInit {
 
   displayedColumns: string[] = ['symbol', 'description', 'market', 'actions'];
 
+  @ViewChild('viewport') private viewportRef?: ElementRef<HTMLDivElement>;
+
   private readonly searchTrigger$ = new Subject<void>();
 
   ngOnInit(): void {
@@ -109,6 +111,10 @@ export class ScreenerComponent implements OnInit {
       if (res) {
         this.symbols.set(res.data);
         this.totalElements.set(res.totalElements);
+        // Sin esto, filtrar/buscar con el scroll de la tabla bajado dejaba
+        // los resultados nuevos empezando a mitad de la vista en vez de
+        // arriba del todo, donde el usuario esperaria verlos.
+        if (this.viewportRef) this.viewportRef.nativeElement.scrollTop = 0;
       }
     });
 

@@ -44,7 +44,7 @@
         <div class="col-actions"></div>
       </div>
 
-      <div class="viewport">
+      <div class="viewport" #viewport>
         @for (element of symbols(); track element.symbol) {
           <div class="table-row clickable-row" (click)="viewDetails(element.symbol)">
             <div class="col-symbol">
