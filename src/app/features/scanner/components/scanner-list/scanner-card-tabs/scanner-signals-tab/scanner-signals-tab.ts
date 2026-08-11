@@ -131,10 +131,11 @@ export class ScannerSignalsTab implements OnInit {
 
   onViewDetails(signal: SignalRow): void {
     const { precio, matches } = this.parseMetadatos(signal.metadatos);
+    const isMobile = window.innerWidth <= 768;
     this.dialog.open(SymbolDetailsComponent, {
       data: { symbol: signal.symbol, mensaje: signal.mensaje, buyPrice: precio, signalMatches: matches, scannerName: this.scanner().nombre },
-      width: '90vw',
-      maxWidth: '900px',
+      width: isMobile ? '98vw' : '90vw',
+      maxWidth: isMobile ? '98vw' : '900px',
       maxHeight: '90vh',
       panelClass: 'premium-dialog'
     });

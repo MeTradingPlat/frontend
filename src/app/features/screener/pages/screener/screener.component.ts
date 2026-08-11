@@ -150,14 +150,16 @@ export class ScreenerComponent implements OnInit {
   }
 
   viewDetails(symbol: string): void {
+    const isMobile = window.innerWidth <= 768;
     this.dialog.open(SymbolDetailsComponent, {
       data: { symbol },
       // width en vw como medida principal (no un px fijo con vw solo de
       // tope) -- igual que dialog-scanner-expand, para que en movil ocupe
       // el mismo ancho proporcional que en escritorio en vez de quedar mas
-      // angosto de lo esperado.
-      width: '90vw',
-      maxWidth: '900px',
+      // angosto de lo esperado. En movil casi todo el ancho de pantalla,
+      // no solo el 90% (poco margen util en una pantalla ya angosta).
+      width: isMobile ? '98vw' : '90vw',
+      maxWidth: isMobile ? '98vw' : '900px',
       maxHeight: '90vh',
       panelClass: 'premium-dialog'
     });

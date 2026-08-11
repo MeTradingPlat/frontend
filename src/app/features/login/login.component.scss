@@ -1,8 +1,20 @@
+// El padre (.app-content) ya reserva su propio espacio para el navbar
+// inferior de movil (margin-bottom: 60px) y calcula su altura acorde --
+// si este componente TAMBIEN pide 100vh para si mismo, las dos reservas se
+// suman y el total se pasa de la pantalla, generando una barra de
+// desplazamiento para revelar esos ~60px de mas que nunca hacen falta ver.
+// flex: 1 deja que ocupe exactamente el espacio que el padre ya le da.
+:host {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  flex: 1;
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   padding: 20px;
 }

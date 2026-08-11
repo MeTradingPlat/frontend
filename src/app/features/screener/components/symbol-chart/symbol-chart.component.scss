@@ -96,3 +96,12 @@
   text-align: center;
   padding: 1rem;
 }
+
+// En movil el popup ya reparte espacio con el header y el mensaje de senal
+// (ver symbol-details.component.scss) -- la grafica cede altura ahi para
+// que todo el contenido quepa sin scroll en pantallas bajas.
+@media (max-width: 768px) {
+  .chart-container-outer {
+    height: clamp(220px, 36vh, 380px);
+  }
+}

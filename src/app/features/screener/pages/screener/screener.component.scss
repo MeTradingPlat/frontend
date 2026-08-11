@@ -72,8 +72,8 @@
     align-items: center;
     padding: 0 24px;
 
-    .col-symbol { flex: 0 0 120px; }
-    .col-description { flex: 1; min-width: 200px; }
+    .col-symbol { flex: 0 0 120px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .col-description { flex: 1; min-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .col-market { flex: 0 0 150px; }
     .col-actions { flex: 0 0 60px; text-align: right; }
   }

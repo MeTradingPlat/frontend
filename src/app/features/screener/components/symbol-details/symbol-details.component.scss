@@ -172,3 +172,30 @@
   text-align: right;
   margin-top: 16px;
 }
+
+// Recorta el "chrome" fijo (header + mensaje de senal) en pantallas
+// angostas y bajas -- ese espacio es lo que le quita a la grafica antes de
+// que el popup necesite scroll (ver clamp() en symbol-chart.component.scss,
+// que tambien se achica en este mismo breakpoint).
+@media (max-width: 768px) {
+  .details-header {
+    padding: 16px 48px 12px 16px;
+
+    .symbol-info .symbol {
+      font-size: 1.5rem;
+    }
+
+    .description {
+      font-size: 1rem;
+    }
+  }
+
+  .signal-mensaje {
+    padding: 10px 16px;
+  }
+
+  .details-content {
+    padding: 16px;
+    gap: 20px;
+  }
+}
