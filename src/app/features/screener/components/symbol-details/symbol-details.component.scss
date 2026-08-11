@@ -148,29 +148,6 @@
   }
 }
 
-.signal-filters {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.signal-filters-label {
-  font-size: 0.78rem;
-  color: var(--mat-sys-on-surface-variant);
-  opacity: 0.75;
-}
-
-.filter-chip {
-  display: inline-flex;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  background: color-mix(in srgb, var(--mat-sys-primary) 15%, transparent);
-  color: var(--mat-sys-primary);
-}
-
 .signal-timeframe-chips {
   display: flex;
   gap: 8px;

@@ -32,12 +32,6 @@
           }
         </div>
       }
-      <div class="signal-filters">
-        <span class="signal-filters-label">{{ 'SCANNER.FILTERS_MET' | translate }}:</span>
-        @for (f of uniqueFilters(); track f) {
-          <span class="filter-chip">{{ f }}</span>
-        }
-      </div>
     </div>
   } @else if (data.mensaje) {
     <div class="signal-mensaje">

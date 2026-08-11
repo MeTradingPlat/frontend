@@ -124,7 +124,6 @@
     "SIGNALS_FILTER_LABEL": "Signals from",
     "TODAY": "Today",
     "SIGNAL_MESSAGE": "Signal generated for {{symbol}} in '{{scannerName}}'",
-    "FILTERS_MET": "Filters met",
     "EVENT_SCANNER_INICIADO": "Scanner started",
     "EVENT_SCANNER_DETENIDO_MANUAL": "Scanner stopped by user",
     "EVENT_SCANNER_DETENIDO_AUTOMATICO": "Scanner completed automatically",

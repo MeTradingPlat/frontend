@@ -73,7 +73,7 @@
   // propio canvas), asi que reduce la altura en pantallas bajas sin
   // reintroducir el loop.
   position: relative;
-  height: clamp(260px, 43vh, 460px);
+  height: clamp(280px, 46vh, 480px);
 }
 
 .chart-container {
