@@ -41,22 +41,6 @@
 
 }
 
-.timezone-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background-color: var(--mat-sys-surface-container);
-    border-radius: 4px;
-    margin-bottom: 4px;
-
-    .timezone-label {
-        font-size: 0.875rem;
-        color: var(--mat-sys-on-surface-variant);
-        font-weight: 500;
-    }
-}
-
 .session-shortcuts {
     display: flex;
     margin-bottom: 12px;
