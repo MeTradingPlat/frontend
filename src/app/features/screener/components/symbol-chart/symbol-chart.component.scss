@@ -68,9 +68,12 @@
   // Altura FIJA a proposito, no flex:1/height:100% -- esa es la pieza que
   // rompe el ciclo de resize descrito arriba: con un valor fijo en px, el
   // ResizeObserver de la libreria del grafico siempre reporta el mismo
-  // numero sin importar que tan grande se dibuje el canvas adentro.
+  // numero sin importar que tan grande se dibuje el canvas adentro. clamp()
+  // sigue siendo un valor fijo en ese sentido (depende del viewport, no del
+  // propio canvas), asi que reduce la altura en pantallas bajas sin
+  // reintroducir el loop.
   position: relative;
-  height: 500px;
+  height: clamp(280px, 48vh, 500px);
 }
 
 .chart-container {
