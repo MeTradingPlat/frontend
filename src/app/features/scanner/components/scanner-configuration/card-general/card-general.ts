@@ -6,6 +6,7 @@ import { FormControl, FormGroupDirective, NgForm, ReactiveFormsModule } from '@a
 import { ErrorStateMatcher } from '@angular/material/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../models/escaner.interface';
+import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 
 /** Custom error state matcher that shows errors when errorMessage is present */
 class CustomErrorStateMatcher implements ErrorStateMatcher {
@@ -26,7 +27,8 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
-    TranslatePipe
+    TranslatePipe,
+    I18nRefreshDirective
   ],
   templateUrl: './card-general.html',
   styleUrl: './card-general.scss',

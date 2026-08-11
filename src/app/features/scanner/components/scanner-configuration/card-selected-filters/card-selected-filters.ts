@@ -9,6 +9,7 @@ import { ConditionalParameter } from './conditional-parameter/conditional-parame
 import { FloatParameter } from './float-parameter/float-parameter';
 import { IntegerParameter } from './integer-parameter/integer-parameter';
 import { OptionsParameter } from './options-parameter/options-parameter';
+import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 
 @Component({
   selector: 'app-card-selected-filters',
@@ -21,7 +22,8 @@ import { OptionsParameter } from './options-parameter/options-parameter';
     ConditionalParameter,
     FloatParameter,
     IntegerParameter,
-    OptionsParameter
+    OptionsParameter,
+    I18nRefreshDirective
   ],
   templateUrl: './card-selected-filters.html',
   styleUrl: './card-selected-filters.scss',

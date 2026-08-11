@@ -5,10 +5,11 @@ import { TranslatePipe } from "@ngx-translate/core";
 import { Escaner } from "../../../models/escaner.interface";
 import { Mercado } from "../../../models/mercado.interface";
 import { MatCardModule } from "@angular/material/card";
+import { I18nRefreshDirective } from "../../../../../shared/directives/i18n-refresh.directive";
 
 @Component({
   selector: 'app-card-market',
-  imports: [FormsModule, ReactiveFormsModule, MatCheckboxModule, MatCardModule, TranslatePipe],
+  imports: [FormsModule, ReactiveFormsModule, MatCheckboxModule, MatCardModule, TranslatePipe, I18nRefreshDirective],
   templateUrl: './card-market.html',
   styleUrl: './card-market.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

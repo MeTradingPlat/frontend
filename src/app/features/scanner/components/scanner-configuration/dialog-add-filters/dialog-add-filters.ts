@@ -12,6 +12,7 @@ import { Categoria } from '../../../models/categoria.interface';
 import { Filtro } from '../../../models/filtro.interface';
 import { MatDividerModule } from '@angular/material/divider';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 
 @Component({
   selector: 'app-dialog-add-filters',
@@ -24,7 +25,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
     MatInputModule,
     MatDividerModule,
     ReactiveFormsModule,
-    TranslatePipe
+    TranslatePipe,
+    I18nRefreshDirective
   ],
   templateUrl: './dialog-add-filters.html',
   styleUrl: './dialog-add-filters.scss',

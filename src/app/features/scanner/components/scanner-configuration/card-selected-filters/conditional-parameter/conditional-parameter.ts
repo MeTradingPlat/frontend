@@ -8,6 +8,7 @@ import { Parametro } from '../../../../models/parametro.interface';
 import { ValorCondicional } from '../../../../models/valor-condicional.interface';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FormControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { I18nRefreshDirective } from '../../../../../../shared/directives/i18n-refresh.directive';
 
 class CustomErrorStateMatcher implements ErrorStateMatcher {
   constructor(private errorMessage: () => string | undefined) {}
@@ -24,7 +25,8 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
     MatInputModule,
     MatSelectModule,
     FormsModule,
-    TranslatePipe
+    TranslatePipe,
+    I18nRefreshDirective
   ],
   templateUrl: './conditional-parameter.html',
   styleUrl: './conditional-parameter.scss',

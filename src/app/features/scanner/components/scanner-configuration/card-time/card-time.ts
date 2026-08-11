@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { TranslatePipe } from '@ngx-translate/core';
 import { TimezoneService } from '../../../../../core/services/timezone.service';
+import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 
 /** Horarios oficiales del mercado de EE.UU. en hora de Nueva York (ET) --
  * confirmados contra fuentes publicas (NYSE/Nasdaq): pre-market 4:00am,
@@ -33,7 +34,7 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
 
 @Component({
   selector: 'app-card-time',
-  imports: [MatFormFieldModule, MatInputModule, MatTimepickerModule, MatCardModule, MatSelectModule, MatButtonToggleModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormFieldModule, MatInputModule, MatTimepickerModule, MatCardModule, MatSelectModule, MatButtonToggleModule, ReactiveFormsModule, TranslatePipe, I18nRefreshDirective],
   templateUrl: './card-time.html',
   providers: [provideNativeDateAdapter()],
   styleUrl: './card-time.scss',
