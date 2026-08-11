@@ -50,6 +50,20 @@ const TIMEFRAMES: TimeframeOption[] = [
   { id: 'Y1', label: '1y' }
 ];
 
+// Duracion nominal de cada timeframe en segundos, para ubicar el marcador de
+// senal (ver applyMarker) sin depender de la diferencia entre las dos
+// primeras velas cargadas -- esa resta se rompia con un simple hueco entre
+// esas dos velas especificas (comun en simbolos de bajo volumen como los que
+// buscan estos escaners: un minuto sin ninguna operacion no genera vela),
+// que inflaba el "ancho de vela" calculado y desalineaba el marcador varias
+// barras respecto a donde realmente disparo la senal.
+const TIMEFRAME_SECONDS: Record<string, number> = {
+  M1: 60, M2: 120, M3: 180, M5: 300, M10: 600, M15: 900, M30: 1800, M45: 2700,
+  H1: 3600, H2: 7200, H3: 10800, H4: 14400, H12: 43200,
+  D1: 86400, D2: 172800, D3: 259200, W1: 604800,
+  MO1: 2592000, MO3: 7776000, MO6: 15552000, Y1: 31536000
+};
+
 const PRIMARY_TIMEFRAME_IDS = ['M1', 'M5', 'M15', 'H1', 'D1'];
 const PRIMARY_TIMEFRAMES = PRIMARY_TIMEFRAME_IDS.map(id => TIMEFRAMES.find(tf => tf.id === id)!);
 const MORE_TIMEFRAME_GROUPS: { label: string; items: TimeframeOption[] }[] = [
@@ -359,7 +373,8 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // en el tiempo de esa barra encontrada (no en el markerTime crudo, que
     // timeToCoordinate no reconoceria en un timeframe mas grueso que el de
     // la senal).
-    const barSpacing = this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60;
+    const barSpacing = TIMEFRAME_SECONDS[this.selectedTimeframe()]
+      ?? (this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60);
     const nearestIdx = this.allBars.findIndex(b => b.time <= this.markerTime! && this.markerTime! < b.time + barSpacing);
     if (nearestIdx === -1) {
       const first = this.allBars[0].time;
