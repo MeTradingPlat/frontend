@@ -129,8 +129,13 @@ export class ScannerDataStore {
       return { loadMore: (): void => fetchDatePage(page + 1) };
     }
 
+    // Sin esto, "Hoy" pedia los ultimos N logs sin acotar por fecha -- si el
+    // escaner no habia generado nada todavia hoy, esos "ultimos N" terminaban
+    // siendo literalmente los mismos del dia mas reciente con actividad,
+    // mostrando exactamente lo mismo que elegir esa fecha a mano.
+    const hoy = this._localToday();
     const fetchPage = (p: number): void => {
-      logApi.getRegistroPorEscanerTodas(scannerId, p, size).subscribe({
+      logApi.getRegistroPorEscanerTodas(scannerId, p, size, hoy).subscribe({
         next: (logs: RegistroLogDTORespuesta[]) => {
           const hasMore = logs.length === size;
           const entry = this.logCache.get(scannerId);
