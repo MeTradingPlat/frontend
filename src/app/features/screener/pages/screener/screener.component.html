@@ -1,9 +1,8 @@
-<div class="screener-container">
-  <div class="title-section">
-    <h1>{{ 'ASSETS.TITLE' | translate }}</h1>
-    <p class="subtitle">{{ 'ASSETS.SUBTITLE' | translate }}</p>
-  </div>
+<app-header-navbar
+  [title]="title()"
+/>
 
+<div class="screener-container">
   <mat-card class="table-card">
     <div class="filter-section">
       <mat-form-field appearance="outline" class="search-field">

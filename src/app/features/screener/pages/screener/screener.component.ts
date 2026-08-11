@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ScreenerService } from '../../services/screener.service';
@@ -20,8 +20,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
+import { HeaderNavbar } from '../../../../shared/components/layout/header-navbar/header-navbar';
+import { I18nService } from '../../../../core/services/i18n/i18n.service';
 
 const PAGE_SIZE = 50;
 
@@ -45,7 +47,8 @@ const PAGE_SIZE = 50;
     MatDividerModule,
     MatPaginatorModule,
     TranslateModule,
-    MarketLabelPipe
+    MarketLabelPipe,
+    HeaderNavbar
   ],
   templateUrl: './screener.component.html',
   styleUrls: ['./screener.component.scss']
@@ -53,6 +56,14 @@ const PAGE_SIZE = 50;
 export class ScreenerComponent implements OnInit {
   private screenerService = inject(ScreenerService);
   private dialog = inject(MatDialog);
+  private readonly translate = inject(TranslateService);
+  private readonly i18nService = inject(I18nService);
+
+  readonly title = computed(() => {
+    // Hacer que el computed dependa del idioma actual
+    const currentLang = this.i18nService.currentLocale();
+    return this.translate.instant('ASSETS.TITLE');
+  });
 
   markets = signal<Market[]>([]);
   symbols = signal<Symbol[]>([]);

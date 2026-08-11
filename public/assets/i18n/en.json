@@ -169,7 +169,6 @@
   },
   "ASSETS": {
     "TITLE": "Assets",
-    "SUBTITLE": "Explore all available assets in the Market Data Service with detailed fundamental information.",
     "SEARCH_LABEL": "Search symbol or description",
     "MARKET_LABEL": "Filter by Market",
     "LOADING": "Fetching Market Data...",

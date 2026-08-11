@@ -1,31 +1,16 @@
-.screener-container {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  height: calc(100vh - 64px);
-  box-sizing: border-box;
+:host {
+  display: block;
+  margin-top: 115px;
 }
 
-.title-section {
-  flex-shrink: 0;
-
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    margin: 0;
-    // Use Material Primary color instead of hardcoded gradient
-    color: var(--mat-sys-primary);
-    letter-spacing: -1px;
-  }
-
-  .subtitle {
-    color: var(--mat-sys-on-surface-variant);
-    margin: 8px 0 0;
-    font-size: 1.1rem;
-  }
+.screener-container {
+  padding: 0 24px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: calc(100vh - 115px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .filter-section {
@@ -59,7 +44,6 @@
 
 .table-card {
   border-radius: 16px;
-  overflow: hidden;
   background-color: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
   position: relative;
@@ -67,6 +51,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 
   .table-container {
     flex: 1;
@@ -78,6 +63,7 @@
   .viewport {
     flex: 1;
     width: 100%;
+    min-height: 0;
     overflow-y: auto;
   }
 
@@ -85,7 +71,7 @@
     display: flex;
     align-items: center;
     padding: 0 24px;
-    
+
     .col-symbol { flex: 0 0 120px; }
     .col-description { flex: 1; min-width: 200px; }
     .col-market { flex: 0 0 150px; }
@@ -95,14 +81,12 @@
   .table-header {
     background: var(--mat-sys-surface-container-high);
     height: 56px;
+    flex-shrink: 0;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 1px;
     border-bottom: 1px solid var(--mat-sys-outline-variant);
-    position: sticky;
-    top: 0;
-    z-index: 2;
   }
 
   .table-row {
@@ -150,10 +134,9 @@
   align-items: center;
   justify-content: center;
   gap: 16px;
-  
+
   p {
     font-weight: 500;
     color: var(--mat-sys-primary);
   }
 }
-

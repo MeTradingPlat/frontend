@@ -169,7 +169,6 @@
   },
   "ASSETS": {
     "TITLE": "Activos",
-    "SUBTITLE": "Explora todos los activos disponibles en Market Data Service con información fundamental detallada.",
     "SEARCH_LABEL": "Buscar símbolo o descripción",
     "MARKET_LABEL": "Filtrar por Mercado",
     "LOADING": "Consultando Market Data...",
