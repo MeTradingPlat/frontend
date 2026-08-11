@@ -1,10 +1,10 @@
 <div class="screener-container">
-  <header class="screener-header">
-    <div class="title-section">
-      <h1>{{ 'ASSETS.TITLE' | translate }}</h1>
-      <p class="subtitle">{{ 'ASSETS.SUBTITLE' | translate }}</p>
-    </div>
+  <div class="title-section">
+    <h1>{{ 'ASSETS.TITLE' | translate }}</h1>
+    <p class="subtitle">{{ 'ASSETS.SUBTITLE' | translate }}</p>
+  </div>
 
+  <mat-card class="table-card">
     <div class="filter-section">
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>{{ 'ASSETS.SEARCH_LABEL' | translate }}</mat-label>
@@ -16,8 +16,8 @@
         <mat-label>{{ 'ASSETS.MARKET_LABEL' | translate }}</mat-label>
         <mat-select [formControl]="marketControl" multiple>
           <div class="select-all-container">
-            <mat-checkbox class="select-all-checkbox" 
-                          [checked]="isAllSelected()" 
+            <mat-checkbox class="select-all-checkbox"
+                          [checked]="isAllSelected()"
                           (change)="toggleAllMarkets($event.checked)">
               Seleccionar Todos
             </mat-checkbox>
@@ -29,9 +29,7 @@
         </mat-select>
       </mat-form-field>
     </div>
-  </header>
 
-  <mat-card class="table-card">
     @if (isLoading()) {
       <div class="loading-overlay">
         <mat-spinner diameter="50"></mat-spinner>
