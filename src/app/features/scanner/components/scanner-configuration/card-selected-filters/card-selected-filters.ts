@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,11 +37,6 @@ export class CardSelectedFilters {
   removeFilter = output<number>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
-
-  soloTecnicos = computed(() => {
-    const filtros = this.filtros();
-    return filtros.length > 0 && filtros.every(f => f.enumTipoFiltro === 'TECNICO');
-  });
 
   onAddFilter(): void {
     this.openAddDialog.emit();
