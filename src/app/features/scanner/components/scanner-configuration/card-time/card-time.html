@@ -6,7 +6,16 @@
   </mat-card-header>
   <mat-card-content>
     <div class="timezone-info">
-      <span class="timezone-label">⏰ Zona horaria: {{ timezoneAbbreviation() }} → UTC</span>
+      <span class="timezone-label">⏰ {{ 'SCANNER.YOUR_TIMEZONE' | translate }}: {{ timezoneAbbreviation() }}</span>
+    </div>
+
+    <div class="session-shortcuts">
+      <span class="session-shortcuts-label">{{ 'SCANNER.MARKET_SESSION_SHORTCUTS' | translate }}</span>
+      <mat-button-toggle-group>
+        @for (session of marketSessions; track session.key) {
+          <mat-button-toggle (click)="applySession(session.key)">{{ session.labelKey | translate }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
     </div>
 
     <mat-form-field appearance="outline">
@@ -19,11 +28,12 @@
       }
     </mat-form-field>
 
-    @if (horaInicioLocal() && horaInicioUTC()) {
+    @if (horaInicioLocal() && horaInicioNY()) {
       <div class="time-conversion">
         <span class="local-time">{{ horaInicioLocal() }} {{ timezoneAbbreviation() }}</span>
-        <span class="arrow">→</span>
-        <span class="utc-time">{{ horaInicioUTC() }} UTC</span>
+        <span class="arrow">=</span>
+        <span class="ny-time">{{ horaInicioNY() }} {{ nyAbbreviation() }}</span>
+        <span class="ny-caption">{{ 'SCANNER.NEW_YORK_MARKET' | translate }}</span>
       </div>
     }
 
@@ -37,11 +47,12 @@
       }
     </mat-form-field>
 
-    @if (horaFinLocal() && horaFinUTC()) {
+    @if (horaFinLocal() && horaFinNY()) {
       <div class="time-conversion">
         <span class="local-time">{{ horaFinLocal() }} {{ timezoneAbbreviation() }}</span>
-        <span class="arrow">→</span>
-        <span class="utc-time">{{ horaFinUTC() }} UTC</span>
+        <span class="arrow">=</span>
+        <span class="ny-time">{{ horaFinNY() }} {{ nyAbbreviation() }}</span>
+        <span class="ny-caption">{{ 'SCANNER.NEW_YORK_MARKET' | translate }}</span>
       </div>
     }
 

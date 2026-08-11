@@ -48,7 +48,7 @@
     padding: 8px 12px;
     background-color: var(--mat-sys-surface-container);
     border-radius: 4px;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
 
     .timezone-label {
         font-size: 0.875rem;
@@ -57,8 +57,30 @@
     }
 }
 
+.session-shortcuts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+
+    .session-shortcuts-label {
+        font-size: 0.8125rem;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
+    mat-button-toggle-group {
+        width: 100%;
+
+        mat-button-toggle {
+            flex: 1;
+            font-size: 0.8125rem;
+        }
+    }
+}
+
 .time-conversion {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     padding: 6px 12px;
@@ -78,11 +100,17 @@
         font-size: 1rem;
     }
 
-    .utc-time {
+    .ny-time {
         color: var(--mat-sys-primary);
         font-weight: 600;
         background-color: var(--mat-sys-surface);
         padding: 2px 8px;
         border-radius: 4px;
+    }
+
+    .ny-caption {
+        font-size: 0.75rem;
+        color: var(--mat-sys-on-primary-container);
+        opacity: 0.8;
     }
 }
