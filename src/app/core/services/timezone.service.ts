@@ -62,15 +62,6 @@ export class TimezoneService {
     return this.shortAbbreviation(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }
 
-  /**
-   * Abreviatura de la hora de mercado (ej: "EDT" en verano, "EST" en
-   * invierno) -- nunca fija, depende de si Nueva York esta en horario de
-   * verano hoy.
-   */
-  getNewYorkAbbreviation(): string {
-    return this.shortAbbreviation(this.NY_TIMEZONE);
-  }
-
   private shortAbbreviation(timeZone: string): string {
     const parts = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'short' }).formatToParts(new Date());
     return parts.find(p => p.type === 'timeZoneName')?.value ?? '';
@@ -111,6 +102,17 @@ export class TimezoneService {
     const nyOffset = this.getNewYorkOffsetMinutes();
     const localOffset = new Date().getTimezoneOffset();
     return this.formatMinutes(hours * 60 + minutes + (nyOffset - localOffset), seconds);
+  }
+
+  /** UTC (lo que guarda el backend) <-> hora de Nueva York directo, sin
+   * pasar por la hora local del navegador -- compuesto sobre las
+   * conversiones ya probadas de arriba en vez de duplicar la cuenta. */
+  convertUTCToNewYork(utcTime: string): string {
+    return this.convertLocalToNewYork(this.convertUTCToLocal(utcTime));
+  }
+
+  convertNewYorkToUTC(nyTime: string): string {
+    return this.convertLocalToUTC(this.convertNewYorkToLocal(nyTime));
   }
 
   private formatMinutes(totalMinutes: number, seconds = 0): string {

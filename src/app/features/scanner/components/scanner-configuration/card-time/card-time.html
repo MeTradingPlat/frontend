@@ -6,11 +6,10 @@
   </mat-card-header>
   <mat-card-content>
     <div class="timezone-info">
-      <span class="timezone-label">⏰ {{ 'SCANNER.YOUR_TIMEZONE' | translate }}: {{ timezoneAbbreviation() }}</span>
+      <span class="timezone-label">🗽 {{ 'SCANNER.MARKET_TIME_NOTICE' | translate }}</span>
     </div>
 
     <div class="session-shortcuts">
-      <span class="session-shortcuts-label">{{ 'SCANNER.MARKET_SESSION_SHORTCUTS' | translate }}</span>
       <mat-button-toggle-group>
         @for (session of marketSessions; track session.key) {
           <mat-button-toggle (click)="applySession(session.key)">{{ session.labelKey | translate }}</mat-button-toggle>
@@ -23,38 +22,26 @@
       <input matInput [formControl]="startTime" [matTimepicker]="startPicker" [errorStateMatcher]="startTimeErrorMatcher">
       <mat-timepicker-toggle matIconSuffix [for]="startPicker"/>
       <mat-timepicker #startPicker/>
+      @if (horaInicioLocal()) {
+        <mat-hint>{{ 'SCANNER.YOUR_TIME_HINT' | translate }}: {{ horaInicioLocal() }} {{ timezoneAbbreviation() }}</mat-hint>
+      }
       @if (errors()['horaInicio']) {
         <mat-error>{{errors()['horaInicio']}}</mat-error>
       }
     </mat-form-field>
-
-    @if (horaInicioLocal() && horaInicioNY()) {
-      <div class="time-conversion">
-        <span class="local-time">{{ horaInicioLocal() }} {{ timezoneAbbreviation() }}</span>
-        <span class="arrow">=</span>
-        <span class="ny-time">{{ horaInicioNY() }} {{ nyAbbreviation() }}</span>
-        <span class="ny-caption">{{ 'SCANNER.NEW_YORK_MARKET' | translate }}</span>
-      </div>
-    }
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.END_TIME' | translate }}</mat-label>
       <input matInput [formControl]="endTime" [matTimepicker]="endPicker" [errorStateMatcher]="endTimeErrorMatcher">
       <mat-timepicker-toggle matIconSuffix [for]="endPicker"/>
       <mat-timepicker #endPicker/>
+      @if (horaFinLocal()) {
+        <mat-hint>{{ 'SCANNER.YOUR_TIME_HINT' | translate }}: {{ horaFinLocal() }} {{ timezoneAbbreviation() }}</mat-hint>
+      }
       @if (errors()['horaFin']) {
         <mat-error>{{errors()['horaFin']}}</mat-error>
       }
     </mat-form-field>
-
-    @if (horaFinLocal() && horaFinNY()) {
-      <div class="time-conversion">
-        <span class="local-time">{{ horaFinLocal() }} {{ timezoneAbbreviation() }}</span>
-        <span class="arrow">=</span>
-        <span class="ny-time">{{ horaFinNY() }} {{ nyAbbreviation() }}</span>
-        <span class="ny-caption">{{ 'SCANNER.NEW_YORK_MARKET' | translate }}</span>
-      </div>
-    }
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.EXECUTION_TYPE' | translate }}</mat-label>

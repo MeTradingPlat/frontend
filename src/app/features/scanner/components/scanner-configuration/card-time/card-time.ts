@@ -48,15 +48,15 @@ export class CardTime {
   endTime = new FormControl<Date | null>(null);
   selectEjecution = new FormControl<string>('UNA_VEZ', { nonNullable: true });
 
-  // Señales para mostrar conversión a hora de mercado (Nueva York) y UTC
+  // El picker edita directamente hora de Nueva York -- la hora local del
+  // usuario queda solo como referencia (no editable) para que nunca haya
+  // que convertir mentalmente "mi hora -> hora de mercado" (confirmado en
+  // vivo: eso fue justo lo que causo que un escaner de "post-market"
+  // terminara corriendo en horario regular por no tener en cuenta el
+  // horario de verano).
   horaInicioLocal = signal<string>('');
-  horaInicioNY = signal<string>('');
-  horaInicioUTC = signal<string>('');
   horaFinLocal = signal<string>('');
-  horaFinNY = signal<string>('');
-  horaFinUTC = signal<string>('');
   timezoneAbbreviation = signal<string>('');
-  nyAbbreviation = signal<string>('');
 
   readonly marketSessions: { key: MarketSession; labelKey: string }[] = [
     { key: 'PRE_MARKET', labelKey: 'SCANNER.SESSION_PRE_MARKET' },
@@ -71,19 +71,17 @@ export class CardTime {
   constructor() {
     // Inicializar timezone abbreviation
     this.timezoneAbbreviation.set(this.timezoneService.getTimezoneAbbreviation());
-    this.nyAbbreviation.set(this.timezoneService.getNewYorkAbbreviation());
 
     // Inicializar FormControls con valores del scanner o defaults
     effect(() => {
       const scannerValue = this.scanner();
 
       if (scannerValue.horaInicio) {
-        // Backend envía en UTC, convertir a local para mostrar en el picker
-        const localTime = this.timezoneService.convertUTCToLocal(scannerValue.horaInicio);
-        this.startTime.setValue(this.parseTime(localTime), { emitEvent: false });
-        this.horaInicioUTC.set(scannerValue.horaInicio);
-        this.horaInicioLocal.set(localTime);
-        this.horaInicioNY.set(this.timezoneService.convertLocalToNewYork(localTime));
+        // Backend envia en UTC, convertir a hora de Nueva York para mostrar
+        // en el picker (el picker ES hora de mercado, no hora local).
+        const nyTime = this.timezoneService.convertUTCToNewYork(scannerValue.horaInicio);
+        this.startTime.setValue(this.parseTime(nyTime), { emitEvent: false });
+        this.horaInicioLocal.set(this.timezoneService.convertNewYorkToLocal(nyTime));
       } else {
         const defaultStart = new Date();
         defaultStart.setHours(9, 30, 0);
@@ -91,12 +89,9 @@ export class CardTime {
       }
 
       if (scannerValue.horaFin) {
-        // Backend envía en UTC, convertir a local para mostrar en el picker
-        const localTime = this.timezoneService.convertUTCToLocal(scannerValue.horaFin);
-        this.endTime.setValue(this.parseTime(localTime), { emitEvent: false });
-        this.horaFinUTC.set(scannerValue.horaFin);
-        this.horaFinLocal.set(localTime);
-        this.horaFinNY.set(this.timezoneService.convertLocalToNewYork(localTime));
+        const nyTime = this.timezoneService.convertUTCToNewYork(scannerValue.horaFin);
+        this.endTime.setValue(this.parseTime(nyTime), { emitEvent: false });
+        this.horaFinLocal.set(this.timezoneService.convertNewYorkToLocal(nyTime));
       } else {
         const defaultEnd = new Date();
         defaultEnd.setHours(16, 0, 0);
@@ -110,34 +105,24 @@ export class CardTime {
 
     // Sincronizar cambios hacia el scanner
     this.startTime.valueChanges.subscribe(value => {
-      const localTime = this.formatTime(value);
-      const utcTime = this.timezoneService.convertLocalToUTC(localTime);
-
-      // Actualizar signals para mostrar en UI
-      this.horaInicioLocal.set(localTime);
-      this.horaInicioNY.set(this.timezoneService.convertLocalToNewYork(localTime));
-      this.horaInicioUTC.set(utcTime);
+      const nyTime = this.formatTime(value);
+      this.horaInicioLocal.set(this.timezoneService.convertNewYorkToLocal(nyTime));
 
       // Guardar en UTC
       this.scanner.update(s => ({
         ...s,
-        horaInicio: utcTime
+        horaInicio: this.timezoneService.convertNewYorkToUTC(nyTime)
       }));
     });
 
     this.endTime.valueChanges.subscribe(value => {
-      const localTime = this.formatTime(value);
-      const utcTime = this.timezoneService.convertLocalToUTC(localTime);
-
-      // Actualizar signals para mostrar en UI
-      this.horaFinLocal.set(localTime);
-      this.horaFinNY.set(this.timezoneService.convertLocalToNewYork(localTime));
-      this.horaFinUTC.set(utcTime);
+      const nyTime = this.formatTime(value);
+      this.horaFinLocal.set(this.timezoneService.convertNewYorkToLocal(nyTime));
 
       // Guardar en UTC
       this.scanner.update(s => ({
         ...s,
-        horaFin: utcTime
+        horaFin: this.timezoneService.convertNewYorkToUTC(nyTime)
       }));
     });
 
@@ -152,16 +137,12 @@ export class CardTime {
     });
   }
 
-  /** Traduce una sesion fija de mercado (pre-market/regular/post-market,
-   * definida en hora de Nueva York) a la hora local de quien esta
-   * configurando el escaner, y carga ambos campos de una vez -- evita que
-   * alguien fuera de Nueva York tenga que calcular a mano la diferencia
-   * horaria (confirmado en vivo: eso fue justo lo que causo que un
-   * escaner de "post-market" terminara corriendo en horario regular). */
+  /** Carga una sesion fija de mercado -- el picker ya esta en hora de
+   * Nueva York, asi que se cargan los valores tal cual, sin convertir. */
   applySession(session: MarketSession): void {
     const { start, end } = MARKET_SESSIONS[session];
-    this.startTime.setValue(this.parseTime(this.timezoneService.convertNewYorkToLocal(start)));
-    this.endTime.setValue(this.parseTime(this.timezoneService.convertNewYorkToLocal(end)));
+    this.startTime.setValue(this.parseTime(start));
+    this.endTime.setValue(this.parseTime(end));
   }
 
   private formatTime(date: Date | null): string {
