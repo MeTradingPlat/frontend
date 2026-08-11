@@ -154,9 +154,10 @@
 // que seguirlo o queda un hueco/recorte de ~15px. Los campos del filtro
 // tambien pasan al mismo ancho compacto que ya usan los toolbars de
 // Senales/Registro (search-field/date-field) en vez del min-width pensado
-// para escritorio, que en un telefono forzaba un wrap feo o desbordaba. La
-// columna de mercado se oculta -- en una fila tan angosta no cabe junto al
-// simbolo y la descripcion sin apretar todo.
+// para escritorio, que en un telefono forzaba un wrap feo o desbordaba. En
+// una fila tan angosta no caben las 3 columnas de contenido junto al ojo --
+// se oculta descripcion y se deja simbolo + mercado + ojo (pedido explicito:
+// mercado es mas util de un vistazo que la descripcion larga).
 @media (max-width: 768px) {
   .screener-container {
     padding: 0 12px 12px;
@@ -179,8 +180,8 @@
     .table-header, .table-row {
       padding: 0 12px;
 
-      .col-market { display: none; }
-      .col-description { min-width: 0; }
+      .col-description { display: none; }
+      .col-market { flex: 1; }
     }
   }
 }
