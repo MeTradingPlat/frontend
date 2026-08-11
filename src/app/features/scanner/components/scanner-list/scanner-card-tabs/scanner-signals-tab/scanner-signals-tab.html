@@ -16,6 +16,7 @@
   </div>
 </div>
 
+<div class="signals-body">
 @if (loading()) {
   <div class="loading-container">
     <p>{{ 'SCANNER.LOADING_SIGNALS' | translate }}</p>
@@ -70,3 +71,4 @@
         [class.salida-row]="row.tipo === 'SALIDA'"></tr>
   </table>
 }
+</div>

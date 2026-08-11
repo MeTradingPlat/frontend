@@ -5,15 +5,22 @@
   height: 100%;
   padding: 20px 24px;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .signals-toolbar {
   display: flex;
   justify-content: center;
+  flex-shrink: 0;
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--mat-sys-outline-variant, #30363d);
+}
+
+.signals-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .signals-header {
