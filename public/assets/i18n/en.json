@@ -122,6 +122,8 @@
     "LOADING_SIGNALS": "Loading signals...",
     "NO_SIGNALS": "No signals yet",
     "SIGNALS_FILTER_LABEL": "Signals from",
+    "REGISTRY_FILTER_LABEL": "Registry from",
+    "SEARCH_SYMBOL_LABEL": "Search symbol",
     "TODAY": "Today",
     "SIGNAL_MESSAGE": "Signal generated for {{symbol}} in '{{scannerName}}'",
     "EVENT_SCANNER_INICIADO": "Scanner started",

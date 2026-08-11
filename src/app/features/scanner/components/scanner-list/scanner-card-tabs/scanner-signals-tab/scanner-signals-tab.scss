@@ -10,35 +10,24 @@
 
 .signals-toolbar {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
   flex-shrink: 0;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--mat-sys-outline-variant, #30363d);
+
+  .search-field {
+    flex: 1;
+    min-width: 160px;
+  }
 }
 
 .signals-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-}
-
-.signals-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.filter-icon {
-  font-size: 1.05rem;
-  color: var(--mat-sys-on-surface-variant, #8b949e);
-}
-
-.filter-label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--mat-sys-on-surface-variant, #8b949e);
-  white-space: nowrap;
 }
 
 .date-field {

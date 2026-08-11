@@ -1,13 +1,35 @@
+<div class="registry-toolbar">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>{{ 'SCANNER.SEARCH_SYMBOL_LABEL' | translate }}</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="AAPL, TSLA...">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="date-field">
+    <mat-label>{{ 'SCANNER.REGISTRY_FILTER_LABEL' | translate }}</mat-label>
+    <mat-select
+      [value]="selectedDate()"
+      (selectionChange)="onDateChange($event.value)">
+      @for (date of availableDates(); track date.value) {
+        <mat-option [value]="date.value">
+          {{ date.isToday ? ('SCANNER.TODAY' | translate) : formatDateLabel(date.value) }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div class="registry-body">
 @if (loading()) {
   <div class="loading-container">
     <p>{{ 'SCANNER.LOADING_REGISTRY' | translate }}</p>
   </div>
-} @else if (dataSource().length === 0) {
+} @else if (filteredDataSource().length === 0) {
   <div class="empty-state">
     <p>{{ 'SCANNER.NO_REGISTRY' | translate }}</p>
   </div>
 } @else {
-  <table mat-table [dataSource]="dataSource()">
+  <table mat-table [dataSource]="filteredDataSource()">
 
     <!-- Timestamp Column -->
     <ng-container matColumnDef="timestamp">
@@ -82,3 +104,4 @@
     </button>
   }
 }
+</div>

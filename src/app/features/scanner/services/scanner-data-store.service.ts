@@ -107,11 +107,30 @@ export class ScannerDataStore {
   // nunca al onUpdate cerrado sobre el en el momento de creacion -- si no,
   // una instancia de componente destruida se queda "recibiendo" los refrescos
   // en vivo mientras la visible en pantalla nunca se entera.
-  loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void): { loadMore: () => void } {
+  loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void, fecha?: string): { loadMore: () => void } {
     const size = 50;
 
+    if (fecha) {
+      // Vista de una fecha pasada: sin cache ni SSE (igual que loadSignals),
+      // pagina propia por llamada para no pisar la cache "en vivo" de hoy.
+      let page = 0;
+      let data: RegistroLogDTORespuesta[] = [];
+      const fetchDatePage = (p: number): void => {
+        logApi.getRegistroPorEscanerTodas(scannerId, p, size, fecha).subscribe({
+          next: (logs: RegistroLogDTORespuesta[]) => {
+            const hasMore = logs.length === size;
+            data = p === 0 ? logs : [...data, ...logs];
+            page = p;
+            onUpdate(data, hasMore);
+          }
+        });
+      };
+      fetchDatePage(0);
+      return { loadMore: (): void => fetchDatePage(page + 1) };
+    }
+
     const fetchPage = (p: number): void => {
-      logApi.getLogsPorEscanerPaginated(scannerId, p, size).subscribe({
+      logApi.getRegistroPorEscanerTodas(scannerId, p, size).subscribe({
         next: (logs: RegistroLogDTORespuesta[]) => {
           const hasMore = logs.length === size;
           const entry = this.logCache.get(scannerId);

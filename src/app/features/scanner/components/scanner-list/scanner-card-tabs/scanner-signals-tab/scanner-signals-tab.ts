@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -34,8 +37,10 @@ interface DateOption {
   selector: 'app-scanner-signals-tab',
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatTableModule,
     MatIconModule,
+    MatInputModule,
     MatTooltipModule,
     MatChipsModule,
     MatFormFieldModule,
@@ -60,6 +65,15 @@ export class ScannerSignalsTab implements OnInit {
   loading = signal<boolean>(false);
   availableDates = signal<DateOption[]>([]);
   selectedDate = signal<string>('');
+
+  searchControl = new FormControl('');
+  private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
+
+  filteredDataSource = computed(() => {
+    const term = (this.searchTerm() || '').trim().toUpperCase();
+    if (!term) return this.dataSource();
+    return this.dataSource().filter(row => row.symbol?.toUpperCase().includes(term));
+  });
 
   ngOnInit(): void {
     const scannerId = this.scanner().idEscaner;
