@@ -392,8 +392,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // (el precio es el mismo sin importar que tan de cerca se mire), asi que
   // se mantiene visible al cambiar de chip. Morado a proposito: naranja ya
   // lo usa la herramienta de dibujo de lineas horizontales del usuario, azul
-  // el marcador de vela -- necesitaba un tercer color que no se confundiera
-  // con esos dos ni con las velas verdes/rojas.
+  // la de tendencia, cian el marcador de vela (ver vertical-line-primitive.ts)
+  // -- necesitaba un color que no se confundiera con esos tres ni con las
+  // velas verdes/rojas. (Antes el marcador de vela tambien caia en este
+  // mismo morado por defecto -- las dos lineas quedaban identicas y parecia
+  // que "se movian" al cambiar de timeframe cuando en realidad eran dos
+  // lineas superpuestas del mismo color.)
   private applyBuyPriceLine(): void {
     if (this.buyPriceLineRef) {
       this.series?.removePriceLine(this.buyPriceLineRef);
