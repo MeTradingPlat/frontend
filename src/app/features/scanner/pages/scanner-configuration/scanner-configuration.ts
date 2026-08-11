@@ -109,7 +109,7 @@ export class ScannerConfiguration implements OnInit {
       const editMode = untracked(() => this.isEditMode());
       const id = untracked(() => this.scannerId());
       if (editMode && id) {
-        this.loadFiltrosEscaner(id);
+        this.loadFiltrosEscaner(id, true);
       }
     });
   }
@@ -146,8 +146,8 @@ export class ScannerConfiguration implements OnInit {
     });
   }
 
-  private loadFiltrosEscaner(idEscaner: number): void {
-    this.facade.loadFiltrosEscaner(idEscaner).subscribe({
+  private loadFiltrosEscaner(idEscaner: number, forceRefresh: boolean = false): void {
+    this.facade.loadFiltrosEscaner(idEscaner, forceRefresh).subscribe({
       next: (filtros) => {
         this.filtros.set(filtros);
       },
