@@ -63,10 +63,7 @@ export class VerticalLinePrimitive implements ISeriesPrimitive<Time> {
     readonly chart: IChartApi,
     readonly series: ISeriesApi<keyof SeriesOptionsMap>,
     readonly time: Time,
-    // Cian a proposito -- no #ab47bc (linea de precio de compra) ni
-    // #2196f3 (herramienta de tendencia del usuario) ni #ff9800 (herramienta
-    // de linea horizontal): ver comentario en symbol-chart.component.ts.
-    readonly color: string = '#00bcd4',
+    readonly color: string = '#ab47bc',
     readonly width: number = 2,
   ) {}
 
