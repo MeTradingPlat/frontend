@@ -37,14 +37,14 @@
     }
 
     <div class="table-container">
-      <div class="table-header">
-        <div class="col-symbol">{{ 'ASSETS.SYMBOL' | translate }}</div>
-        <div class="col-description">{{ 'ASSETS.DESCRIPTION' | translate }}</div>
-        <div class="col-market">{{ 'ASSETS.MARKET' | translate }}</div>
-        <div class="col-actions"></div>
-      </div>
-
       <div class="viewport" #viewport>
+        <div class="table-header">
+          <div class="col-symbol">{{ 'ASSETS.SYMBOL' | translate }}</div>
+          <div class="col-description">{{ 'ASSETS.DESCRIPTION' | translate }}</div>
+          <div class="col-market">{{ 'ASSETS.MARKET' | translate }}</div>
+          <div class="col-actions"></div>
+        </div>
+
         @for (element of symbols(); track element.symbol) {
           <div class="table-row clickable-row" (click)="viewDetails(element.symbol)">
             <div class="col-symbol">

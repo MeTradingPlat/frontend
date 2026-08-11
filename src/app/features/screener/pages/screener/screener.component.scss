@@ -79,9 +79,17 @@
   }
 
   .table-header {
+    // Dentro de .viewport (no como hermano fuera de el) y sticky en vez de
+    // fijo aparte -- asi comparte el mismo ancho que las filas, que pierden
+    // el espacio de la barra de desplazamiento vertical que el header, al
+    // vivir afuera, nunca perdia. Esa diferencia de ancho corria las
+    // columnas del header respecto a las de las filas (la de "Descripcion"
+    // quedaba mas ancha en el header que en el contenido de abajo).
+    position: sticky;
+    top: 0;
+    z-index: 2;
     background: var(--mat-sys-surface-container-high);
     height: 56px;
-    flex-shrink: 0;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
