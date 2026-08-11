@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, model, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, model, OnInit, signal, untracked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NavbarButton } from '../../../../shared/models/interface/navbar-button.interface';
@@ -97,6 +97,22 @@ export class ScannerConfiguration implements OnInit {
 
     return buttons;
   });
+
+  constructor() {
+    // Las etiquetas de filtro/parametro/opciones las traduce el backend segun
+    // el header Accept-Language al momento de la peticion (no ngx-translate)
+    // -- ya se cargaron una vez con el idioma que estaba activo entonces, asi
+    // que sin esto cambiar de idioma no actualiza lo que ya esta en pantalla
+    // (ej. las opciones de timeframe como "15 minutes" seguian en ingles).
+    effect(() => {
+      this.i18nService.currentLocale();
+      const editMode = untracked(() => this.isEditMode());
+      const id = untracked(() => this.scannerId());
+      if (editMode && id) {
+        this.loadFiltrosEscaner(id);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.facade.loadMercados().subscribe();
