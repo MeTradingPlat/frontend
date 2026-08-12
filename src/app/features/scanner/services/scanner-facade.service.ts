@@ -37,11 +37,34 @@ export class ScannerFacadeService {
   public error = signal<ApiError | null>(null);
   public selectedScanner = signal<Escaner | null>(null);
 
+  // IDs de escaner cuyo cambio de estado acaba de iniciar este mismo cliente.
+  // El backend notifica cada cambio de estado por SSE a todos los que tengan
+  // la pagina abierta -- sin esto, la propia accion del usuario dispara DOS
+  // mensajes: el de la respuesta HTTP y el eco por SSE de ese mismo cambio.
+  private readonly recentlyToggledScannerIds = new Set<number>();
+
   /**
    * Selecciona un escaner
    */
   selectEscaner(scanner: Escaner | null): void {
     this.selectedScanner.set(scanner);
+  }
+
+  /**
+   * Marca un escaner como recien alternado por este cliente, para que el eco
+   * por SSE de ese cambio no dispare una segunda notificacion.
+   */
+  markRecentlyToggled(idEscaner: number): void {
+    this.recentlyToggledScannerIds.add(idEscaner);
+    setTimeout(() => this.recentlyToggledScannerIds.delete(idEscaner), 5000);
+  }
+
+  /**
+   * Indica si este cliente inicio hace poco el cambio de estado de ese
+   * escaner (y por lo tanto ya mostro su propia notificacion).
+   */
+  wasRecentlyToggledByMe(idEscaner: number): boolean {
+    return this.recentlyToggledScannerIds.has(idEscaner);
   }
 
   /**

@@ -283,6 +283,8 @@ export class DialogScannerExpand {
       ? this.scannerApi.detenerEscaner(this.scanner.idEscaner!)
       : this.scannerApi.iniciarEscaner(this.scanner.idEscaner!);
 
+    this.facade.markRecentlyToggled(this.scanner.idEscaner!);
+
     action$.subscribe({
       next: () => {
         const message = isRunning

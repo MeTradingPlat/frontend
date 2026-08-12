@@ -140,6 +140,12 @@ export class ScannerList implements OnInit, OnDestroy {
       // Forzar actualizacion del signal
       this.facade.escaners.set(updatedScanners);
 
+      // Si este mismo cliente disparo el cambio, ya mostro su propia
+      // notificacion al recibir la respuesta HTTP -- evitar duplicarla.
+      if (this.facade.wasRecentlyToggledByMe(idEscaner)) {
+        return;
+      }
+
       // Mostrar notificacion al usuario
       const scannerName = this.getScannerName(idEscaner);
       const mensaje = `Escaner "${scannerName}" cambio a ${metadatos.estadoNuevo}`;
@@ -178,6 +184,8 @@ export class ScannerList implements OnInit, OnDestroy {
     const action$ = isRunning
       ? this.scannerApi.detenerEscaner(id)
       : this.scannerApi.iniciarEscaner(id);
+
+    this.facade.markRecentlyToggled(id);
 
     action$.subscribe({
       next: (nuevoEstado) => {
