@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
@@ -13,10 +13,23 @@ interface FilterRow {
   nombre: string;
   categoriaEtiqueta: string;
   categoriaIcon: string;
+  enumTipoFiltro: string;
   tipoEtiqueta: string;
   tipoIcon: string;
   parametros: FilterParamView[];
 }
+
+interface FilterSection {
+  enumTipoFiltro: string;
+  tipoEtiqueta: string;
+  tipoIcon: string;
+  filas: FilterRow[];
+}
+
+// Estaticos primero (se evaluan una sola vez), luego dinamicos, luego
+// tecnicos (necesitan velas) -- refleja el orden real en que un escaner
+// va reduciendo el universo de simbolos.
+const ORDEN_TIPOS = ['ESTATICO', 'DINAMICO', 'TECNICO'];
 
 @Component({
   selector: 'app-scanner-filters-tab',
@@ -36,6 +49,22 @@ export class ScannerFiltersTab {
 
   dataSource = signal<FilterRow[]>([]);
   loading = signal<boolean>(false);
+
+  secciones = computed<FilterSection[]>(() => {
+    const filas = this.dataSource();
+    return ORDEN_TIPOS
+      .map(tipo => {
+        const filasTipo = filas.filter(f => f.enumTipoFiltro === tipo);
+        const primera = filasTipo[0];
+        return {
+          enumTipoFiltro: tipo,
+          tipoEtiqueta: primera?.tipoEtiqueta || '',
+          tipoIcon: primera?.tipoIcon || getFilterTypeIcon(tipo),
+          filas: filasTipo
+        };
+      })
+      .filter(seccion => seccion.filas.length > 0);
+  });
 
   constructor() {
     // Las etiquetas de filtro/categoria las traduce el backend segun el
@@ -75,6 +104,7 @@ export class ScannerFiltersTab {
       nombre: filtro.etiquetaNombre || '',
       categoriaEtiqueta: filtro.objCategoria?.etiqueta || '',
       categoriaIcon: getCategoryFilterIcon(enumCategoria),
+      enumTipoFiltro: filtro.enumTipoFiltro || '',
       tipoEtiqueta: filtro.etiquetaTipoFiltro || '',
       tipoIcon: getFilterTypeIcon(filtro.enumTipoFiltro),
       parametros: formatFilterParameters(filtro)

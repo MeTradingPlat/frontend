@@ -8,30 +8,34 @@
   </div>
 } @else {
   <div class="filters-list">
-    @for (row of dataSource(); track row.nombre) {
-      <div class="filter-card">
-        <div class="filter-card-header">
-          <span class="filter-name">{{ row.nombre || ('SCANNER.NO_NAME' | translate) }}</span>
-          <span class="category-chip">
-            <i [class]="'bi ' + row.categoriaIcon"></i>
-            {{ row.categoriaEtiqueta }}
-          </span>
-          <span class="tipo-chip">
-            <i [class]="'bi ' + row.tipoIcon"></i>
-            {{ row.tipoEtiqueta }}
-          </span>
-        </div>
-        @if (row.parametros.length) {
-          <div class="filter-params">
-            @for (p of row.parametros; track p.etiqueta) {
-              <span class="param-pill">
-                <span class="param-label">{{ p.etiqueta }}</span>
-                <span class="param-value">{{ p.valor }}</span>
+    @for (seccion of secciones(); track seccion.enumTipoFiltro) {
+      <div class="filter-section">
+        <h3 class="filter-section-title">
+          <i [class]="'bi ' + seccion.tipoIcon"></i>
+          {{ seccion.tipoEtiqueta }}
+        </h3>
+        @for (row of seccion.filas; track row.nombre) {
+          <div class="filter-card">
+            <div class="filter-card-header">
+              <span class="filter-name">{{ row.nombre || ('SCANNER.NO_NAME' | translate) }}</span>
+              <span class="category-chip">
+                <i [class]="'bi ' + row.categoriaIcon"></i>
+                {{ row.categoriaEtiqueta }}
               </span>
+            </div>
+            @if (row.parametros.length) {
+              <div class="filter-params">
+                @for (p of row.parametros; track p.etiqueta) {
+                  <span class="param-pill">
+                    <span class="param-label">{{ p.etiqueta }}</span>
+                    <span class="param-value">{{ p.valor }}</span>
+                  </span>
+                }
+              </div>
+            } @else {
+              <p class="no-params">{{ 'SCANNER.NO_PARAMETERS' | translate }}</p>
             }
           </div>
-        } @else {
-          <p class="no-params">{{ 'SCANNER.NO_PARAMETERS' | translate }}</p>
         }
       </div>
     }
