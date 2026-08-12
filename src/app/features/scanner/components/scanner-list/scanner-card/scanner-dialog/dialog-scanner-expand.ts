@@ -19,6 +19,8 @@ import { ScannerFacadeService } from '../../../../services/scanner-facade.servic
 import { AuthService } from '../../../../../../core/auth/auth.service';
 import { TimezoneService } from '../../../../../../core/services/timezone.service';
 import { ClockTickService } from '../../../../../../core/services/clock-tick.service';
+import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
+import { CalendarFacadeService } from '../../../../services/calendar-facade.service';
 import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
 
 @Component({
@@ -44,7 +46,7 @@ import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
         <mat-card-title>{{ scanner.nombre }}</mat-card-title>
         <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
           @if (phase(); as p) {
-            {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
+            {{ p.translationKey | translate: { day: p.day, time: p.displayTime.slice(0, 5), tz: timezoneAbbreviation } }}
           } @else {
             &nbsp;
           }
@@ -311,6 +313,8 @@ export class DialogScannerExpand {
   readonly authService = inject(AuthService);
   private readonly timezoneService = inject(TimezoneService);
   private readonly clockTick = inject(ClockTickService);
+  private readonly i18nService = inject(I18nService);
+  private readonly calendarFacade = inject(CalendarFacadeService);
 
   /** null cuando el escaner no esta INICIADO -- no hay fase que mostrar. */
   readonly phase = computed<ScannerPhaseResult | null>(() => {
@@ -324,8 +328,17 @@ export class DialogScannerExpand {
       this.timezoneService.convertUTCToLocal(this.scanner.horaInicio),
       this.timezoneService.convertUTCToLocal(this.scanner.horaFin),
       new Date(),
+      this.calendarFacade.estado(),
+      this.i18nService.currentLocale(),
+      this.translate.instant('SCANNER.TODAY'),
     );
   });
+
+  readonly timezoneAbbreviation = this.timezoneService.getTimezoneAbbreviation();
+
+  constructor() {
+    this.calendarFacade.ensureLoaded();
+  }
 
   onConfigureScanner(): void {
     this.dialogRef.close();

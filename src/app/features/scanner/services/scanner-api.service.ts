@@ -7,6 +7,7 @@ import { EstadoEscanerDTORespuesta } from '../models/estado-escaner.interface';
 import { MercadoDTORespuesta } from '../models/mercado.interface';
 import { FiltroDtoRespuesta, FiltroDtoPeticion } from '../models/filtro.interface';
 import { CategoriaDTORespuesta } from '../models/categoria.interface';
+import { CalendarioEstadoDTORespuesta } from '../models/calendario-estado.interface';
 // Eliminar ApiError, ya que el interceptor lo maneja
 
 /**
@@ -68,6 +69,14 @@ export class ScannerApiService {
    */
   archiveEscaner(id: number): Observable<EscanerDTORespuesta> {
     return this.http.patch<EscanerDTORespuesta>(`${this.apiUrl}/${id}/archivar`, {});
+  }
+
+  /**
+   * Estado del calendario de dias habiles (feriados de mercado incluidos) --
+   * lo calcula signal-processing-service, este endpoint solo lo consulta.
+   */
+  getEstadoCalendario(): Observable<CalendarioEstadoDTORespuesta> {
+    return this.http.get<CalendarioEstadoDTORespuesta>(`${this.apiUrl}/calendario`);
   }
 
   /**

@@ -5,7 +5,7 @@
     <mat-card-title>{{ scanner().nombre }}</mat-card-title>
     <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
       @if (phase(); as p) {
-        {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
+        {{ p.translationKey | translate: { day: p.day, time: p.displayTime.slice(0, 5), tz: timezoneAbbreviation } }}
       } @else {
         &nbsp;
       }

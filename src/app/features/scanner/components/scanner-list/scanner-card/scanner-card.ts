@@ -6,7 +6,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { RouterLink } from '@angular/router';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Escaner } from '../../../models/escaner.interface';
@@ -21,6 +21,8 @@ import { NotificacionSseService } from '../../../services/notificacion-sse.servi
 import { AuthService } from '../../../../../core/auth/auth.service';
 import { TimezoneService } from '../../../../../core/services/timezone.service';
 import { ClockTickService } from '../../../../../core/services/clock-tick.service';
+import { I18nService } from '../../../../../core/services/i18n/i18n.service';
+import { CalendarFacadeService } from '../../../services/calendar-facade.service';
 import { computeScannerPhase, ScannerPhaseResult } from './scanner-phase.util';
 
 
@@ -61,6 +63,9 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
   private readonly sseService = inject(NotificacionSseService);
   private readonly timezoneService = inject(TimezoneService);
   private readonly clockTick = inject(ClockTickService);
+  private readonly i18nService = inject(I18nService);
+  private readonly translate = inject(TranslateService);
+  private readonly calendarFacade = inject(CalendarFacadeService);
   readonly authService = inject(AuthService);
   private sseSub?: Subscription;
 
@@ -77,10 +82,16 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
       this.timezoneService.convertUTCToLocal(scanner.horaInicio),
       this.timezoneService.convertUTCToLocal(scanner.horaFin),
       new Date(),
+      this.calendarFacade.estado(),
+      this.i18nService.currentLocale(),
+      this.translate.instant('SCANNER.TODAY'),
     );
   });
 
+  readonly timezoneAbbreviation = this.timezoneService.getTimezoneAbbreviation();
+
   ngOnInit(): void {
+    this.calendarFacade.ensureLoaded();
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
 
