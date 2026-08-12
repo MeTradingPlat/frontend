@@ -21,8 +21,8 @@
           [ngModel]="valorCondicional.valor1"
           (ngModelChange)="onValor1Selected($event)"
         >
-          @for (opcion of opciones; track opcion) {
-            <mat-option [value]="opcion">{{ getValorPermitidoLabel(opcion) | translate }}</mat-option>
+          @for (opcion of opciones; track opcion.valor) {
+            <mat-option [value]="opcion.valor">{{ opcion.etiqueta }}</mat-option>
           }
         </mat-select>
       } @else {

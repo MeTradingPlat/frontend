@@ -71,12 +71,6 @@ export class ConditionalParameter {
     return valores && valores.length > 0 ? valores : null;
   });
 
-  getValorPermitidoLabel(valor: number): string {
-    if (valor === 1) return 'SCANNER.VALUE_YES';
-    if (valor === -1) return 'SCANNER.VALUE_OPPOSITE';
-    return 'SCANNER.VALUE_NO';
-  }
-
   /**
    * Obtiene el valor correcto de una opción
    * Para condicionales, las opciones son ValorString donde el valor está en la propiedad 'valor'

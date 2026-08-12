@@ -1,11 +1,16 @@
 import { Valor, ValorDTOPeticion, ValorDTORespuesta } from "./valor.interface";
 
+export interface OpcionValor {
+    valor: number;
+    etiqueta: string;
+}
+
 export interface ValorCondicional extends Valor{
     enumCondicional: string;
     isInteger: boolean;
     valor1: number;
     valor2?: number;
-    valoresPermitidos?: number[];
+    valoresPermitidos?: OpcionValor[];
 }
 
 export interface ValorCondicionalDTORespuesta extends ValorDTORespuesta {
@@ -13,7 +18,7 @@ export interface ValorCondicionalDTORespuesta extends ValorDTORespuesta {
     isInteger: boolean;
     valor1: number;
     valor2?: number;
-    valoresPermitidos?: number[];
+    valoresPermitidos?: OpcionValor[];
 }
 
 export interface ValorCondicionalDTOPeticion extends ValorDTOPeticion {
