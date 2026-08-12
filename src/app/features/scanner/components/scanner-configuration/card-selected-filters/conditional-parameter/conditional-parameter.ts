@@ -62,6 +62,22 @@ export class ConditionalParameter {
   });
 
   /**
+   * Cuando la estrategia solo puede devolver un conjunto discreto de
+   * valores (ej. patrones detectados: -1/0/1), el backend manda
+   * valoresPermitidos para mostrar un selector en vez de un input libre.
+   */
+  valoresPermitidos = computed(() => {
+    const valores = this.valorCondicional.valoresPermitidos;
+    return valores && valores.length > 0 ? valores : null;
+  });
+
+  getValorPermitidoLabel(valor: number): string {
+    if (valor === 1) return 'SCANNER.VALUE_YES';
+    if (valor === -1) return 'SCANNER.VALUE_OPPOSITE';
+    return 'SCANNER.VALUE_NO';
+  }
+
+  /**
    * Obtiene el valor correcto de una opción
    * Para condicionales, las opciones son ValorString donde el valor está en la propiedad 'valor'
    */
@@ -125,6 +141,19 @@ export class ConditionalParameter {
       objValorSeleccionado: {
         ...valorCond,
         valor1: numericValue
+      }
+    });
+  }
+
+  onValor1Selected(valor: number): void {
+    const currentParam = this.parametro();
+    const valorCond = currentParam.objValorSeleccionado as ValorCondicional;
+
+    this.parametro.set({
+      ...currentParam,
+      objValorSeleccionado: {
+        ...valorCond,
+        valor1: valor
       }
     });
   }

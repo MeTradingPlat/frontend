@@ -654,7 +654,8 @@ export class ScannerFacadeService {
           enumCondicional: dtoAny.enumCondicional || '',
           isInteger: typeof dtoAny.isInteger === 'boolean' ? dtoAny.isInteger : false,
           valor1: typeof dtoAny.valor1 === 'number' ? dtoAny.valor1 : 0,
-          valor2: typeof dtoAny.valor2 === 'number' ? dtoAny.valor2 : undefined
+          valor2: typeof dtoAny.valor2 === 'number' ? dtoAny.valor2 : undefined,
+          valoresPermitidos: Array.isArray(dtoAny.valoresPermitidos) ? dtoAny.valoresPermitidos : undefined
         } as ValorCondicional;
 
       default:

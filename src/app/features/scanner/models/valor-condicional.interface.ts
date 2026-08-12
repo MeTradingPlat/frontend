@@ -5,6 +5,7 @@ export interface ValorCondicional extends Valor{
     isInteger: boolean;
     valor1: number;
     valor2?: number;
+    valoresPermitidos?: number[];
 }
 
 export interface ValorCondicionalDTORespuesta extends ValorDTORespuesta {
@@ -12,6 +13,7 @@ export interface ValorCondicionalDTORespuesta extends ValorDTORespuesta {
     isInteger: boolean;
     valor1: number;
     valor2?: number;
+    valoresPermitidos?: number[];
 }
 
 export interface ValorCondicionalDTOPeticion extends ValorDTOPeticion {
