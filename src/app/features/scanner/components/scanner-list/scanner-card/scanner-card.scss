@@ -105,20 +105,25 @@
         color: var(--mat-sys-on-primary);
     }
 
-    .title-block {
+    // Wrapper que Material genera solo (proyecta mat-card-title/subtitle
+    // dentro de el via ng-content select -- solo engancha hijos DIRECTOS de
+    // mat-card-header, asi que hay que estilarlo a el, no envolverlo en un
+    // div propio o la proyeccion cae en otro slot con otro contexto de flex.
+    .mat-mdc-card-header-text {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
         min-width: 0;
         overflow: hidden;
+        width: auto;
+    }
 
-        .mat-mdc-card-title,
-        .mat-mdc-card-subtitle {
-            width: 100%;
-            text-align: left;
-            margin: 0;
-        }
+    .mat-mdc-card-title,
+    .mat-mdc-card-subtitle {
+        width: 100%;
+        text-align: left;
+        margin: 0;
     }
 
     .mat-mdc-tab-group {

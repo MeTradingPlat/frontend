@@ -2,16 +2,14 @@
   class="scanner-card"
   appearance="outlined">
   <mat-card-header>
-    <div class="title-block">
-      <mat-card-title>{{ scanner().nombre }}</mat-card-title>
-      <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
-        @if (phase(); as p) {
-          {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
-        } @else {
-          &nbsp;
-        }
-      </mat-card-subtitle>
-    </div>
+    <mat-card-title>{{ scanner().nombre }}</mat-card-title>
+    <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
+      @if (phase(); as p) {
+        {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
+      } @else {
+        &nbsp;
+      }
+    </mat-card-subtitle>
     <div class="header-icons">
       @if (authService.isEditor()) {
         <i
