@@ -4,11 +4,13 @@
   <mat-card-header>
     <div class="title-block">
       <mat-card-title>{{ scanner().nombre }}</mat-card-title>
-      @if (phase(); as p) {
-        <mat-card-subtitle class="phase-text">
+      <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
+        @if (phase(); as p) {
           {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
-        </mat-card-subtitle>
-      }
+        } @else {
+          &nbsp;
+        }
+      </mat-card-subtitle>
     </div>
     <div class="header-icons">
       @if (authService.isEditor()) {
