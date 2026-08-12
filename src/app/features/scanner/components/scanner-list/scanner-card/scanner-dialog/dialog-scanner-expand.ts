@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +17,9 @@ import { ScannerApiService } from '../../../../services/scanner-api.service';
 import { NotificationService } from '../../../../../../core/services/notification/notification.service';
 import { ScannerFacadeService } from '../../../../services/scanner-facade.service';
 import { AuthService } from '../../../../../../core/auth/auth.service';
+import { TimezoneService } from '../../../../../../core/services/timezone.service';
+import { ClockTickService } from '../../../../../../core/services/clock-tick.service';
+import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
 
 @Component({
   selector: 'app-scanner-dialog',
@@ -39,6 +42,13 @@ import { AuthService } from '../../../../../../core/auth/auth.service';
     <mat-card appearance="outlined" class="dialog-scanner-card">
       <mat-card-header>
         <mat-card-title>{{ scanner.nombre }}</mat-card-title>
+        <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
+          @if (phase(); as p) {
+            {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
+          } @else {
+            &nbsp;
+          }
+        </mat-card-subtitle>
         <div class="header-icons">
           @if (authService.isEditor()) {
             <i
@@ -147,6 +157,36 @@ import { AuthService } from '../../../../../../core/auth/auth.service';
 
       .mat-mdc-card-title {
         color: var(--mat-sys-on-primary);
+      }
+
+      .mat-mdc-card-header-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        min-width: 0;
+        overflow: hidden;
+        width: auto;
+      }
+
+      .mat-mdc-card-title,
+      .mat-mdc-card-subtitle {
+        width: 100%;
+        text-align: left;
+        margin: 0;
+      }
+
+      .phase-text {
+        color: var(--mat-sys-on-primary);
+        opacity: 0.75;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.phase-text--empty {
+          visibility: hidden;
+        }
       }
 
       .header-icons {
@@ -269,6 +309,23 @@ export class DialogScannerExpand {
   private readonly translate = inject(TranslateService);
   private readonly facade = inject(ScannerFacadeService);
   readonly authService = inject(AuthService);
+  private readonly timezoneService = inject(TimezoneService);
+  private readonly clockTick = inject(ClockTickService);
+
+  /** null cuando el escaner no esta INICIADO -- no hay fase que mostrar. */
+  readonly phase = computed<ScannerPhaseResult | null>(() => {
+    if (this.scanner.objEstado?.enumEstadoEscaner !== 'INICIADO' || !this.scanner.horaInicio || !this.scanner.horaFin) {
+      return null;
+    }
+    this.clockTick.now(); // dependencia de senal -- recalcula solo por el paso del reloj
+    return computeScannerPhase(
+      this.scanner.horaInicio,
+      this.scanner.horaFin,
+      this.timezoneService.convertUTCToLocal(this.scanner.horaInicio),
+      this.timezoneService.convertUTCToLocal(this.scanner.horaFin),
+      new Date(),
+    );
+  });
 
   onConfigureScanner(): void {
     this.dialogRef.close();
