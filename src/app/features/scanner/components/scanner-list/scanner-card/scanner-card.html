@@ -2,7 +2,14 @@
   class="scanner-card"
   appearance="outlined">
   <mat-card-header>
-    <mat-card-title>{{ scanner().nombre }}</mat-card-title>
+    <div class="title-block">
+      <mat-card-title>{{ scanner().nombre }}</mat-card-title>
+      @if (phase(); as p) {
+        <mat-card-subtitle class="phase-text">
+          {{ p.translationKey | translate: { time: p.displayTime.slice(0, 5) } }}
+        </mat-card-subtitle>
+      }
+    </div>
     <div class="header-icons">
       @if (authService.isEditor()) {
         <i

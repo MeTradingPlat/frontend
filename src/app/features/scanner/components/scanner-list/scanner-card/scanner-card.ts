@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -19,6 +19,9 @@ import { ScannerFiltersTab } from '../scanner-card-tabs/scanner-filters-tab/scan
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NotificacionSseService } from '../../../services/notificacion-sse.service';
 import { AuthService } from '../../../../../core/auth/auth.service';
+import { TimezoneService } from '../../../../../core/services/timezone.service';
+import { ClockTickService } from '../../../../../core/services/clock-tick.service';
+import { computeScannerPhase, ScannerPhaseResult } from './scanner-phase.util';
 
 
 @Component({
@@ -56,8 +59,26 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
   private tabActivaIndex = 0;
   private readonly dialog = inject(MatDialog);
   private readonly sseService = inject(NotificacionSseService);
+  private readonly timezoneService = inject(TimezoneService);
+  private readonly clockTick = inject(ClockTickService);
   readonly authService = inject(AuthService);
   private sseSub?: Subscription;
+
+  /** null cuando el escaner no esta INICIADO -- no hay fase que mostrar. */
+  readonly phase = computed<ScannerPhaseResult | null>(() => {
+    const scanner = this.scanner();
+    if (scanner.objEstado?.enumEstadoEscaner !== 'INICIADO' || !scanner.horaInicio || !scanner.horaFin) {
+      return null;
+    }
+    this.clockTick.now(); // dependencia de senal -- recalcula solo por el paso del reloj
+    return computeScannerPhase(
+      scanner.horaInicio,
+      scanner.horaFin,
+      this.timezoneService.convertUTCToLocal(scanner.horaInicio),
+      this.timezoneService.convertUTCToLocal(scanner.horaFin),
+      new Date(),
+    );
+  });
 
   ngOnInit(): void {
     const scannerId = this.scanner().idEscaner;
