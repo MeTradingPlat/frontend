@@ -47,7 +47,7 @@ export interface FundamentalData {
   marketCap?: number;
   sharesOutstanding?: number;
   floatShares?: number;
-  floatSource?: 'SEC_EDGAR' | 'ESTIMATED';
+  floatSource?: 'SEC_EDGAR' | 'DXLINK' | 'ESTIMATED';
   shortInterest?: number;
   shortRatio?: number;
   dayVolume?: number;
