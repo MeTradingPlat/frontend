@@ -158,6 +158,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private oldestTime: number | null = null;
   private hasMoreHistory = true;
   private isLoadingMore = false;
+  // El timeScale es del chart, no de la serie -- removeSeries/addSeries en
+  // resubscribe() no lo toca, asi que sin esto cambiar de temporalidad
+  // dejaba la vista en el mismo rango logico (misma "zona" visual) en vez
+  // de arrancar mostrando las barras mas recientes de la nueva serie.
+  private pendingViewReset = false;
   // Una vez que applyMarker() encuentra y dibuja la vela objetivo, la linea
   // se mantiene sola (VerticalLinePrimitive recalcula su posicion por
   // tiempo, no por indice) -- no hace falta re-centrar la vista cada vez
@@ -257,6 +262,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.hasMoreHistory = true;
     this.isLoadingMore = false;
     this.markerFound = false;
+    this.pendingViewReset = true;
 
     // Recreate the series instead of series.setData([]): an empty array doesn't
     // reliably reset a series that already has data, which left the previous
@@ -285,6 +291,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.allBars = sanitizeBars(message.bars);
       this.oldestTime = this.allBars.length ? this.allBars[0].time : null;
       this.series?.setData(this.allBars.map(bar => toCandlestickData(bar, this.marketShiftSeconds)));
+      if (this.pendingViewReset) {
+        this.pendingViewReset = false;
+        this.chart?.timeScale().scrollToRealTime();
+      }
       this.isLoading.set(false);
       this.hasNoData.set(this.allBars.length === 0);
       this.applyMarker();
