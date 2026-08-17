@@ -109,7 +109,10 @@ export class ScreenerComponent implements OnInit {
     ).subscribe(res => {
       this.isLoading.set(false);
       if (res) {
-        this.symbols.set(res.data);
+        // El backend garantiza data como array, pero un viejo cache/edge
+        // podria traer null -- la tabla hace symbols().length, asi que
+        // nunca se siembra la senal con null.
+        this.symbols.set(res.data ?? []);
         this.totalElements.set(res.totalElements);
         // Sin esto, filtrar/buscar con el scroll de la tabla bajado dejaba
         // los resultados nuevos empezando a mitad de la vista en vez de
