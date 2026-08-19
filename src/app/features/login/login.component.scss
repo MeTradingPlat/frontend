@@ -62,29 +62,51 @@ h2 {
   font-size: 0.9rem;
 }
 
+// Los inputs mas angostos que la card y centrados -- la card se ensancho
+// para verse mejor en pantalla, pero el formulario en si no necesitaba
+// estirarse hasta el borde (reportado en vivo el 2026-08-19).
 form {
   display: flex;
   flex-direction: column;
   text-align: left;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
 mat-form-field {
   width: 100%;
+
+  & + mat-form-field {
+    margin-top: 4px;
+  }
+}
+
+// Slot de altura fija SIEMPRE presente (ver login.component.html: ya no es
+// *ngIf en el contenedor, solo en el texto de adentro) -- antes el div del
+// error entraba y salia del DOM, empujando el boton hacia abajo cada vez
+// que aparecia/desaparecia, y quedaba pegado a los inputs de arriba y al
+// boton de abajo sin separacion real (reportado en vivo).
+.error-slot {
+  min-height: 40px;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
 }
 
 .error-message {
+  width: 100%;
   color: var(--mat-sys-error);
   font-size: 0.85rem;
-  margin-bottom: 16px;
   padding: 10px;
   background: color-mix(in srgb, var(--mat-sys-error) 10%, transparent);
   border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .btn-submit {
   width: 100%;
   height: 44px;
-  margin-top: 4px;
   display: flex;
   justify-content: center;
   align-items: center;

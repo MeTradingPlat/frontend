@@ -29,8 +29,10 @@
             [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate">
         </mat-form-field>
 
-        <div *ngIf="errorMessage()" class="error-message">
-          {{ errorMessage() | translate }}
+        <!-- Reservado siempre (no *ngIf) para que aparecer/desaparecer no
+             mueva el boton de un lado a otro -- solo cambia el contenido. -->
+        <div class="error-slot" aria-live="polite">
+          <span *ngIf="errorMessage()" class="error-message">{{ errorMessage() | translate }}</span>
         </div>
 
         <button mat-flat-button color="primary" type="submit" [disabled]="isLoading()" class="btn-submit">
