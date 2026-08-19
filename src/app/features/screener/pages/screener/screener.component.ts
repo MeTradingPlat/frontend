@@ -116,8 +116,15 @@ export class ScreenerComponent implements OnInit {
         }))),
     ).subscribe(res => {
       this.isLoading.set(false);
-      this.maintenance.set(false);
       if (res) {
+        // maintenance solo se apaga en una respuesta real -- si viene de
+        // catchError (res=null), ya lo dejo en el valor correcto (ver
+        // arriba) y este subscribe no debe pisarlo. Antes se apagaba aca
+        // sin condicion, apenas un instante despues de prenderse, asi que
+        // el banner nunca llegaba a pintarse (confirmado en vivo el
+        // 2026-08-19: el backend mandaba MAINTENANCE de verdad y nunca se
+        // vio el mensaje).
+        this.maintenance.set(false);
         // El backend garantiza data como array, pero un viejo cache/edge
         // podria traer null -- la tabla hace symbols().length, asi que
         // nunca se siembra la senal con null.

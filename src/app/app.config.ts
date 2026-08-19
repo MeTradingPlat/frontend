@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { provideAppInitializer, inject } from '@angular/core';
@@ -20,22 +21,9 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideHttpClient(
       withInterceptors([
-        languageInterceptor, 
+        languageInterceptor,
         authInterceptor,
-        (req, next) => {
-          const { tap } = require('rxjs/operators');
-          return next(req).pipe(
-            tap({
-              error: (err: any) => {
-                console.group('HTTP ERROR DIAGNOSTIC');
-                console.log('URL:', req.url);
-                console.log('Status:', err.status);
-                console.log('Body:', err.error);
-                console.groupEnd();
-              }
-            })
-          );
-        }
+        errorInterceptor,
       ]),
       withXsrfConfiguration({ cookieName: 'XSRF-TOKEN', headerName: 'X-XSRF-TOKEN' })
     ),

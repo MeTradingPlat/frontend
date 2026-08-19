@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 import { ApiError } from '../models/api-error';
 import { inject } from '@angular/core';
-import { NotificationService } from '../services/notification.service';
+import { NotificationService } from '../services/notification/notification.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notificationService = inject(NotificationService);
@@ -46,7 +46,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // Mostrar notificación
-      notificationService.error(apiError.mensaje);
+      notificationService.showError(apiError.mensaje);
 
       console.error('Error HTTP interceptado:', apiError);
 
