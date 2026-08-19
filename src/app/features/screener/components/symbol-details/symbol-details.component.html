@@ -70,6 +70,8 @@
           <mat-spinner diameter="40"></mat-spinner>
           <p>Consultando Market Data Service...</p>
         </div>
+      } @else if (maintenance()) {
+        <app-page-maintenance />
       } @else if (error()) {
         <div class="error-state">
           <mat-icon color="warn">error</mat-icon>

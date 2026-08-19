@@ -175,7 +175,8 @@
   "COMMON": {
     "RETRY": "Reintentar",
     "LOADING_CONTENT": "Cargando contenido",
-    "LOADING": "Cargando..."
+    "LOADING": "Cargando...",
+    "MAINTENANCE": "El servicio está en mantenimiento (refill de datos). Por favor espere e intente de nuevo en unos minutos."
   },
   "ASSETS": {
     "TITLE": "Activos",

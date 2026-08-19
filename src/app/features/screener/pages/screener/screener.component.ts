@@ -24,6 +24,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
 import { HeaderNavbar } from '../../../../shared/components/layout/header-navbar/header-navbar';
 import { I18nService } from '../../../../core/services/i18n/i18n.service';
+import { PageMaintenance } from '../../../../shared/components/ui/page-maintenance/page-maintenance';
 
 const PAGE_SIZE = 50;
 
@@ -48,7 +49,8 @@ const PAGE_SIZE = 50;
     MatPaginatorModule,
     TranslateModule,
     MarketLabelPipe,
-    HeaderNavbar
+    HeaderNavbar,
+    PageMaintenance
   ],
   templateUrl: './screener.component.html',
   styleUrls: ['./screener.component.scss']
@@ -69,6 +71,7 @@ export class ScreenerComponent implements OnInit {
   symbols = signal<Symbol[]>([]);
   totalElements = signal<number>(0);
   isLoading = signal<boolean>(false);
+  maintenance = signal<boolean>(false);
   pageIndex = signal<number>(0);
   readonly pageSize = PAGE_SIZE;
 
@@ -105,15 +108,21 @@ export class ScreenerComponent implements OnInit {
       tap(() => this.isLoading.set(true)),
       switchMap(() => this.screenerService
         .searchSymbols(this.searchControl.value || '', this.marketControl.value || [], this.pageIndex(), this.pageSize)
-        .pipe(catchError(() => {
-          // El interceptor global ya muestra el toast de error (incluido
-          // MAINTENANCE durante el refill) -- aca solo hace falta no
-          // cortar el stream, la tabla se queda como estaba.
+        .pipe(catchError((err) => {
+          // El interceptor global ya muestra el toast para cualquier error,
+          // pero MAINTENANCE ademas reemplaza la card+tabla enteras por
+          // <app-page-maintenance> -- el usuario no quiere ver una tabla
+          // vacia mientras el refill esta en curso.
+          this.maintenance.set(err?.codigoError === 'MAINTENANCE');
           return of(null);
         }))),
     ).subscribe(res => {
       this.isLoading.set(false);
       if (res) {
+        // maintenance solo se apaga en una respuesta real -- si viene de
+        // catchError (res=null) ya quedo en el valor correcto arriba, este
+        // subscribe no debe pisarlo.
+        this.maintenance.set(false);
         // El backend garantiza data como array, pero un viejo cache/edge
         // podria traer null -- la tabla hace symbols().length, asi que
         // nunca se siembra la senal con null.

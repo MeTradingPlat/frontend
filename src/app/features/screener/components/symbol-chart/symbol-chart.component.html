@@ -47,20 +47,26 @@
   }
 
   <div class="chart-container-outer">
-    @if (isLoading()) {
-      <div class="chart-overlay">
-        <mat-spinner diameter="36"></mat-spinner>
+    @if (maintenance()) {
+      <div class="chart-overlay maintenance-overlay">
+        <app-page-maintenance />
       </div>
-    }
-    @if (error()) {
-      <div class="chart-overlay error-overlay">
-        <span>{{ error() }}</span>
-      </div>
-    }
-    @if (!isLoading() && hasNoData()) {
-      <div class="chart-overlay">
-        <span>{{ 'ASSETS.CHART_NO_DATA' | translate }}</span>
-      </div>
+    } @else {
+      @if (isLoading()) {
+        <div class="chart-overlay">
+          <mat-spinner diameter="36"></mat-spinner>
+        </div>
+      }
+      @if (error()) {
+        <div class="chart-overlay error-overlay">
+          <span>{{ error() }}</span>
+        </div>
+      }
+      @if (!isLoading() && hasNoData()) {
+        <div class="chart-overlay">
+          <span>{{ 'ASSETS.CHART_NO_DATA' | translate }}</span>
+        </div>
+      }
     }
     <div #chartContainer class="chart-container"></div>
   </div>

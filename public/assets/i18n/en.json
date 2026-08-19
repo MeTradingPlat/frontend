@@ -175,7 +175,8 @@
   "COMMON": {
     "RETRY": "Retry",
     "LOADING_CONTENT": "Loading content",
-    "LOADING": "Loading..."
+    "LOADING": "Loading...",
+    "MAINTENANCE": "The service is under maintenance (data refill). Please wait and try again in a few minutes."
   },
   "ASSETS": {
     "TITLE": "Assets",

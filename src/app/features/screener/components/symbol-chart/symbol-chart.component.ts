@@ -29,6 +29,7 @@ import { TimezoneService } from '../../../../core/services/timezone.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
 import { VerticalLinePrimitive } from './drawing/vertical-line-primitive';
+import { PageMaintenance } from '../../../../shared/components/ui/page-maintenance/page-maintenance';
 
 interface TimeframeOption {
   id: string;
@@ -131,7 +132,7 @@ function fromHistoricalDto(dto: HistoricalCandleDTO): CandleBar {
   standalone: true,
   imports: [
     CommonModule, MatButtonToggleModule, MatButtonModule, MatIconModule, MatMenuModule,
-    MatProgressSpinnerModule, MatTooltipModule, TranslateModule
+    MatProgressSpinnerModule, MatTooltipModule, TranslateModule, PageMaintenance
   ],
   templateUrl: './symbol-chart.component.html',
   styleUrls: ['./symbol-chart.component.scss']
@@ -149,6 +150,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
   readonly hasNoData = signal<boolean>(false);
+  readonly maintenance = signal<boolean>(false);
   readonly drawingTool = signal<DrawingTool>('cursor');
   readonly drawingHint = signal<string | null>(null);
 
@@ -296,13 +298,29 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.isLoading.set(true);
     this.error.set(null);
     this.hasNoData.set(false);
+    this.maintenance.set(false);
 
     this.streamSubscription = this.candleStream
       .subscribe(this.symbol, this.selectedTimeframe())
       .subscribe({
         next: (message) => this.handleMessage(message),
-        error: () => this.error.set('No se pudo conectar al stream de velas.')
+        error: () => {
+          this.error.set('No se pudo conectar al stream de velas.');
+          this.checkMaintenance();
+        }
       });
+  }
+
+  // El handshake del WS no expone el cuerpo 503/MAINTENANCE del refill (la
+  // API de WebSocket del navegador no da acceso a la respuesta HTTP de un
+  // handshake rechazado) -- ante un fallo de stream, esta llamada REST
+  // liviana (ya pasa por el interceptor global) es la unica forma de saber
+  // si la causa es el refill en curso y reemplazar el grafico por
+  // <app-page-maintenance> en vez del mensaje generico de conexion.
+  private checkMaintenance(): void {
+    this.screenerService.getMarkets().subscribe({
+      error: (err) => this.maintenance.set(err?.codigoError === 'MAINTENANCE')
+    });
   }
 
   private handleMessage(message: CandleStreamMessage): void {
@@ -315,6 +333,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
         this.chart?.timeScale().scrollToRealTime();
       }
       this.isLoading.set(false);
+      this.maintenance.set(false);
       this.hasNoData.set(this.allBars.length === 0);
       // Re-aplicar la linea de compra simulada cuando llega la data: si se
       // creo sobre la serie vacia (antes del primer historial), el auto-scale
@@ -331,6 +350,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.hasNoData.set(false);
     } else if (message.type === 'error') {
       this.error.set(message.message ?? 'Error en el stream de velas.');
+      this.checkMaintenance();
     }
   }
 

@@ -16,6 +16,7 @@ import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
 import { MarketDatetimePipe } from '../../../../shared/pipes/market-datetime.pipe';
 import { Subscription, interval, startWith, switchMap, catchError, of } from 'rxjs';
+import { PageMaintenance } from '../../../../shared/components/ui/page-maintenance/page-maintenance';
 
 // Mismo orden de temporalidades que el backend (ver _TIMEFRAME_MINUTES en
 // signal-processing-service/app/scanner/timeframe.py) -- solo se usa aca para
@@ -54,7 +55,8 @@ const POLL_INTERVAL_MS = 5000;
     TranslateModule,
     SymbolChartComponent,
     MarketLabelPipe,
-    MarketDatetimePipe
+    MarketDatetimePipe,
+    PageMaintenance
   ],
   templateUrl: './symbol-details.component.html',
   styleUrls: ['./symbol-details.component.scss']
@@ -67,6 +69,7 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
   symbolDetails = signal<SymbolDetails | null>(null);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
+  maintenance = signal<boolean>(false);
 
   readonly timeframeOptions: SignalFilterMatch[] = dedupeByTimeframe(this.data.signalMatches ?? []);
   // Arranca en la temporalidad mas fina donde se disparo la senal (primera del
@@ -85,7 +88,10 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
       switchMap(() => this.screenerService.getSymbolDetails(this.data.symbol).pipe(
         catchError((err) => {
           console.error('Error loading symbol details:', err);
-          this.error.set('No se pudo cargar la información fundamental del símbolo.');
+          this.maintenance.set(err?.codigoError === 'MAINTENANCE');
+          if (!this.maintenance()) {
+            this.error.set('No se pudo cargar la información fundamental del símbolo.');
+          }
           return of(null);
         })
       ))
@@ -93,6 +99,7 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
       if (details) {
         this.symbolDetails.set(details);
         this.error.set(null);
+        this.maintenance.set(false);
       }
       this.isLoading.set(false);
     });
