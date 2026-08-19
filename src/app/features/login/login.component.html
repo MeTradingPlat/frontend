@@ -1,43 +1,43 @@
 <div class="login-container">
   <!-- Forzar reactividad en modo Zoneless vinculando a la señal de idioma -->
   <span [hidden]="true">{{ i18nService.currentLocale() }}</span>
-  
-  <div class="login-card">
-    <img src="logo-isotipo.png" alt="MeTradingPlat" class="login-mark" />
-    <h2>{{ 'AUTH.WELCOME' | translate }}</h2>
-    <p class="subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="username">{{ 'AUTH.USERNAME' | translate }}</label>
-        <input 
-          id="username" 
-          type="text" 
-          formControlName="username"
-          autocomplete="username"
-          [placeholder]="'AUTH.USERNAME_PLACEHOLDER' | translate"
-          [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
-      </div>
+  <mat-card class="login-card" appearance="outlined">
+    <mat-card-content>
+      <img src="logo-isotipo.png" alt="MeTradingPlat" class="login-mark" />
+      <h2>{{ 'AUTH.WELCOME' | translate }}</h2>
+      <p class="subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
 
-      <div class="form-group">
-        <label for="password">{{ 'AUTH.PASSWORD' | translate }}</label>
-        <input 
-          id="password" 
-          type="password" 
-          formControlName="password"
-          autocomplete="current-password"
-          [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
-          [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'AUTH.USERNAME' | translate }}</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+            [placeholder]="'AUTH.USERNAME_PLACEHOLDER' | translate">
+        </mat-form-field>
 
-      <div *ngIf="errorMessage()" class="error-message">
-        {{ errorMessage() | translate }}
-      </div>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate">
+        </mat-form-field>
 
-      <button type="submit" [disabled]="isLoading()" class="btn-primary">
-        <span *ngIf="isLoading()" class="spinner"></span>
-        <span *ngIf="!isLoading()">{{ 'AUTH.SUBMIT' | translate }}</span>
-      </button>
-    </form>
-  </div>
+        <div *ngIf="errorMessage()" class="error-message">
+          {{ errorMessage() | translate }}
+        </div>
+
+        <button mat-flat-button color="primary" type="submit" [disabled]="isLoading()" class="btn-submit">
+          <mat-spinner *ngIf="isLoading()" diameter="20"></mat-spinner>
+          <span *ngIf="!isLoading()">{{ 'AUTH.SUBMIT' | translate }}</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>

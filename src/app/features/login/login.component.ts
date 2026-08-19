@@ -5,6 +5,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../../core/services/i18n/i18n.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +17,12 @@ import { I18nService } from '../../core/services/i18n/i18n.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    TranslatePipe
+    TranslatePipe,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
