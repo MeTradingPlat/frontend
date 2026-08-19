@@ -69,7 +69,6 @@ export class ScreenerComponent implements OnInit {
   symbols = signal<Symbol[]>([]);
   totalElements = signal<number>(0);
   isLoading = signal<boolean>(false);
-  maintenance = signal<boolean>(false);
   pageIndex = signal<number>(0);
   readonly pageSize = PAGE_SIZE;
 
@@ -106,25 +105,15 @@ export class ScreenerComponent implements OnInit {
       tap(() => this.isLoading.set(true)),
       switchMap(() => this.screenerService
         .searchSymbols(this.searchControl.value || '', this.marketControl.value || [], this.pageIndex(), this.pageSize)
-        .pipe(catchError((err) => {
-          // El refill del marketdata-service responde 503 con
-          // codigoError MAINTENANCE -- la tabla se queda en silencio y se
-          // muestra el banner "en mantenimiento, espere" (el usuario
-          // reintenta cuando el refill termina).
-          this.maintenance.set(err?.codigoError === 'MAINTENANCE');
+        .pipe(catchError(() => {
+          // El interceptor global ya muestra el toast de error (incluido
+          // MAINTENANCE durante el refill) -- aca solo hace falta no
+          // cortar el stream, la tabla se queda como estaba.
           return of(null);
         }))),
     ).subscribe(res => {
       this.isLoading.set(false);
       if (res) {
-        // maintenance solo se apaga en una respuesta real -- si viene de
-        // catchError (res=null), ya lo dejo en el valor correcto (ver
-        // arriba) y este subscribe no debe pisarlo. Antes se apagaba aca
-        // sin condicion, apenas un instante despues de prenderse, asi que
-        // el banner nunca llegaba a pintarse (confirmado en vivo el
-        // 2026-08-19: el backend mandaba MAINTENANCE de verdad y nunca se
-        // vio el mensaje).
-        this.maintenance.set(false);
         // El backend garantiza data como array, pero un viejo cache/edge
         // podria traer null -- la tabla hace symbols().length, asi que
         // nunca se siembra la senal con null.
