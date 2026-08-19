@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { NotificationSnackbar, NotificationSnackbarData, NotificationType } from '../../../shared/components/ui/notification-snackbar/notification-snackbar';
 
-export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+export type { NotificationType };
 
 /**
  * Servicio centralizado para mostrar notificaciones usando Material Snackbar
@@ -13,7 +14,7 @@ export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 export class NotificationService {
   private readonly snackBar = inject(MatSnackBar);
 
-  private readonly defaultConfig: MatSnackBarConfig = {
+  private readonly defaultConfig: MatSnackBarConfig<NotificationSnackbarData> = {
     duration: 5000,
     horizontalPosition: 'center',
     verticalPosition: 'bottom'
@@ -48,16 +49,20 @@ export class NotificationService {
   }
 
   /**
-   * Método genérico para mostrar notificaciones
+   * Método genérico para mostrar notificaciones -- openFromComponent en vez
+   * de open(): el snackbar plano de Material solo admite texto + un boton de
+   * accion, sin espacio para el icono que distingue cada tipo a simple vista
+   * (ver NotificationSnackbar).
    */
   private show(message: string, type: NotificationType, duration: number): void {
-    const config: MatSnackBarConfig = {
+    const config: MatSnackBarConfig<NotificationSnackbarData> = {
       ...this.defaultConfig,
       duration,
-      panelClass: [`snackbar-${type}`]
+      panelClass: ['notification-snackbar-panel', `snackbar-${type}`],
+      data: { message, type }
     };
 
-    this.snackBar.open(message, 'X', config);
+    this.snackBar.openFromComponent(NotificationSnackbar, config);
   }
 
   /**

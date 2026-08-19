@@ -9,8 +9,8 @@
     padding: 2rem;
     gap: 1rem;
     border-radius: 1rem;
-    background-color: var(--mat-sys-secondary-container);
-    color: var(--mat-sys-on-secondary-container);
+    background-color: var(--mat-sys-error-container, #fdecea);
+    color: var(--mat-sys-on-error-container, #b3261e);
     box-sizing: border-box;
 }
 

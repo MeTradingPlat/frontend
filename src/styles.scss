@@ -100,49 +100,65 @@ body {
   line-height: 1.2 !important;
 }
 
-// Snackbar custom styles using Material Design 3 color roles
-.snackbar-success {
+// --app-success/--app-warning: Material 3 no trae roles semanticos para
+// estos dos (solo define "error"), asi que antes exito/info compartian
+// literalmente el mismo color (inverse-surface) y warning tomaba el
+// tertiary de la marca (azul-violeta, misma familia que primary/secondary)
+// -- ningun color realmente decia "advertencia" o "funciono". Valores fijos
+// con buen contraste en claro y oscuro, mismo criterio que el resto de la
+// paleta (Material Design Color Tool / M3).
+:root {
+  --app-success: #1b873f;
+  --app-warning: #b25e00;
+}
+:root:not([data-theme="light"]) {
+  @media (prefers-color-scheme: dark) {
+    --app-success: #4ade80;
+    --app-warning: #fbbf24;
+  }
+}
+body.dark-mode {
+  --app-success: #4ade80;
+  --app-warning: #fbbf24;
+}
+
+// Notificacion moderna: superficie neutra unica para los 4 tipos (no un
+// bloque solido de color a pantalla completa) con un borde de acento y un
+// icono coloreados segun el tipo -- icono + acento ya distinguen error de
+// advertencia de exito de info de un vistazo, sin que la notificacion grite.
+// Esquinas mas redondeadas y sombra propia que el bloque MDC por defecto
+// (4dp), acorde al resto de la UI (--app-card-shadow ya usa ese lenguaje).
+.notification-snackbar-panel {
   .mdc-snackbar__surface {
-    background-color: var(--mat-sys-inverse-surface) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    background-color: var(--mat-sys-surface-container-high) !important;
+    color: var(--mat-sys-on-surface);
+    border-left: 4px solid transparent;
   }
-  .mat-mdc-snack-bar-label {
-    color: var(--mat-sys-inverse-on-surface) !important;
-  }
-  .mat-mdc-button {
-    color: var(--mat-sys-inverse-primary) !important;
+  .mat-mdc-snackbar-surface {
+    padding: 4px 8px !important;
   }
 }
 
-.snackbar-error {
-  .mdc-snackbar__surface {
-    background-color: var(--mat-sys-error) !important;
-  }
-  .mat-mdc-snack-bar-label,
-  .mat-mdc-button {
-    color: var(--mat-sys-on-error) !important;
-  }
+.snackbar-success .mdc-snackbar__surface {
+  border-left-color: var(--app-success);
+  .notification-icon { color: var(--app-success); }
 }
 
-.snackbar-warning {
-  .mdc-snackbar__surface {
-    background-color: var(--mat-sys-tertiary) !important;
-  }
-  .mat-mdc-snack-bar-label,
-  .mat-mdc-button {
-    color: var(--mat-sys-on-tertiary) !important;
-  }
+.snackbar-error .mdc-snackbar__surface {
+  border-left-color: var(--mat-sys-error);
+  .notification-icon { color: var(--mat-sys-error); }
 }
 
-.snackbar-info {
-  .mdc-snackbar__surface {
-    background-color: var(--mat-sys-inverse-surface) !important;
-  }
-  .mat-mdc-snack-bar-label {
-    color: var(--mat-sys-inverse-on-surface) !important;
-  }
-  .mat-mdc-button {
-    color: var(--mat-sys-inverse-primary) !important;
-  }
+.snackbar-warning .mdc-snackbar__surface {
+  border-left-color: var(--app-warning);
+  .notification-icon { color: var(--app-warning); }
+}
+
+.snackbar-info .mdc-snackbar__surface {
+  border-left-color: var(--mat-sys-primary);
+  .notification-icon { color: var(--mat-sys-primary); }
 }
 
 // El dialogo MDC por defecto pone el scroll en .mdc-dialog__surface -- el

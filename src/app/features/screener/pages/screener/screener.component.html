@@ -3,9 +3,6 @@
 />
 
 <div class="screener-container">
-  @if (maintenance()) {
-    <app-page-maintenance />
-  } @else {
   <mat-card class="table-card">
     <div class="filter-section">
       <mat-form-field appearance="outline" class="search-field">
@@ -83,5 +80,4 @@
       (page)="onPageChange($event)">
     </mat-paginator>
   </mat-card>
-  }
 </div>
