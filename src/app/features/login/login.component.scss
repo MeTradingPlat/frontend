@@ -10,35 +10,42 @@
   min-height: 0;
 }
 
+// Antes esta pagina entera dependia de --bg-primary/--text-primary/
+// --primary-color/etc, ninguna definida en ningun lado del proyecto (grep
+// sin resultados) -- sin valor real, el navegador las trata como invalidas
+// y toda declaracion que las usa se ignora (texto blanco a proposito sobre
+// fondo sin color = boton invisible en tema claro, confirmado en vivo el
+// 2026-08-19). Reemplazadas por los tokens --mat-sys-* reales del tema
+// (ver styles.scss), que ya resuelven claro/oscuro solos.
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   flex: 1;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background: linear-gradient(135deg, var(--mat-sys-surface) 0%, var(--mat-sys-surface-container-low) 100%);
   padding: 20px;
 }
 
 .login-card {
-  background: var(--surface-card);
+  background: var(--mat-sys-surface-container);
   padding: 40px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 400px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--mat-sys-outline-variant);
   text-align: center;
 }
 
 h2 {
   margin-bottom: 8px;
-  color: var(--text-primary);
+  color: var(--mat-sys-on-surface);
   font-weight: 700;
 }
 
 .subtitle {
-  color: var(--text-secondary);
+  color: var(--mat-sys-on-surface-variant);
   margin-bottom: 30px;
   font-size: 0.9rem;
 }
@@ -51,37 +58,37 @@ h2 {
     display: block;
     margin-bottom: 8px;
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--mat-sys-on-surface-variant);
   }
 
   input {
     width: 100%;
     padding: 12px 16px;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-input);
-    color: var(--text-primary);
+    border: 1px solid var(--mat-sys-outline);
+    background: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface);
     font-size: 1rem;
     transition: all 0.3s ease;
 
     &:focus {
       outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+      border-color: var(--mat-sys-primary);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--mat-sys-primary) 20%, transparent);
     }
 
     &.is-invalid {
-      border-color: var(--error-color);
+      border-color: var(--mat-sys-error);
     }
   }
 }
 
 .error-message {
-  color: var(--error-color);
+  color: var(--mat-sys-error);
   font-size: 0.85rem;
   margin-bottom: 20px;
   padding: 10px;
-  background: rgba(var(--error-rgb), 0.1);
+  background: color-mix(in srgb, var(--mat-sys-error) 10%, transparent);
   border-radius: 8px;
 }
 
@@ -90,8 +97,8 @@ h2 {
   padding: 14px;
   border-radius: 12px;
   border: none;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
-  color: white;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
@@ -103,7 +110,7 @@ h2 {
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(var(--primary-rgb), 0.4);
+    box-shadow: 0 5px 15px color-mix(in srgb, var(--mat-sys-primary) 40%, transparent);
   }
 
   &:disabled {
@@ -115,9 +122,9 @@ h2 {
 .spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  border: 3px solid color-mix(in srgb, var(--mat-sys-on-primary) 30%, transparent);
   border-radius: 50%;
-  border-top-color: #fff;
+  border-top-color: var(--mat-sys-on-primary);
   animation: spin 1s ease-in-out infinite;
 }
 
