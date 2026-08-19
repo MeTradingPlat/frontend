@@ -179,6 +179,7 @@
   },
   "ASSETS": {
     "TITLE": "Activos",
+    "MAINTENANCE": "El servicio está en mantenimiento (refill de datos). Por favor espere e intente de nuevo en unos minutos.",
     "SEARCH_LABEL": "Buscar símbolo o descripción",
     "MARKET_LABEL": "Filtrar por Mercado",
     "LOADING": "Consultando Market Data...",

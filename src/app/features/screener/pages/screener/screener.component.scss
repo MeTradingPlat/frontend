@@ -13,6 +13,18 @@
   flex-direction: column;
 }
 
+.maintenance-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 24px 0;
+  padding: 12px 16px;
+  background: var(--mat-sys-error-container, #fdecea);
+  color: var(--mat-sys-on-error-container, #b3261e);
+  font-weight: 500;
+  border-radius: 8px;
+}
+
 .filter-section {
   display: flex;
   gap: 16px;

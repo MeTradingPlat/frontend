@@ -3,6 +3,12 @@
 />
 
 <div class="screener-container">
+  @if (maintenance()) {
+    <mat-card class="maintenance-banner">
+      <mat-icon>build</mat-icon>
+      <span>{{ 'ASSETS.MAINTENANCE' | translate }}</span>
+    </mat-card>
+  }
   <mat-card class="table-card">
     <div class="filter-section">
       <mat-form-field appearance="outline" class="search-field">

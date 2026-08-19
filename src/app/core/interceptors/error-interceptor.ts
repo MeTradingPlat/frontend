@@ -11,15 +11,19 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       let apiError: ApiError;
 
-      // Si el backend envía un error estructurado con 'codigo'
-      if (error.error && error.error.codigo) {
-        const backendError = error.error;
+      // Si el backend envía un error estructurado con 'codigo' (gateway
+      // legacy) o 'code' (marketdata-service, ej. MAINTENANCE durante el
+      // refill) -- ambos se mapean al mismo ApiError.
+      const backendError = error.error;
+      const code = backendError?.codigo ?? backendError?.code;
+      const message = backendError?.mensaje ?? backendError?.message;
+      if (code) {
         apiError = {
-          codigoError: backendError.codigo,
-          mensaje: backendError.mensaje,
-          codigoHttp: backendError.codigoHttp || error.status,
-          url: backendError.url || error.url || '',
-          metodo: backendError.metodo || req.method
+          codigoError: code,
+          mensaje: message,
+          codigoHttp: backendError?.codigoHttp || error.status,
+          url: backendError?.url || error.url || '',
+          metodo: backendError?.metodo || req.method
         };
       } else if (error.error instanceof ErrorEvent) {
         // Error del lado del cliente o de red

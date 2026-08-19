@@ -179,6 +179,7 @@
   },
   "ASSETS": {
     "TITLE": "Assets",
+    "MAINTENANCE": "The service is under maintenance (data refill). Please wait and try again in a few minutes.",
     "SEARCH_LABEL": "Search symbol or description",
     "MARKET_LABEL": "Filter by Market",
     "LOADING": "Fetching Market Data...",

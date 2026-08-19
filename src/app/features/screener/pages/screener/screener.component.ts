@@ -69,6 +69,7 @@ export class ScreenerComponent implements OnInit {
   symbols = signal<Symbol[]>([]);
   totalElements = signal<number>(0);
   isLoading = signal<boolean>(false);
+  maintenance = signal<boolean>(false);
   pageIndex = signal<number>(0);
   readonly pageSize = PAGE_SIZE;
 
@@ -105,9 +106,17 @@ export class ScreenerComponent implements OnInit {
       tap(() => this.isLoading.set(true)),
       switchMap(() => this.screenerService
         .searchSymbols(this.searchControl.value || '', this.marketControl.value || [], this.pageIndex(), this.pageSize)
-        .pipe(catchError(() => of(null)))),
+        .pipe(catchError((err) => {
+          // El refill del marketdata-service responde 503 con
+          // codigoError MAINTENANCE -- la tabla se queda en silencio y se
+          // muestra el banner "en mantenimiento, espere" (el usuario
+          // reintenta cuando el refill termina).
+          this.maintenance.set(err?.codigoError === 'MAINTENANCE');
+          return of(null);
+        }))),
     ).subscribe(res => {
       this.isLoading.set(false);
+      this.maintenance.set(false);
       if (res) {
         // El backend garantiza data como array, pero un viejo cache/edge
         // podria traer null -- la tabla hace symbols().length, asi que
