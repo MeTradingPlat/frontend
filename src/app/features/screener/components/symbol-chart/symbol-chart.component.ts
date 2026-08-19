@@ -316,6 +316,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       }
       this.isLoading.set(false);
       this.hasNoData.set(this.allBars.length === 0);
+      // Re-aplicar la linea de compra simulada cuando llega la data: si se
+      // creo sobre la serie vacia (antes del primer historial), el auto-scale
+      // del chart puede no incluir su precio y la linea queda fuera de la
+      // vista (confirmado en vivo con senales de simbolos con data dispersa,
+      // ej. ETFs nuevos como RKLZ).
+      this.applyBuyPriceLine();
       this.applyMarker();
     } else if (message.type === 'bar') {
       if (!isWellFormed(message.bar)) return;
