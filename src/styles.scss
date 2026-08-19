@@ -133,7 +133,11 @@ body.dark-mode {
     border-radius: 12px !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
     background-color: var(--mat-sys-surface-container-high) !important;
-    color: var(--mat-sys-on-surface);
+    // !important tambien en color -- MDC trae su propia regla de color para
+    // el snackbar (pensada para el fondo por defecto, inverse-surface) que
+    // sin esto le ganaba a esta y dejaba texto e icono casi del mismo tono
+    // que el fondo nuevo (confirmado en vivo: ilegible).
+    color: var(--mat-sys-on-surface) !important;
     border-left: 4px solid transparent;
   }
   .mat-mdc-snackbar-surface {
