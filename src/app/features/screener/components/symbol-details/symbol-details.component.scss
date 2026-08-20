@@ -148,15 +148,21 @@
   }
 }
 
+// Vive dentro de .signal-meta (misma fila que el reloj/precio, ver .html)
+// -- a proposito, no un bloque aparte arriba del grafico: ahi competia
+// visualmente con el propio selector de temporalidad del grafico, dos filas
+// de chips casi identicas una encima de la otra, y le sumaba altura fija a
+// la card por cada señal con mas de una temporalidad.
 .signal-timeframe-chips {
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px 0;
+  display: inline-flex;
+  gap: 6px;
 
   mat-chip {
     cursor: pointer;
     font-family: 'Roboto Mono', monospace;
     font-weight: 600;
+    font-size: 0.75rem;
+    min-height: 22px;
 
     &.active {
       background: var(--mat-sys-primary);

@@ -22,13 +22,22 @@
       <p class="signal-mensaje-text">
         {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: data.symbol, scannerName: data.scannerName } }}
       </p>
-      @if (activeMatch()?.velaTimestamp || data.buyPrice !== undefined) {
+      @if (activeMatch()?.velaTimestamp || data.buyPrice !== undefined || timeframeOptions.length > 1) {
         <div class="signal-meta">
           @if (activeMatch()?.velaTimestamp; as vela) {
             <span><i class="bi bi-clock"></i> {{ vela | marketDatetime }}</span>
           }
           @if (data.buyPrice !== undefined) {
             <span><i class="bi bi-currency-dollar"></i> {{ data.buyPrice | number:'1.2-4' }}</span>
+          }
+          @if (timeframeOptions.length > 1) {
+            <span class="signal-timeframe-chips">
+              @for (opt of timeframeOptions; track opt.timeframe) {
+                <mat-chip [class.active]="activeMatch()?.timeframe === opt.timeframe" (click)="selectTimeframe(opt)">
+                  {{ opt.timeframe }}
+                </mat-chip>
+              }
+            </span>
           }
         </div>
       }
@@ -48,15 +57,6 @@
            consulta de fundamentales fallaba (confirmado en vivo: simbolo sin
            datos en marketdata-service), el grafico tampoco se mostraba
            aunque no tuviera nada que ver con esa falla. -->
-      @if (timeframeOptions.length > 1) {
-        <div class="signal-timeframe-chips">
-          @for (opt of timeframeOptions; track opt.timeframe) {
-            <mat-chip [class.active]="activeMatch()?.timeframe === opt.timeframe" (click)="selectTimeframe(opt)">
-              {{ opt.timeframe }}
-            </mat-chip>
-          }
-        </div>
-      }
       <app-symbol-chart
         [symbol]="data.symbol"
         [initialTimeframe]="activeTimeframe()"
