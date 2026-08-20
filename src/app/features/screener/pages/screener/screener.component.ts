@@ -103,14 +103,28 @@ export class ScreenerComponent implements OnInit {
     // corresponden a lo que hay escrito ahora.
     this.searchTrigger$.pipe(
       tap(() => this.isLoading.set(true)),
-      switchMap(() => this.screenerService
-        .searchSymbols(this.searchControl.value || '', this.marketControl.value || [], this.pageIndex(), this.pageSize)
-        .pipe(catchError(() => {
-          // El interceptor global ya muestra el toast para cualquier error
-          // (incluido MAINTENANCE) -- aca solo hace falta no cortar el
-          // stream, la tabla se queda como estaba.
-          return of(null);
-        }))),
+      switchMap(() => {
+        const selectedMarkets = this.marketControl.value || [];
+        // Sin ningun mercado seleccionado -- no confundir con "todavia no
+        // cargaron los mercados" (this.markets() tambien arranca vacio, ver
+        // loadMarkets). searchSymbols() omite el parametro "markets" por
+        // completo cuando la lista viene vacia (ver ScreenerService), asi
+        // que "deseleccionar todos" y "no filtrar" llegaban al backend como
+        // la MISMA peticion -- confirmado en vivo el 2026-08-20: deseleccionar
+        // todo no sacaba ningun simbolo de la tabla. Mostrar vacio directo
+        // ademas ahorra el viaje al backend para una respuesta ya conocida.
+        if (this.markets().length > 0 && selectedMarkets.length === 0) {
+          return of({ data: [], page: 0, pageSize: this.pageSize, totalPages: 0, totalElements: 0 });
+        }
+        return this.screenerService
+          .searchSymbols(this.searchControl.value || '', selectedMarkets, this.pageIndex(), this.pageSize)
+          .pipe(catchError(() => {
+            // El interceptor global ya muestra el toast para cualquier error
+            // (incluido MAINTENANCE) -- aca solo hace falta no cortar el
+            // stream, la tabla se queda como estaba.
+            return of(null);
+          }));
+      }),
     ).subscribe(res => {
       this.isLoading.set(false);
       if (res) {
