@@ -464,12 +464,33 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     }
 
     this.markerFound = true;
+
+    // La barra encontrada arriba es "la vela donde disparo la senal", pero
+    // dibujar en SU PROPIA apertura (this.allBars[nearestIdx].time) pone la
+    // linea al INICIO de esa vela -- confirmado en vivo: en M5 viendo M5 se
+    // veia al comienzo de la vela, no donde realmente disparo (al cerrar).
+    // El cierre real de la vela de origen es un instante fijo en UTC
+    // (markerTime + signalSpacing) que no depende del timeframe mostrado --
+    // si la barra siguiente YA cargada empieza exactamente ahi (caso comun:
+    // mismo timeframe que la senal, o mas fino con el ajuste de arriba), se
+    // dibuja en esa frontera real en vez de en la apertura de la barra
+    // encontrada. Sin esa barra siguiente (senal en la vela mas reciente,
+    // todavia sin la que sigue) o en un timeframe mas grueso que el de la
+    // senal (el cierre real cae a mitad de la barra, no en ningun borde),
+    // no hay una frontera exacta que timeToCoordinate pueda resolver -- se
+    // mantiene la apertura de la barra encontrada como venia haciendo.
+    const closeInstant = signalSpacing !== undefined ? this.markerTime + signalSpacing : undefined;
+    const nextBar = this.allBars[nearestIdx + 1];
+    const lineTime = (closeInstant !== undefined && nextBar && nextBar.time === closeInstant)
+      ? nextBar.time
+      : this.allBars[nearestIdx].time;
+
     // + displayShift(): el eje del chart esta en tiempo desplazado (ver
     // toCandlestickData y displayShift -- de mercado en intraday, offset del
     // navegador en timeframes de calendario), asi que timeToCoordinate
     // necesita el mismo tiempo desplazado para encontrar la barra, no el UTC
     // real.
-    const barTime = this.allBars[nearestIdx].time + this.displayShift();
+    const barTime = lineTime + this.displayShift();
     this.chart.timeScale().setVisibleLogicalRange({ from: nearestIdx - 30, to: nearestIdx + 30 });
 
     // Puerto del plugin oficial de TradingView (ver drawing/vertical-line-primitive.ts)
