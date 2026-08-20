@@ -3,9 +3,11 @@
   appearance="outlined">
   <mat-card-header>
     <mat-card-title>{{ scanner().nombre }}</mat-card-title>
-    <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
+    <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase() && scanner().objEstado?.enumEstadoEscaner !== 'DETENIDO'">
       @if (phase(); as p) {
         {{ p.translationKey | translate: { day: p.day, time: p.displayTime.slice(0, 5), tz: timezoneAbbreviation } }}
+      } @else if (scanner().objEstado?.enumEstadoEscaner === 'DETENIDO') {
+        {{ 'SCANNER.PHASE_STOPPED' | translate }}
       } @else {
         &nbsp;
       }
@@ -20,7 +22,9 @@
       }
       @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
         <div class="button-with-spinner">
-          <span class="loader"></span>
+          @if (phase()?.phase === 'ACTIVE') {
+            <span class="loader"></span>
+          }
           <i
             class="bi bi-stop-fill"
             [class.disabled]="!authService.isEditor()"

@@ -100,6 +100,7 @@
     "PHASE_WAITING": "Waiting to start · begins {{day}} at {{time}} {{tz}}",
     "PHASE_ACTIVE": "Active · scanning until {{time}} {{tz}}",
     "PHASE_FINISHED": "Finished for today · next run {{day}} at {{time}} {{tz}}",
+    "PHASE_STOPPED": "Scanner stopped",
     "TODAY": "today",
     "SIGNALS": "Signals",
     "REGISTRY": "Registry",

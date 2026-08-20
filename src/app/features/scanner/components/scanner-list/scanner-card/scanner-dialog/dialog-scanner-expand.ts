@@ -44,9 +44,11 @@ import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
     <mat-card appearance="outlined" class="dialog-scanner-card">
       <mat-card-header>
         <mat-card-title>{{ scanner.nombre }}</mat-card-title>
-        <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase()">
+        <mat-card-subtitle class="phase-text" [class.phase-text--empty]="!phase() && scanner.objEstado?.enumEstadoEscaner !== 'DETENIDO'">
           @if (phase(); as p) {
             {{ p.translationKey | translate: { day: p.day, time: p.displayTime.slice(0, 5), tz: timezoneAbbreviation } }}
+          } @else if (scanner.objEstado?.enumEstadoEscaner === 'DETENIDO') {
+            {{ 'SCANNER.PHASE_STOPPED' | translate }}
           } @else {
             &nbsp;
           }
@@ -63,7 +65,9 @@ import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
 
           @if (scanner.objEstado?.enumEstadoEscaner === 'INICIADO') {
             <div class="button-with-spinner">
-              <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="2"></mat-progress-spinner>
+              @if (phase()?.phase === 'ACTIVE') {
+                <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="2"></mat-progress-spinner>
+              }
               <i
                 class="bi bi-stop-fill"
                 [class.disabled]="!authService.isEditor()"
@@ -325,8 +329,8 @@ export class DialogScannerExpand {
     return computeScannerPhase(
       this.scanner.horaInicio,
       this.scanner.horaFin,
-      this.timezoneService.convertUTCToLocal(this.scanner.horaInicio),
-      this.timezoneService.convertUTCToLocal(this.scanner.horaFin),
+      this.timezoneService.convertUTCToNewYork(this.scanner.horaInicio),
+      this.timezoneService.convertUTCToNewYork(this.scanner.horaFin),
       new Date(),
       this.calendarFacade.estado(),
       this.i18nService.currentLocale(),
@@ -334,7 +338,9 @@ export class DialogScannerExpand {
     );
   });
 
-  readonly timezoneAbbreviation = this.timezoneService.getTimezoneAbbreviation();
+  // Ver el mismo comentario en scanner-card.ts -- hora de Nueva York, no la
+  // del navegador.
+  readonly timezoneAbbreviation = this.timezoneService.getNewYorkTimezoneAbbreviation();
 
   constructor() {
     this.calendarFacade.ensureLoaded();

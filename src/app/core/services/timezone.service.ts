@@ -62,6 +62,16 @@ export class TimezoneService {
     return this.shortAbbreviation(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }
 
+  /**
+   * Nombre corto del huso de Nueva York en este momento (EDT/EST) --
+   * distinto del huso del navegador, para mostrar horarios de mercado
+   * (ej. la ventana de un escaner) siempre en hora de Nueva York sin
+   * importar donde este el usuario.
+   */
+  getNewYorkTimezoneAbbreviation(): string {
+    return this.shortAbbreviation(this.NY_TIMEZONE);
+  }
+
   private shortAbbreviation(timeZone: string): string {
     const parts = new Intl.DateTimeFormat('en-US', { timeZone, timeZoneName: 'short' }).formatToParts(new Date());
     return parts.find(p => p.type === 'timeZoneName')?.value ?? '';

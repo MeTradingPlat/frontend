@@ -79,8 +79,8 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
     return computeScannerPhase(
       scanner.horaInicio,
       scanner.horaFin,
-      this.timezoneService.convertUTCToLocal(scanner.horaInicio),
-      this.timezoneService.convertUTCToLocal(scanner.horaFin),
+      this.timezoneService.convertUTCToNewYork(scanner.horaInicio),
+      this.timezoneService.convertUTCToNewYork(scanner.horaFin),
       new Date(),
       this.calendarFacade.estado(),
       this.i18nService.currentLocale(),
@@ -88,7 +88,11 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
     );
   });
 
-  readonly timezoneAbbreviation = this.timezoneService.getTimezoneAbbreviation();
+  // Hora de Nueva York, no la del navegador -- el horario de un escaner es
+  // horario de mercado, mostrarlo en la hora local de quien mira confundia
+  // mas de lo que ayudaba (ej. Bogota, GMT-5 fijo todo el año, se ve igual
+  // a la hora ET en invierno pero no en verano).
+  readonly timezoneAbbreviation = this.timezoneService.getNewYorkTimezoneAbbreviation();
 
   ngOnInit(): void {
     this.calendarFacade.ensureLoaded();
