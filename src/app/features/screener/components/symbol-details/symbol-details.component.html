@@ -95,7 +95,7 @@
           </div>
           <div class="metric-item">
             <span class="label">EPS</span>
-            <span class="value">{{ fund?.eps || 'N/A' }}</span>
+            <span class="value">{{ formatNumber(fund?.eps) }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Short Interest</span>
@@ -107,7 +107,7 @@
           </div>
           <div class="metric-item">
             <span class="label">Beta</span>
-            <span class="value">{{ fund?.beta || 'N/A' }}</span>
+            <span class="value">{{ formatNumber(fund?.beta) }}</span>
           </div>
           <div class="metric-item">
             <span class="label">Volume (Daily)</span>
