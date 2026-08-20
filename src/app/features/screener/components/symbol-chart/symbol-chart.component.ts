@@ -141,6 +141,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   @Input({ required: true }) symbol!: string;
   @Input() initialTimeframe?: string;
   @Input() markerTime?: number;
+  @Input() markerTimeframe?: string;
   @Input() buyPriceLine?: number;
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef<HTMLDivElement>;
 
@@ -420,20 +421,40 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // cargada -- no existe "la mas cercana" en lightweight-charts
     // (confirmado en la documentacion/issues oficiales de TradingView,
     // github.com/tradingview/lightweight-charts#1716). Pero el objetivo
-    // (markerTime) es la vela donde disparo la senal en SU PROPIO timeframe
-    // (ej. M5 a las 13:30), que no coincide con el inicio exacto de una vela
-    // mas gruesa (H1 arranca en 13:00, D1 en 00:00) salvo que caiga justo en
-    // la hora/dia en punto -- por eso se busca la barra de ESTE timeframe
-    // cuya ventana [time, time+barSpacing) CONTIENE el objetivo, y se dibuja
-    // en el tiempo de esa barra encontrada (no en el markerTime crudo, que
-    // timeToCoordinate no reconoceria en un timeframe mas grueso que el de
-    // la senal).
-    const barSpacing = TIMEFRAME_SECONDS[this.selectedTimeframe()]
+    // (markerTime) es la APERTURA de la vela donde disparo la senal en SU
+    // PROPIO timeframe (ej. M5 abierta a las 13:25, senal real al cerrar a
+    // las 13:30) -- por eso se busca la barra de ESTE timeframe cuya ventana
+    // CONTIENE el objetivo, y se dibuja en el tiempo de esa barra encontrada
+    // (no en el markerTime crudo, que timeToCoordinate no reconoceria en un
+    // timeframe mas grueso que el de la senal).
+    //
+    // Cuando el timeframe mostrado es MAS FINO que el de la senal (ej. senal
+    // en M5, viendo M1), buscar "la barra que contiene markerTime" a secas
+    // encuentra el PRIMER minuto de la ventana M5 (la apertura), no el
+    // ultimo (donde realmente disparo la senal al cerrar la vela M5) --
+    // corregido desplazando el objetivo al cierre de la vela de origen.
+    const displaySpacing = TIMEFRAME_SECONDS[this.selectedTimeframe()]
       ?? (this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60);
-    const nearestIdx = this.allBars.findIndex(b => b.time <= this.markerTime! && this.markerTime! < b.time + barSpacing);
+    const signalSpacing = this.markerTimeframe ? TIMEFRAME_SECONDS[this.markerTimeframe] : undefined;
+    const target = (signalSpacing !== undefined && displaySpacing < signalSpacing)
+      ? this.markerTime + signalSpacing - displaySpacing
+      : this.markerTime;
+
+    // La ventana de cada barra se toma de la SIGUIENTE barra real cargada
+    // (no de displaySpacing fijo) -- displaySpacing asume duracion constante,
+    // que es falsa para MO1/MO3/MO6/Y1 (meses/anos de largo variable: un
+    // agosto de 31 dias vs. los 30 fijos asumidos dejaba senales de fin de
+    // mes sin ninguna barra que las contuviera, y el marcador nunca se
+    // dibujaba). Solo la ultima barra cargada (sin siguiente todavia) usa
+    // displaySpacing como respaldo.
+    const nearestIdx = this.allBars.findIndex((b, i) => {
+      if (b.time > target) return false;
+      const windowEnd = this.allBars[i + 1]?.time ?? b.time + displaySpacing;
+      return target < windowEnd;
+    });
     if (nearestIdx === -1) {
       const first = this.allBars[0].time;
-      if (this.markerTime < first && this.hasMoreHistory && !this.isLoadingMore) {
+      if (target < first && this.hasMoreHistory && !this.isLoadingMore) {
         // El objetivo es mas viejo que lo cargado -- probablemente el lote
         // inicial no llega tan atras todavia. Pedir mas y reintentar cuando
         // llegue (loadMoreHistory ya vuelve a llamar applyMarker()).

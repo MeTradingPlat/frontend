@@ -61,6 +61,7 @@
         [symbol]="data.symbol"
         [initialTimeframe]="activeTimeframe()"
         [markerTime]="markerTime()"
+        [markerTimeframe]="activeMatch()?.timeframe"
         [buyPriceLine]="data.buyPrice"
       ></app-symbol-chart>
     </mat-tab>
