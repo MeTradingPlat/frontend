@@ -82,6 +82,11 @@ const MORE_TIMEFRAME_GROUPS: { label: string; items: TimeframeOption[] }[] = [
 // hueco en blanco.
 const LOAD_MORE_THRESHOLD_BARS = 20;
 const LOAD_MORE_BATCH_SIZE = 500;
+// Tope de una sola pedida al saltar directo hasta la vela de una senal (ver
+// applyMarker) -- evita una request absurda para una senal muy vieja o un
+// timeframe muy fino, sin volver al patron de a LOAD_MORE_BATCH_SIZE que
+// encadenaba decenas de round trips secuenciales.
+const MARKER_JUMP_MAX_BARS = 5000;
 
 // shiftSeconds desplaza el tiempo real (UTC) al "tiempo falso" que hace que
 // lightweight-charts, al formatearlo con el reloj local del navegador, lo
@@ -394,12 +399,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     }
   }
 
-  private loadMoreHistory(): void {
+  private loadMoreHistory(barsOverride?: number): void {
     if (this.oldestTime === null) return;
     this.isLoadingMore = true;
     const endDate = new Date(this.oldestTime * 1000).toISOString();
 
-    this.screenerService.getHistoricalCandles(this.symbol, this.selectedTimeframe(), endDate, LOAD_MORE_BATCH_SIZE)
+    this.screenerService.getHistoricalCandles(this.symbol, this.selectedTimeframe(), endDate, barsOverride ?? LOAD_MORE_BATCH_SIZE)
       .subscribe({
         next: (older) => {
           this.isLoadingMore = false;
@@ -478,10 +483,23 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (nearestIdx === -1) {
       const first = this.allBars[0].time;
       if (target < first && this.hasMoreHistory && !this.isLoadingMore) {
-        // El objetivo es mas viejo que lo cargado -- probablemente el lote
-        // inicial no llega tan atras todavia. Pedir mas y reintentar cuando
-        // llegue (loadMoreHistory ya vuelve a llamar applyMarker()).
-        this.loadMoreHistory();
+        // El objetivo es mas viejo que lo cargado. Saltar directo a cubrir
+        // TODO el hueco hasta el objetivo en una sola pedida (acotada por
+        // MARKER_JUMP_MAX_BARS) en vez de pedir de a LOAD_MORE_BATCH_SIZE e
+        // ir reintentando -- una senal de hace horas/dias, o un simbolo de
+        // bajo volumen con huecos que hacen que 500 barras alcancen mucho
+        // menos tiempo real del esperado, encadenaba decenas de round trips
+        // secuenciales antes de alcanzar la vela real (confirmado: abrir el
+        // mismo simbolo desde Activos -- sin markerTime, sin esta cadena --
+        // era instantaneo, pero abrir una senal se sentia lento). El tamano
+        // se calcula como el numero de periodos completos en el hueco (cota
+        // superior real de barras posibles ahi, los huecos solo la bajan) +
+        // margen; si el hueco es mas grande que el tope, esta misma logica
+        // se vuelve a ejecutar tras cada pedida (loadMoreHistory ya llama a
+        // applyMarker() de nuevo), acortando la cadena en vez de eliminarla.
+        const period = TIMEFRAME_SECONDS[this.selectedTimeframe()] ?? LOAD_MORE_BATCH_SIZE;
+        const barsNeeded = Math.min(Math.ceil((first - target) / period) + 10, MARKER_JUMP_MAX_BARS);
+        this.loadMoreHistory(Math.max(barsNeeded, LOAD_MORE_BATCH_SIZE));
       }
       return;
     }
