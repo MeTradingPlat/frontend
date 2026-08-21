@@ -293,6 +293,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.hasMoreHistory = true;
     this.isLoadingMore = false;
     this.markerFound = false;
+    this.markerAtCloseInstant = false;
     this.pendingViewReset = true;
 
     // Recreate the series instead of series.setData([]): an empty array doesn't
