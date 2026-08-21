@@ -200,7 +200,8 @@
     "HINT_TRENDLINE_START": "Haz click en el punto inicial de la línea",
     "HINT_TRENDLINE_END": "Ahora haz click en el punto final",
     "HINT_HLINE": "Haz click en el gráfico para colocar una línea horizontal",
-    "GENERATED_AT_HINT": "Hora real en que se generó la señal (la vela que la disparó puede haber cerrado un poco antes)"
+    "GENERATED_AT_HINT": "Hora real en que se generó la señal (la vela que la disparó puede haber cerrado un poco antes)",
+    "SIGNAL_CANDLE_HINT": "Temporalidad y hora de apertura de la vela que disparó este filtro -- compara contra dónde el gráfico dibuja el marcador y la línea de compra"
   },
   "AUTH": {
     "LOGIN": "Iniciar sesión",

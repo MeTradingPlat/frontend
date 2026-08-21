@@ -200,7 +200,8 @@
     "HINT_TRENDLINE_START": "Click the starting point of the trend line",
     "HINT_TRENDLINE_END": "Now click the ending point",
     "HINT_HLINE": "Click on the chart to place a horizontal line",
-    "GENERATED_AT_HINT": "Time the signal was actually generated (the candle that triggered it may have closed a bit earlier)"
+    "GENERATED_AT_HINT": "Time the signal was actually generated (the candle that triggered it may have closed a bit earlier)",
+    "SIGNAL_CANDLE_HINT": "Timeframe and candle open time that triggered this filter -- compare against where the chart draws the marker and the buy line"
   },
   "AUTH": {
     "LOGIN": "Login",
