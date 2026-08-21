@@ -2,9 +2,11 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
+  Output,
   SimpleChanges,
   ViewChild,
   inject,
@@ -143,6 +145,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   @Input() markerTime?: number;
   @Input() markerTimeframe?: string;
   @Input() buyPriceLine?: number;
+  // Avisa hacia arriba cuando el timeframe cambia DESDE el selector propio
+  // del grafico (no desde initialTimeframe) -- simetrico a como
+  // initialTimeframe ya empuja el timeframe hacia abajo, para que los chips
+  // de informacion de la senal (arriba) puedan reflejar cual esta activo.
+  @Output() timeframeChange = new EventEmitter<string>();
   @ViewChild('chartContainer', { static: true }) chartContainer!: ElementRef<HTMLDivElement>;
 
   readonly primaryTimeframes = PRIMARY_TIMEFRAMES;
@@ -235,6 +242,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (timeframe === this.selectedTimeframe()) return;
     this.selectedTimeframe.set(timeframe);
     this.resubscribe();
+    this.timeframeChange.emit(timeframe);
   }
 
   isPrimaryTimeframe(id: string): boolean {

@@ -118,6 +118,23 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
     this.activeTimeframe.set(match.timeframe);
   }
 
+  // Reflejo inverso: cuando el timeframe cambia DESDE el selector propio del
+  // grafico (no desde un chip de aca arriba), busca si hay un filtro de la
+  // senal en esa misma temporalidad y lo activa -- para que el reloj/precio
+  // mostrados sigan correspondiendo a lo que el grafico esta mostrando. Si
+  // el usuario navega a una temporalidad que la senal no toco (ej. H1), no
+  // hay nada que reflejar -- se deja el ultimo match valido tal cual, en vez
+  // de mostrar informacion inventada. activeTimeframe SI se actualiza
+  // siempre (aunque no haya match) para no pelear con [initialTimeframe]:
+  // como ya coincide con lo que el grafico acaba de setear por su cuenta, el
+  // guard de ngOnChanges del grafico (initialTimeframe !== selectedTimeframe)
+  // no dispara un resubscribe circular.
+  onChartTimeframeChange(timeframe: string): void {
+    this.activeTimeframe.set(timeframe);
+    const match = this.timeframeOptions.find(opt => opt.timeframe === timeframe);
+    if (match) this.activeMatch.set(match);
+  }
+
   // El backend manda velaTimestamp en UTC pero sin sufijo de zona horaria
   // (Python le quita el tzinfo antes de serializar) -- un ISO sin 'Z' ni
   // offset lo interpreta JS como hora LOCAL del navegador, no UTC. Sin este

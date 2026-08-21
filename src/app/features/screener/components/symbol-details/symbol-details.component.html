@@ -74,6 +74,7 @@
         [markerTime]="markerTime()"
         [markerTimeframe]="activeMatch()?.timeframe"
         [buyPriceLine]="data.buyPrice"
+        (timeframeChange)="onChartTimeframeChange($event)"
       ></app-symbol-chart>
     </mat-tab>
     <mat-tab [label]="'ASSETS.TAB_FUNDAMENTALS' | translate">
