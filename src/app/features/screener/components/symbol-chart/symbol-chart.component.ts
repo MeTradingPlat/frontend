@@ -192,6 +192,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // usuario. Sin esto, navegar lejos de la senal la traia de vuelta a la
   // fuerza en cuanto llegaba la siguiente pagina de historial.
   private markerFound = false;
+  // true solo cuando el marcador ya se dibujo en el cierre REAL de su vela
+  // de origen (la barra siguiente exacta), no en el fallback de apertura.
+  // Distinto de markerFound: una senal recien generada puede resolverse al
+  // fallback porque la vela siguiente (su propio cierre) todavia no existia
+  // en el historial inicial -- llega segundos despues por el stream en vivo,
+  // y sin este flag el marcador se quedaba pegado en la apertura para
+  // siempre en vez de saltar a la posicion correcta apenas esa vela llega.
+  private markerAtCloseInstant = false;
 
   ngAfterViewInit(): void {
     if (this.initialTimeframe) this.selectedTimeframe.set(this.initialTimeframe);
@@ -210,6 +218,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     } else {
       if (changes['markerTime'] && !changes['markerTime'].firstChange) {
         this.markerFound = false;
+        this.markerAtCloseInstant = false;
         this.applyMarker();
       }
       if (changes['buyPriceLine'] && !changes['buyPriceLine'].firstChange) this.applyBuyPriceLine();
@@ -349,6 +358,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.series?.update(toCandlestickData(message.bar, this.displayShift()));
       this.isLoading.set(false);
       this.hasNoData.set(false);
+      // La vela que marca el cierre real de la senal (markerTime +
+      // signalSpacing) puede llegar aca, recien en vivo, si no estaba en el
+      // historial inicial -- reintentar hasta que applyMarker() la encuentre
+      // y salte del fallback (apertura de su propia vela) al cierre real.
+      if (this.markerTime !== undefined && !this.markerAtCloseInstant) this.applyMarker();
     } else if (message.type === 'error') {
       this.error.set(message.message ?? 'Error en el stream de velas.');
       this.checkMaintenance();
@@ -481,9 +495,9 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // mantiene la apertura de la barra encontrada como venia haciendo.
     const closeInstant = signalSpacing !== undefined ? this.markerTime + signalSpacing : undefined;
     const nextBar = this.allBars[nearestIdx + 1];
-    const lineTime = (closeInstant !== undefined && nextBar && nextBar.time === closeInstant)
-      ? nextBar.time
-      : this.allBars[nearestIdx].time;
+    const foundCloseInstant = closeInstant !== undefined && nextBar !== undefined && nextBar.time === closeInstant;
+    const lineTime = foundCloseInstant ? nextBar!.time : this.allBars[nearestIdx].time;
+    this.markerAtCloseInstant = foundCloseInstant;
 
     // + displayShift(): el eje del chart esta en tiempo desplazado (ver
     // toCandlestickData y displayShift -- de mercado en intraday, offset del
