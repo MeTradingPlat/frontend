@@ -156,6 +156,10 @@
 .signal-timeframe-chips {
   display: inline-flex;
   gap: 6px;
+  // Empuja los chips al extremo derecho de la fila -- el reloj/precio se
+  // quedan agrupados a la izquierda, las temporalidades quedan claramente
+  // separadas al otro lado en vez de pegadas justo despues.
+  margin-left: auto;
 
   mat-chip {
     cursor: pointer;
