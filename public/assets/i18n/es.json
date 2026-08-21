@@ -199,7 +199,8 @@
     "TOOL_HLINE_HINT": "Línea horizontal: click en cualquier parte del gráfico para colocarla",
     "HINT_TRENDLINE_START": "Haz click en el punto inicial de la línea",
     "HINT_TRENDLINE_END": "Ahora haz click en el punto final",
-    "HINT_HLINE": "Haz click en el gráfico para colocar una línea horizontal"
+    "HINT_HLINE": "Haz click en el gráfico para colocar una línea horizontal",
+    "GENERATED_AT_HINT": "Hora real en que se generó la señal (la vela que la disparó puede haber cerrado un poco antes)"
   },
   "AUTH": {
     "LOGIN": "Iniciar sesión",

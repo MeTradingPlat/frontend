@@ -199,7 +199,8 @@
     "TOOL_HLINE_HINT": "Horizontal line: click anywhere on the chart to place one",
     "HINT_TRENDLINE_START": "Click the starting point of the trend line",
     "HINT_TRENDLINE_END": "Now click the ending point",
-    "HINT_HLINE": "Click on the chart to place a horizontal line"
+    "HINT_HLINE": "Click on the chart to place a horizontal line",
+    "GENERATED_AT_HINT": "Time the signal was actually generated (the candle that triggered it may have closed a bit earlier)"
   },
   "AUTH": {
     "LOGIN": "Login",

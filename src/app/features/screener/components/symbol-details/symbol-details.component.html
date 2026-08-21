@@ -22,10 +22,14 @@
       <p class="signal-mensaje-text">
         {{ 'SCANNER.SIGNAL_MESSAGE' | translate: { symbol: data.symbol, scannerName: data.scannerName } }}
       </p>
-      @if (activeMatch()?.velaTimestamp || data.buyPrice !== undefined || timeframeOptions.length > 1) {
+      @if (data.generatedAt || data.buyPrice !== undefined || timeframeOptions.length > 1) {
         <div class="signal-meta">
-          @if (activeMatch()?.velaTimestamp; as vela) {
-            <span><i class="bi bi-clock"></i> {{ vela | marketDatetime }}</span>
+          @if (data.generatedAt; as generatedAt) {
+            <!-- Hora real en que se genero la senal (registros_log.timestamp),
+                 no la apertura de la vela que la disparo -- mostrar la vela
+                 aca confundia (parecia que la senal habia salido cuando en
+                 realidad la vela solo termino de cerrar unos minutos antes). -->
+            <span [matTooltip]="'ASSETS.GENERATED_AT_HINT' | translate"><i class="bi bi-clock"></i> {{ generatedAt | marketDatetime:true }}</span>
           }
           @if (data.buyPrice !== undefined) {
             <span><i class="bi bi-currency-dollar"></i> {{ data.buyPrice | number:'1.2-4' }}</span>

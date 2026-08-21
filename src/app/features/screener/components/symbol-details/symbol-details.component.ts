@@ -11,6 +11,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { SymbolChartComponent } from '../symbol-chart/symbol-chart.component';
 import { MarketLabelPipe } from '../../pipes/market-label.pipe';
@@ -51,6 +52,7 @@ const POLL_INTERVAL_MS = 5000;
     MatProgressSpinnerModule,
     MatDividerModule,
     MatTabsModule,
+    MatTooltipModule,
     TranslateModule,
     SymbolChartComponent,
     MarketLabelPipe,
