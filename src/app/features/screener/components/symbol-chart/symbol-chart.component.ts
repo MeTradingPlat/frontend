@@ -497,7 +497,23 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     const closeInstant = signalSpacing !== undefined ? this.markerTime + signalSpacing : undefined;
     const nextBar = this.allBars[nearestIdx + 1];
     const foundCloseInstant = closeInstant !== undefined && nextBar !== undefined && nextBar.time === closeInstant;
-    const lineTime = foundCloseInstant ? nextBar!.time : this.allBars[nearestIdx].time;
+    // Cuando el timeframe mostrado es MAS GRUESO que el de la senal (ej.
+    // senal M5 viendo M15) y su cierre cae justo en un limite tambien del
+    // timeframe mostrado (M5 12:40 cierra a las 12:45, que TAMBIEN es borde
+    // de la M15 12:30-12:45), saltar a la barra siguiente (M15 12:45-13:00,
+    // que recien empieza a formarse en ese instante) deja el marcador una
+    // vela mas alla de donde deberia -- confirmado en vivo. La vela que
+    // realmente estaba formandose cuando la senal disparo es la ENCONTRADA
+    // (nearestIdx, 12:30-12:45): por definicion de agregacion de velas, el
+    // cierre de un sub-periodo (M5) que coincide con el cierre de su
+    // periodo contenedor (M15) es el cierre de ESE periodo contenedor, no
+    // el inicio del siguiente (misma logica con la que este mismo backend
+    // arma M15 a partir de M1: el close final es el close del ultimo
+    // sub-bar). Solo en el mismo timeframe que la senal (donde "barra
+    // siguiente" y "cierre de esta barra" son el mismo punto visual) sigue
+    // usandose la barra siguiente, como antes.
+    const displayIsCoarser = signalSpacing !== undefined && displaySpacing > signalSpacing;
+    const lineTime = (foundCloseInstant && !displayIsCoarser) ? nextBar!.time : this.allBars[nearestIdx].time;
     this.markerAtCloseInstant = foundCloseInstant;
 
     // + displayShift(): el eje del chart esta en tiempo desplazado (ver
