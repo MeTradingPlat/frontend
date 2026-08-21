@@ -24,7 +24,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.START_TIME' | translate }}</mat-label>
-      <input matInput [formControl]="startTime" [matTimepicker]="startPicker" [errorStateMatcher]="startTimeErrorMatcher">
+      <input matInput [formControl]="startTime" [matTimepicker]="startPicker" [matTimepickerMin]="minTime" [matTimepickerMax]="maxTime" [errorStateMatcher]="startTimeErrorMatcher">
       <mat-timepicker-toggle matIconSuffix [for]="startPicker"/>
       <mat-timepicker #startPicker/>
       @if (horaInicioLocal()) {
@@ -37,7 +37,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'SCANNER.END_TIME' | translate }}</mat-label>
-      <input matInput [formControl]="endTime" [matTimepicker]="endPicker" [errorStateMatcher]="endTimeErrorMatcher">
+      <input matInput [formControl]="endTime" [matTimepicker]="endPicker" [matTimepickerMin]="minTime" [matTimepickerMax]="maxTime" [errorStateMatcher]="endTimeErrorMatcher">
       <mat-timepicker-toggle matIconSuffix [for]="endPicker"/>
       <mat-timepicker #endPicker/>
       @if (horaFinLocal()) {

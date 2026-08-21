@@ -49,6 +49,13 @@ export class CardTime {
   endTime = new FormControl<Date | null>(null);
   selectEjecution = new FormControl<string>('UNA_VEZ', { nonNullable: true });
 
+  // Fuera de este rango el mercado esta genuinamente cerrado (ni pre-market
+  // extendido) -- mismo limite que usa signal-processing-service para
+  // recortar horaInicio/horaFin (calendar.py: _MARKET_OPEN_TIME/_REGULAR_CLOSE).
+  // Sin esto el usuario podia armar un escaner que nunca iba a poder operar.
+  readonly minTime = this.parseTime(MARKET_SESSIONS.PRE_MARKET.start);
+  readonly maxTime = this.parseTime(MARKET_SESSIONS.POST_MARKET.end);
+
   // El picker edita directamente hora de Nueva York -- la hora local del
   // usuario queda solo como referencia (no editable) para que nunca haya
   // que convertir mentalmente "mi hora -> hora de mercado" (confirmado en
