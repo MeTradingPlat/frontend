@@ -45,10 +45,13 @@
     }
 
     // Pill de estado -- fondo del mismo color que los iconos del header
-    // (--mat-sys-on-primary, tipicamente blanco/casi blanco sobre el
-    // primary), con texto negro (tono 0 de la paleta, el mismo negro que ya
-    // usa el resto de la app para texto sobre fondos claros) para que siga
-    // siendo legible. Punto de
+    // (--mat-sys-on-primary). Texto en --mat-sys-primary, NO negro fijo:
+    // Material 3 intercambia el tono de primary/on-primary entre tema claro
+    // y oscuro (en oscuro, on-primary se oscurece para seguir contrastando
+    // contra un primary que ahi se aclara) -- un negro fijo se volvia
+    // invisible en modo oscuro (confirmado en vivo el 2026-08-22).
+    // --mat-sys-primary es la pareja que Material ya garantiza legible
+    // contra on-primary en ambos temas, sin fijar nada a mano. Punto de
     // color adentro marca el estado (patron de status pill de Google Cloud
     // Console/Workspace) con --app-success/--app-warning, los mismos
     // tokens que ya definio la app para exito/advertencia (Material 3 no
@@ -62,7 +65,7 @@
         padding: 2px 8px;
         border-radius: 999px;
         background: var(--mat-sys-on-primary);
-        color: #000000;
+        color: var(--mat-sys-primary);
         font-size: 10px;
         font-weight: 500;
         line-height: 1.4;
