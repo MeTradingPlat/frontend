@@ -18,12 +18,22 @@
     // Columna a la derecha del header: iconos arriba (a la altura del
     // nombre del escaner), badge de estado abajo (a la altura del texto de
     // fase) -- espejo del title+subtitle apilados a la izquierda.
+    // align-items centrado (no flex-end) para que el pill quede centrado
+    // bajo la fila de iconos -- con 3 iconos simetricos (gear/stop-play/
+    // fullscreen), el centro de la fila coincide con el icono del medio.
     .header-right {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: center;
         gap: 4px;
         flex-shrink: 0;
+    }
+
+    // Misma clase que .header-icons (mismo display/gap/align-items) para que
+    // ambas filas midan y centren igual -- .status-row solo reduce el gap
+    // porque adentro va un unico pill, no varios iconos sueltos.
+    .status-row {
+        gap: 0;
     }
 
     .header-icons {
@@ -34,23 +44,28 @@
         align-items: center;
     }
 
-    // Pill de estado -- fondo del mismo tono que el cuerpo de la card
-    // (surface-container-low, ver .mat-mdc-tab-group mas abajo) para que se
-    // note como una pieza "de la card" apoyada sobre el primary del header,
-    // con un punto de color adentro que marca el estado (patron de status
-    // pill de Google Cloud Console/Workspace). El punto usa
+    // Pill de estado -- surface-container-high, la misma superficie
+    // "elevada" que ya usa el snackbar de notificaciones (ver styles.scss):
+    // surface/surface-container/surface-container-low quedaron aplanados al
+    // fondo de la app (#18191a en oscuro, blanco puro en claro, ver el
+    // comentario de body.dark-mode/light-mode en styles.scss), asi que usar
+    // "low" ahi se veia identico al negro/blanco del fondo en vez de una
+    // pieza distinguible apoyada sobre el primary del header. "-high" es el
+    // unico tono de superficie que la app dejo sin aplanar, mismo criterio
+    // que el resto de la UI. Punto de color adentro marca el estado (patron
+    // de status pill de Google Cloud Console/Workspace) con
     // --app-success/--app-warning, los mismos tokens que ya definio la app
-    // para exito/advertencia (Material 3 no trae esos roles semanticos, ver
-    // su definicion en styles.scss). Span propio en vez de mat-chip: el
-    // padding/alto interno de MDC no se deja compactar del todo y dejaba un
-    // rectangulo mas alto y corrido a la izquierda de lo esperado.
+    // para exito/advertencia (Material 3 no trae esos roles semanticos).
+    // Span propio en vez de mat-chip: el padding/alto interno de MDC no se
+    // dejaba compactar del todo y quedaba un rectangulo mas alto y corrido a
+    // la izquierda de lo esperado.
     .status-pill {
         display: inline-flex;
         align-items: center;
         gap: 5px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: var(--mat-sys-surface-container-low);
+        background: var(--mat-sys-surface-container-high);
         color: var(--mat-sys-on-surface-variant);
         font-size: 10px;
         font-weight: 500;

@@ -94,10 +94,12 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
               [matTooltip]="'SCANNER.CLOSE' | translate"
             ></i>
           </div>
-          <span class="status-pill">
-            <span class="status-dot" [class]="'status-dot--' + status().toLowerCase()"></span>
-            {{ 'SCANNER.STATUS_' + status() | translate }}
-          </span>
+          <div class="header-icons status-row">
+            <span class="status-pill">
+              <span class="status-dot" [class]="'status-dot--' + status().toLowerCase()"></span>
+              {{ 'SCANNER.STATUS_' + status() | translate }}
+            </span>
+          </div>
         </div>
       </mat-card-header>
 
@@ -204,9 +206,13 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
       .header-right {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
+        align-items: center;
         gap: 4px;
         flex-shrink: 0;
+      }
+
+      .status-row {
+        gap: 0;
       }
 
       // Ver el mismo comentario en scanner-card.scss.
@@ -216,7 +222,7 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
         gap: 5px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: var(--mat-sys-surface-container-low);
+        background: var(--mat-sys-surface-container-high);
         color: var(--mat-sys-on-surface-variant);
         font-size: 10px;
         font-weight: 500;
