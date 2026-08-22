@@ -34,33 +34,36 @@
         align-items: center;
     }
 
-    // mat-chip neutro (traslucido sobre el primary del header, mismo
-    // tratamiento que phase-text/iconos) con un punto de color adentro que
-    // marca el estado -- patron de status pill de Google Cloud Console/
-    // Workspace. El punto usa --app-success/--app-warning, los mismos
-    // tokens que ya definio la app para exito/advertencia (Material 3 no
-    // trae esos roles semanticos, ver su definicion en styles.scss), en vez
-    // de rellenar todo el chip de color y arriesgar mal contraste de texto
-    // entre tema claro/oscuro.
-    .status-chip {
-        --mdc-chip-container-height: 20px;
-        --mdc-chip-elevated-container-color: rgba(255, 255, 255, 0.16);
-        --mdc-chip-label-text-color: var(--mat-sys-on-primary);
-        min-height: 20px;
-        font-size: 11px;
-
-        ::ng-deep .mdc-evolution-chip__text-label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+    // Pill de estado -- fondo del mismo tono que el cuerpo de la card
+    // (surface-container-low, ver .mat-mdc-tab-group mas abajo) para que se
+    // note como una pieza "de la card" apoyada sobre el primary del header,
+    // con un punto de color adentro que marca el estado (patron de status
+    // pill de Google Cloud Console/Workspace). El punto usa
+    // --app-success/--app-warning, los mismos tokens que ya definio la app
+    // para exito/advertencia (Material 3 no trae esos roles semanticos, ver
+    // su definicion en styles.scss). Span propio en vez de mat-chip: el
+    // padding/alto interno de MDC no se deja compactar del todo y dejaba un
+    // rectangulo mas alto y corrido a la izquierda de lo esperado.
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--mat-sys-surface-container-low);
+        color: var(--mat-sys-on-surface-variant);
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1.4;
+        white-space: nowrap;
     }
 
     .status-dot {
         width: 6px;
         height: 6px;
+        flex-shrink: 0;
         border-radius: 50%;
-        background: var(--mat-sys-on-primary);
+        background: var(--mat-sys-on-surface-variant);
         opacity: 0.45;
 
         &--waiting {

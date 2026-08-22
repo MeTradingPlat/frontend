@@ -21,7 +21,6 @@ import { TimezoneService } from '../../../../../../core/services/timezone.servic
 import { ClockTickService } from '../../../../../../core/services/clock-tick.service';
 import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 import { CalendarFacadeService } from '../../../../services/calendar-facade.service';
-import { MatChipsModule } from '@angular/material/chips';
 import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerStatus } from '../scanner-phase.util';
 
 @Component({
@@ -35,7 +34,6 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
     MatIconModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatChipsModule,
     TranslatePipe,
     ScannerSignalsTab,
     ScannerNewsTab,
@@ -96,10 +94,10 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
               [matTooltip]="'SCANNER.CLOSE' | translate"
             ></i>
           </div>
-          <mat-chip class="status-chip">
+          <span class="status-pill">
             <span class="status-dot" [class]="'status-dot--' + status().toLowerCase()"></span>
             {{ 'SCANNER.STATUS_' + status() | translate }}
-          </mat-chip>
+          </span>
         </div>
       </mat-card-header>
 
@@ -212,25 +210,26 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
       }
 
       // Ver el mismo comentario en scanner-card.scss.
-      .status-chip {
-        --mdc-chip-container-height: 20px;
-        --mdc-chip-elevated-container-color: rgba(255, 255, 255, 0.16);
-        --mdc-chip-label-text-color: var(--mat-sys-on-primary);
-        min-height: 20px;
-        font-size: 11px;
-
-        ::ng-deep .mdc-evolution-chip__text-label {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-        }
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--mat-sys-surface-container-low);
+        color: var(--mat-sys-on-surface-variant);
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1.4;
+        white-space: nowrap;
       }
 
       .status-dot {
         width: 6px;
         height: 6px;
+        flex-shrink: 0;
         border-radius: 50%;
-        background: var(--mat-sys-on-primary);
+        background: var(--mat-sys-on-surface-variant);
         opacity: 0.45;
 
         &--waiting {

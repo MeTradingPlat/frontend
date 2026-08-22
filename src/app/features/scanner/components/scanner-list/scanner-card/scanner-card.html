@@ -48,10 +48,10 @@
           (click)="openScannerDialog(scanner()); $event.stopPropagation()"
           [matTooltip]="'SCANNER.EXPAND' | translate: {id: scanner().idEscaner}"></i>
       </div>
-      <mat-chip class="status-chip">
+      <span class="status-pill">
         <span class="status-dot" [class]="'status-dot--' + status().toLowerCase()"></span>
         {{ 'SCANNER.STATUS_' + status() | translate }}
-      </mat-chip>
+      </span>
     </div>
   </mat-card-header>
   <mat-tab-group headerPosition="below" mat-stretch-tabs="false" mat-align-tabs="center"
