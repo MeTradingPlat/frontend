@@ -23,7 +23,7 @@ import { TimezoneService } from '../../../../../core/services/timezone.service';
 import { ClockTickService } from '../../../../../core/services/clock-tick.service';
 import { I18nService } from '../../../../../core/services/i18n/i18n.service';
 import { CalendarFacadeService } from '../../../services/calendar-facade.service';
-import { computeScannerPhase, ScannerPhaseResult } from './scanner-phase.util';
+import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerStatus } from './scanner-phase.util';
 
 
 @Component({
@@ -87,6 +87,12 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
       this.translate.instant('SCANNER.TODAY'),
     );
   });
+
+  /** Etiqueta corta del badge de estado (Detenido/Esperando/Ejecutandose) --
+   * distinta de phase(), que trae el texto descriptivo con dia/hora. */
+  readonly status = computed<ScannerStatus>(() =>
+    computeScannerStatus(this.scanner().objEstado?.enumEstadoEscaner, this.phase())
+  );
 
   // Hora de Nueva York, no la del navegador -- el horario de un escaner es
   // horario de mercado, mostrarlo en la hora local de quien mira confundia

@@ -21,7 +21,7 @@ import { TimezoneService } from '../../../../../../core/services/timezone.servic
 import { ClockTickService } from '../../../../../../core/services/clock-tick.service';
 import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 import { CalendarFacadeService } from '../../../../services/calendar-facade.service';
-import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
+import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerStatus } from '../scanner-phase.util';
 
 @Component({
   selector: 'app-scanner-dialog',
@@ -53,45 +53,50 @@ import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
             &nbsp;
           }
         </mat-card-subtitle>
-        <div class="header-icons">
-          @if (authService.isEditor()) {
-            <i
-              class="bi bi-gear-fill"
-              role="button"
-              (click)="onConfigureScanner()"
-              [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner.idEscaner}"
-            ></i>
-          }
-
-          @if (scanner.objEstado?.enumEstadoEscaner === 'INICIADO') {
-            <div class="button-with-spinner">
-              @if (phase()?.phase === 'ACTIVE') {
-                <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="2"></mat-progress-spinner>
-              }
+        <div class="header-right">
+          <div class="header-icons">
+            @if (authService.isEditor()) {
               <i
-                class="bi bi-stop-fill"
+                class="bi bi-gear-fill"
+                role="button"
+                (click)="onConfigureScanner()"
+                [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner.idEscaner}"
+              ></i>
+            }
+
+            @if (scanner.objEstado?.enumEstadoEscaner === 'INICIADO') {
+              <div class="button-with-spinner">
+                @if (phase()?.phase === 'ACTIVE') {
+                  <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="2"></mat-progress-spinner>
+                }
+                <i
+                  class="bi bi-stop-fill"
+                  [class.disabled]="!authService.isEditor()"
+                  [attr.role]="authService.isEditor() ? 'button' : null"
+                  (click)="onToggleScannerStatus()"
+                  [matTooltip]="'SCANNER.STOP' | translate: {id: scanner.idEscaner}"
+                ></i>
+              </div>
+            } @else {
+              <i
+                class="bi bi-play-fill"
                 [class.disabled]="!authService.isEditor()"
                 [attr.role]="authService.isEditor() ? 'button' : null"
                 (click)="onToggleScannerStatus()"
-                [matTooltip]="'SCANNER.STOP' | translate: {id: scanner.idEscaner}"
+                [matTooltip]="'SCANNER.START' | translate: {id: scanner.idEscaner}"
               ></i>
-            </div>
-          } @else {
-            <i
-              class="bi bi-play-fill"
-              [class.disabled]="!authService.isEditor()"
-              [attr.role]="authService.isEditor() ? 'button' : null"
-              (click)="onToggleScannerStatus()"
-              [matTooltip]="'SCANNER.START' | translate: {id: scanner.idEscaner}"
-            ></i>
-          }
+            }
 
-          <i
-            mat-dialog-close
-            class="bi bi-x-circle-fill"
-            role="button"
-            [matTooltip]="'SCANNER.CLOSE' | translate"
-          ></i>
+            <i
+              mat-dialog-close
+              class="bi bi-x-circle-fill"
+              role="button"
+              [matTooltip]="'SCANNER.CLOSE' | translate"
+            ></i>
+          </div>
+          <span class="status-badge" [class]="'status-badge--' + status().toLowerCase()">
+            {{ 'SCANNER.STATUS_' + status() | translate }}
+          </span>
         </div>
       </mat-card-header>
 
@@ -192,6 +197,37 @@ import { computeScannerPhase, ScannerPhaseResult } from '../scanner-phase.util';
 
         &.phase-text--empty {
           visibility: hidden;
+        }
+      }
+
+      .header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+
+      .status-badge {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        padding: 2px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        color: var(--mat-sys-on-primary);
+
+        &--stopped {
+          background: rgba(255, 255, 255, 0.16);
+        }
+
+        &--waiting {
+          background: #a66a00;
+        }
+
+        &--running {
+          background: #1b7a3d;
         }
       }
 
@@ -341,6 +377,11 @@ export class DialogScannerExpand {
   // Ver el mismo comentario en scanner-card.ts -- hora de Nueva York, no la
   // del navegador.
   readonly timezoneAbbreviation = this.timezoneService.getNewYorkTimezoneAbbreviation();
+
+  /** Ver el mismo comentario en scanner-card.ts. */
+  readonly status = computed<ScannerStatus>(() =>
+    computeScannerStatus(this.scanner.objEstado?.enumEstadoEscaner, this.phase())
+  );
 
   constructor() {
     this.calendarFacade.ensureLoaded();

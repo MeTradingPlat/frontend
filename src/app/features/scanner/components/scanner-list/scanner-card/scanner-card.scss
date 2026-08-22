@@ -15,12 +15,46 @@
     display: flex;
     flex-direction: column;
 
+    // Columna a la derecha del header: iconos arriba (a la altura del
+    // nombre del escaner), badge de estado abajo (a la altura del texto de
+    // fase) -- espejo del title+subtitle apilados a la izquierda.
+    .header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
     .header-icons {
         width: auto;
         display: flex;
         color: var(--mat-sys-on-primary);
         gap: 10px;
         align-items: center;
+    }
+
+    .status-badge {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        padding: 2px 8px;
+        border-radius: 10px;
+        white-space: nowrap;
+        color: var(--mat-sys-on-primary);
+
+        &--stopped {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        &--waiting {
+            background: #a66a00;
+        }
+
+        &--running {
+            background: #1b7a3d;
+        }
     }
 
     .phase-text {

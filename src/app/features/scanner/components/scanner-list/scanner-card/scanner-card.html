@@ -12,40 +12,45 @@
         &nbsp;
       }
     </mat-card-subtitle>
-    <div class="header-icons">
-      @if (authService.isEditor()) {
-        <i
-          class="bi bi-gear-fill"
-          routerLink="/escaneres/configuracion/{{scanner().idEscaner!}}"
-          (click)="$event.stopPropagation(); editScanner.emit(scanner().idEscaner!)"
-          [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner().idEscaner}"></i>
-      }
-      @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
-        <div class="button-with-spinner">
-          @if (phase()?.phase === 'ACTIVE') {
-            <span class="loader"></span>
-          }
+    <div class="header-right">
+      <div class="header-icons">
+        @if (authService.isEditor()) {
           <i
-            class="bi bi-stop-fill"
+            class="bi bi-gear-fill"
+            routerLink="/escaneres/configuracion/{{scanner().idEscaner!}}"
+            (click)="$event.stopPropagation(); editScanner.emit(scanner().idEscaner!)"
+            [matTooltip]="'SCANNER.CONFIGURE' | translate: {id: scanner().idEscaner}"></i>
+        }
+        @if (scanner().objEstado?.enumEstadoEscaner === 'INICIADO') {
+          <div class="button-with-spinner">
+            @if (phase()?.phase === 'ACTIVE') {
+              <span class="loader"></span>
+            }
+            <i
+              class="bi bi-stop-fill"
+              [class.disabled]="!authService.isEditor()"
+              [attr.role]="authService.isEditor() ? 'button' : null"
+              (click)="onToggleClick($event)"
+              [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
+            ></i>
+          </div>
+        } @else {
+          <i
+            class="bi bi-play-fill"
             [class.disabled]="!authService.isEditor()"
             [attr.role]="authService.isEditor() ? 'button' : null"
             (click)="onToggleClick($event)"
-            [matTooltip]="'SCANNER.STOP' | translate: {id: scanner().idEscaner}"
+            [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
           ></i>
-        </div>
-      } @else {
+        }
         <i
-          class="bi bi-play-fill"
-          [class.disabled]="!authService.isEditor()"
-          [attr.role]="authService.isEditor() ? 'button' : null"
-          (click)="onToggleClick($event)"
-          [matTooltip]="'SCANNER.START' | translate: {id: scanner().idEscaner}"
-        ></i>
-      }
-      <i
-        class="bi bi-fullscreen"
-        (click)="openScannerDialog(scanner()); $event.stopPropagation()"
-        [matTooltip]="'SCANNER.EXPAND' | translate: {id: scanner().idEscaner}"></i>
+          class="bi bi-fullscreen"
+          (click)="openScannerDialog(scanner()); $event.stopPropagation()"
+          [matTooltip]="'SCANNER.EXPAND' | translate: {id: scanner().idEscaner}"></i>
+      </div>
+      <span class="status-badge" [class]="'status-badge--' + status().toLowerCase()">
+        {{ 'SCANNER.STATUS_' + status() | translate }}
+      </span>
     </div>
   </mat-card-header>
   <mat-tab-group headerPosition="below" mat-stretch-tabs="false" mat-align-tabs="center"

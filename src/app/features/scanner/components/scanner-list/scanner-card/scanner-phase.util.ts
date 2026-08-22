@@ -13,6 +13,19 @@ export interface ScannerPhaseResult {
   day: string;
 }
 
+/** Estado corto para el badge del header -- distinto del texto descriptivo
+ * de phase-text (que incluye dia/hora). DETENIDO manda siempre, incluso si
+ * por alguna razon quedara una fase calculada de antes de detenerlo. */
+export type ScannerStatus = 'STOPPED' | 'WAITING' | 'RUNNING';
+
+export function computeScannerStatus(
+  enumEstadoEscaner: string | undefined,
+  phase: ScannerPhaseResult | null,
+): ScannerStatus {
+  if (enumEstadoEscaner !== 'INICIADO') return 'STOPPED';
+  return phase?.phase === 'ACTIVE' ? 'RUNNING' : 'WAITING';
+}
+
 function utcTimeToMinutes(hhmmss: string): number {
   const [hours, minutes] = hhmmss.split(':').map(Number);
   return hours * 60 + minutes;

@@ -1,4 +1,4 @@
-import { computeScannerPhase } from './scanner-phase.util';
+import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult } from './scanner-phase.util';
 
 describe('computeScannerPhase', () => {
   // Ventana 13:00-21:00 UTC, "ahora" 15:00 UTC -- dentro del rango horario.
@@ -29,5 +29,25 @@ describe('computeScannerPhase', () => {
       null, 'es', 'hoy',
     );
     expect(result.phase).toBe('ACTIVE');
+  });
+});
+
+describe('computeScannerStatus', () => {
+  const activePhase: ScannerPhaseResult = { phase: 'ACTIVE', translationKey: 'x', displayTime: '', day: '' };
+  const waitingPhase: ScannerPhaseResult = { phase: 'WAITING', translationKey: 'x', displayTime: '', day: '' };
+  const finishedPhase: ScannerPhaseResult = { phase: 'FINISHED', translationKey: 'x', displayTime: '', day: '' };
+
+  it('es STOPPED cuando el escaner no esta INICIADO, sin importar la fase', () => {
+    expect(computeScannerStatus('DETENIDO', activePhase)).toBe('STOPPED');
+    expect(computeScannerStatus(undefined, null)).toBe('STOPPED');
+  });
+
+  it('es RUNNING solo con INICIADO + fase ACTIVE', () => {
+    expect(computeScannerStatus('INICIADO', activePhase)).toBe('RUNNING');
+  });
+
+  it('es WAITING con INICIADO + fase WAITING o FINISHED', () => {
+    expect(computeScannerStatus('INICIADO', waitingPhase)).toBe('WAITING');
+    expect(computeScannerStatus('INICIADO', finishedPhase)).toBe('WAITING');
   });
 });
