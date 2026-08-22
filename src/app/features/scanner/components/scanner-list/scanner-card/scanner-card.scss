@@ -44,29 +44,25 @@
         align-items: center;
     }
 
-    // Pill de estado -- surface-container-high, la misma superficie
-    // "elevada" que ya usa el snackbar de notificaciones (ver styles.scss):
-    // surface/surface-container/surface-container-low quedaron aplanados al
-    // fondo de la app (#18191a en oscuro, blanco puro en claro, ver el
-    // comentario de body.dark-mode/light-mode en styles.scss), asi que usar
-    // "low" ahi se veia identico al negro/blanco del fondo en vez de una
-    // pieza distinguible apoyada sobre el primary del header. "-high" es el
-    // unico tono de superficie que la app dejo sin aplanar, mismo criterio
-    // que el resto de la UI. Punto de color adentro marca el estado (patron
-    // de status pill de Google Cloud Console/Workspace) con
-    // --app-success/--app-warning, los mismos tokens que ya definio la app
-    // para exito/advertencia (Material 3 no trae esos roles semanticos).
-    // Span propio en vez de mat-chip: el padding/alto interno de MDC no se
-    // dejaba compactar del todo y quedaba un rectangulo mas alto y corrido a
-    // la izquierda de lo esperado.
+    // Pill de estado -- fondo del mismo color que los iconos del header
+    // (--mat-sys-on-primary, tipicamente blanco/casi blanco sobre el
+    // primary), con texto negro (tono 0 de la paleta, el mismo negro que ya
+    // usa el resto de la app para texto sobre fondos claros) para que siga
+    // siendo legible. Punto de
+    // color adentro marca el estado (patron de status pill de Google Cloud
+    // Console/Workspace) con --app-success/--app-warning, los mismos
+    // tokens que ya definio la app para exito/advertencia (Material 3 no
+    // trae esos roles semanticos). Span propio en vez de mat-chip: el
+    // padding/alto interno de MDC no se dejaba compactar del todo y quedaba
+    // un rectangulo mas alto y corrido a la izquierda de lo esperado.
     .status-pill {
         display: inline-flex;
         align-items: center;
         gap: 5px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: var(--mat-sys-surface-container-high);
-        color: var(--mat-sys-on-surface-variant);
+        background: var(--mat-sys-on-primary);
+        color: #000000;
         font-size: 10px;
         font-weight: 500;
         line-height: 1.4;
@@ -78,7 +74,7 @@
         height: 6px;
         flex-shrink: 0;
         border-radius: 50%;
-        background: var(--mat-sys-on-surface-variant);
+        background: currentColor;
         opacity: 0.45;
 
         &--waiting {

@@ -222,8 +222,8 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
         gap: 5px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: var(--mat-sys-surface-container-high);
-        color: var(--mat-sys-on-surface-variant);
+        background: var(--mat-sys-on-primary);
+        color: #000000;
         font-size: 10px;
         font-weight: 500;
         line-height: 1.4;
@@ -235,7 +235,7 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
         height: 6px;
         flex-shrink: 0;
         border-radius: 50%;
-        background: var(--mat-sys-on-surface-variant);
+        background: currentColor;
         opacity: 0.45;
 
         &--waiting {
