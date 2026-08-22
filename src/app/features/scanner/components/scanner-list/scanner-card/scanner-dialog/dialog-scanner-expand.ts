@@ -222,8 +222,8 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
         gap: 5px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: var(--mat-sys-background);
-        color: var(--mat-sys-on-background);
+        background: var(--mat-sys-surface);
+        color: var(--mat-sys-on-surface);
         font-size: 10px;
         font-weight: 500;
         line-height: 1.4;
