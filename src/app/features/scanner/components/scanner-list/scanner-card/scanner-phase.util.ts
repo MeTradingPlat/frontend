@@ -46,9 +46,15 @@ export function computeScannerPhase(
   const endMin = utcTimeToMinutes(horaFinUTC);
   const nowMin = utcMinutesOfDay(now);
 
-  const withinWindow = startMin <= endMin
+  // El rango horario solo no alcanza -- sin el chequeo de dia habil, un
+  // sabado/domingo/feriado cuya hora de reloj cae dentro de la ventana
+  // configurada mostraba ACTIVE (spinner girando) aunque el backend
+  // (is_within_window/next_trading_window en signal-processing-service) este
+  // correctamente dormido esperando el proximo dia habil.
+  const withinWindow = (startMin <= endMin
     ? nowMin >= startMin && nowMin <= endMin
-    : nowMin >= startMin || nowMin <= endMin;
+    : nowMin >= startMin || nowMin <= endMin)
+    && (!calendario || calendario.hoyEsDiaHabil);
 
   if (withinWindow) {
     return { phase: 'ACTIVE', translationKey: 'SCANNER.PHASE_ACTIVE', displayTime: horaFinLocal, day: '' };
