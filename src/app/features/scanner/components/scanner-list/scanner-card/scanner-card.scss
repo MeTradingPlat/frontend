@@ -34,26 +34,43 @@
         align-items: center;
     }
 
-    .status-badge {
+    // mat-chip neutro (traslucido sobre el primary del header, mismo
+    // tratamiento que phase-text/iconos) con un punto de color adentro que
+    // marca el estado -- patron de status pill de Google Cloud Console/
+    // Workspace. El punto usa --app-success/--app-warning, los mismos
+    // tokens que ya definio la app para exito/advertencia (Material 3 no
+    // trae esos roles semanticos, ver su definicion en styles.scss), en vez
+    // de rellenar todo el chip de color y arriesgar mal contraste de texto
+    // entre tema claro/oscuro.
+    .status-chip {
+        --mdc-chip-container-height: 20px;
+        --mdc-chip-elevated-container-color: rgba(255, 255, 255, 0.16);
+        --mdc-chip-label-text-color: var(--mat-sys-on-primary);
+        min-height: 20px;
         font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
-        padding: 2px 8px;
-        border-radius: 10px;
-        white-space: nowrap;
-        color: var(--mat-sys-on-primary);
 
-        &--stopped {
-            background: rgba(255, 255, 255, 0.16);
+        ::ng-deep .mdc-evolution-chip__text-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--mat-sys-on-primary);
+        opacity: 0.45;
 
         &--waiting {
-            background: #a66a00;
+            background: var(--app-warning);
+            opacity: 1;
         }
 
         &--running {
-            background: #1b7a3d;
+            background: var(--app-success);
+            opacity: 1;
         }
     }
 

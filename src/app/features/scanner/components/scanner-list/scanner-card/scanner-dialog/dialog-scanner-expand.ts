@@ -21,6 +21,7 @@ import { TimezoneService } from '../../../../../../core/services/timezone.servic
 import { ClockTickService } from '../../../../../../core/services/clock-tick.service';
 import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 import { CalendarFacadeService } from '../../../../services/calendar-facade.service';
+import { MatChipsModule } from '@angular/material/chips';
 import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerStatus } from '../scanner-phase.util';
 
 @Component({
@@ -34,6 +35,7 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
     MatIconModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
+    MatChipsModule,
     TranslatePipe,
     ScannerSignalsTab,
     ScannerNewsTab,
@@ -94,9 +96,10 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
               [matTooltip]="'SCANNER.CLOSE' | translate"
             ></i>
           </div>
-          <span class="status-badge" [class]="'status-badge--' + status().toLowerCase()">
+          <mat-chip class="status-chip">
+            <span class="status-dot" [class]="'status-dot--' + status().toLowerCase()"></span>
             {{ 'SCANNER.STATUS_' + status() | translate }}
-          </span>
+          </mat-chip>
         </div>
       </mat-card-header>
 
@@ -208,26 +211,36 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
         flex-shrink: 0;
       }
 
-      .status-badge {
+      // Ver el mismo comentario en scanner-card.scss.
+      .status-chip {
+        --mdc-chip-container-height: 20px;
+        --mdc-chip-elevated-container-color: rgba(255, 255, 255, 0.16);
+        --mdc-chip-label-text-color: var(--mat-sys-on-primary);
+        min-height: 20px;
         font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
-        padding: 2px 8px;
-        border-radius: 10px;
-        white-space: nowrap;
-        color: var(--mat-sys-on-primary);
 
-        &--stopped {
-          background: rgba(255, 255, 255, 0.16);
+        ::ng-deep .mdc-evolution-chip__text-label {
+          display: flex;
+          align-items: center;
+          gap: 5px;
         }
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--mat-sys-on-primary);
+        opacity: 0.45;
 
         &--waiting {
-          background: #a66a00;
+          background: var(--app-warning);
+          opacity: 1;
         }
 
         &--running {
-          background: #1b7a3d;
+          background: var(--app-success);
+          opacity: 1;
         }
       }
 

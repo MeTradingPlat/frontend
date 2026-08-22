@@ -23,6 +23,7 @@ import { TimezoneService } from '../../../../../core/services/timezone.service';
 import { ClockTickService } from '../../../../../core/services/clock-tick.service';
 import { I18nService } from '../../../../../core/services/i18n/i18n.service';
 import { CalendarFacadeService } from '../../../services/calendar-facade.service';
+import { MatChipsModule } from '@angular/material/chips';
 import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerStatus } from './scanner-phase.util';
 
 
@@ -34,6 +35,7 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
     MatButtonModule,
     MatTabsModule,
     MatBadgeModule,
+    MatChipsModule,
     MatTooltipModule,
     TranslatePipe,
     RouterLink,
