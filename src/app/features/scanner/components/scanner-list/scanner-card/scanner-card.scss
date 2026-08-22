@@ -44,28 +44,26 @@
         align-items: center;
     }
 
-    // Pill de estado -- fondo del mismo color que los iconos del header
-    // (--mat-sys-on-primary). Texto en --mat-sys-primary, NO negro fijo:
-    // Material 3 intercambia el tono de primary/on-primary entre tema claro
-    // y oscuro (en oscuro, on-primary se oscurece para seguir contrastando
-    // contra un primary que ahi se aclara) -- un negro fijo se volvia
-    // invisible en modo oscuro (confirmado en vivo el 2026-08-22).
-    // --mat-sys-primary es la pareja que Material ya garantiza legible
-    // contra on-primary en ambos temas, sin fijar nada a mano. Punto de
-    // color adentro marca el estado (patron de status pill de Google Cloud
-    // Console/Workspace) con --app-success/--app-warning, los mismos
-    // tokens que ya definio la app para exito/advertencia (Material 3 no
-    // trae esos roles semanticos). Span propio en vez de mat-chip: el
-    // padding/alto interno de MDC no se dejaba compactar del todo y quedaba
-    // un rectangulo mas alto y corrido a la izquierda de lo esperado.
+    // Pill de estado -- fondo del mismo color que el fondo de la app
+    // (--mat-sys-background, el #18191a/blanco de body.dark-mode/light-mode
+    // en styles.scss) para que se note como una pieza aparte apoyada sobre
+    // el primary del header, con texto en --mat-sys-on-background (la
+    // pareja que Material ya garantiza legible contra background en ambos
+    // temas). Punto de color adentro marca el estado (patron de status
+    // pill de Google Cloud Console/Workspace) con
+    // --app-success/--app-warning, los mismos tokens que ya definio la app
+    // para exito/advertencia (Material 3 no trae esos roles semanticos).
+    // Span propio en vez de mat-chip: el padding/alto interno de MDC no se
+    // dejaba compactar del todo y quedaba un rectangulo mas alto y corrido
+    // a la izquierda de lo esperado.
     .status-pill {
         display: inline-flex;
         align-items: center;
         gap: 5px;
         padding: 2px 8px;
         border-radius: 999px;
-        background: var(--mat-sys-on-primary);
-        color: var(--mat-sys-primary);
+        background: var(--mat-sys-background);
+        color: var(--mat-sys-on-background);
         font-size: 10px;
         font-weight: 500;
         line-height: 1.4;
