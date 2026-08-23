@@ -3,12 +3,23 @@ import { catchError, throwError } from 'rxjs';
 import { ApiError } from '../models/api-error';
 import { inject } from '@angular/core';
 import { NotificationService } from '../services/notification/notification.service';
+import { AuthService } from '../auth/auth.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notificationService = inject(NotificationService);
+  const authService = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // El token puede vencer con la app ya abierta (no solo al arrancarla,
+      // que ya cubre AuthService.isTokenExpired) -- un 401 en cualquier
+      // llamada real fuerza logout+redirect en vez de dejar al usuario
+      // viendo errores sueltos por toda la app. Se excluye /auth/login para
+      // no confundir credenciales invalidas con sesion vencida.
+      if (error.status === 401 && !req.url.includes('/auth/login')) {
+        authService.logout();
+      }
+
       let apiError: ApiError;
 
       // Si el backend envía un error estructurado con 'codigo' (gateway

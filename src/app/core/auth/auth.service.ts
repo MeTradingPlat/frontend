@@ -36,7 +36,13 @@ export class AuthService {
     if (userData && token) {
       try {
         const user = JSON.parse(userData);
-        if (user.token === token) {
+        // Sin esto, un token vencido (ej. abrir la app tras varios dias sin
+        // usarla -- el backend los emite con 3 dias de validez) dejaba
+        // entrar igual: isAuthenticated() solo miraba si HABIA un string en
+        // localStorage, nunca si seguia siendo valido. El usuario recien se
+        // enteraba al chocar con un 401 en la primera llamada real (ej. al
+        // abrir Escaneres), en vez de quedar fuera desde el arranque.
+        if (user.token === token && !this.isTokenExpired(token)) {
           this.currentUser.set(user);
         } else {
           this.logout();
@@ -46,6 +52,19 @@ export class AuthService {
       }
     } else {
       this.currentUser.set(null);
+    }
+  }
+
+  // Decodifica el payload del JWT (segundo segmento, base64url) para leer
+  // "exp" sin depender de una libreria -- el token es autocontenido, no
+  // hace falta preguntarle al backend si ya vencio.
+  private isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      if (!payload.exp) return false;
+      return Date.now() >= payload.exp * 1000;
+    } catch {
+      return true;
     }
   }
 
@@ -78,7 +97,8 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token && !this.isTokenExpired(token);
   }
 
   isEditor(): boolean {
