@@ -188,6 +188,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private series: ISeriesApi<'Candlestick'> | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
   private pivotPriceLines: IPriceLine[] = [];
+  // Los pivots son D1 fijo, independientes del timeframe que se este viendo
+  // en el chart -- cambiar de timeframe no invalida esta respuesta, solo
+  // cambiar de simbolo (comparado via lastPivotsResponse.symbol).
+  private lastPivotsResponse: PivotsResponse | null = null;
   private signalLinePrimitive: VerticalLinePrimitive | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
@@ -322,7 +326,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.signalLinePrimitive = null; // se destruyo junto con la serie removida
     this.buyPriceLineRef = null; // se destruyo junto con la serie removida
     this.pivotPriceLines = []; // se destruyeron junto con la serie removida
-    this.pivotsActive.set(false);
+    if (this.pivotsActive() && this.lastPivotsResponse?.symbol === this.symbol) {
+      // Mismo simbolo, solo cambio el timeframe visible -- redibuja sobre la
+      // serie nueva sin volver a pedir (los pivots no dependen de este timeframe).
+      this.drawPivots(this.lastPivotsResponse);
+    } else {
+      this.pivotsActive.set(false);
+      this.lastPivotsResponse = null;
+    }
     this.applyBuyPriceLine();
     this.drawingManager?.setSeries(this.series);
     this.isLoading.set(true);
@@ -594,6 +605,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   togglePivots(): void {
     if (this.pivotsActive()) {
       this.pivotsActive.set(false);
+      this.lastPivotsResponse = null;
       this.clearPivots();
       return;
     }
@@ -609,6 +621,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
           this.pivotsActive.set(false);
           return;
         }
+        this.lastPivotsResponse = response;
         this.drawPivots(response);
       },
       error: () => {
