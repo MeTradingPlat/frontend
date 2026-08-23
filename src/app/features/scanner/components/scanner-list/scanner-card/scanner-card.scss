@@ -90,13 +90,17 @@
         }
     }
 
+    // Envuelve en vez de truncar con ellipsis -- en movil, con la card
+    // encogida, el nowrap+ellipsis de antes terminaba empujando los iconos
+    // fuera del limite de la card en vez de recortarse (el texto de fase
+    // puede ser largo, ej. "Abre en 2 horas 15 minutos"). Mismo
+    // comportamiento que ya tiene el nombre del escaner cuando es muy largo:
+    // pasa a una segunda linea en vez de desbordar.
     .phase-text {
         color: var(--mat-sys-on-primary);
         opacity: 0.75;
         font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        word-break: break-word;
 
         &.phase-text--empty {
             visibility: hidden;

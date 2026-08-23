@@ -190,13 +190,14 @@ import { computeScannerPhase, computeScannerStatus, ScannerPhaseResult, ScannerS
         margin: 0;
       }
 
+      // Envuelve en vez de truncar -- ver scanner-card.scss para el detalle
+      // completo (nowrap+ellipsis empujaba los iconos fuera de la card en
+      // movil en vez de recortarse).
       .phase-text {
         color: var(--mat-sys-on-primary);
         opacity: 0.75;
         font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        word-break: break-word;
 
         &.phase-text--empty {
           visibility: hidden;
