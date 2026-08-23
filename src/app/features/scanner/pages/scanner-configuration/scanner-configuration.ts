@@ -12,6 +12,7 @@ import { Filtro } from '../../models/filtro.interface';
 import { CardTime } from "../../components/scanner-configuration/card-time/card-time";
 import { CardMarket } from '../../components/scanner-configuration/card-market/card-market';
 import { CardSelectedFilters } from "../../components/scanner-configuration/card-selected-filters/card-selected-filters";
+import { CardExitIndicatorsPreview } from "../../components/scanner-configuration/card-exit-indicators-preview/card-exit-indicators-preview";
 import { MatDialog } from '@angular/material/dialog';
 import { DialogAddFilters } from '../../components/scanner-configuration/dialog-add-filters/dialog-add-filters';
 import { isValidationErrorResponse, isScannerFieldErrors, ValidationErrorResponse, ScannerFieldErrors } from '../../models/api-error.interface';
@@ -27,7 +28,8 @@ import { NotificationService } from '../../../../core/services/notification/noti
     PageError,
     CardTime,
     CardMarket,
-    CardSelectedFilters
+    CardSelectedFilters,
+    CardExitIndicatorsPreview
 ],
   templateUrl: './scanner-configuration.html',
   styleUrl: './scanner-configuration.scss',

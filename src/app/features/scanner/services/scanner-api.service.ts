@@ -8,6 +8,7 @@ import { MercadoDTORespuesta } from '../models/mercado.interface';
 import { FiltroDtoRespuesta, FiltroDtoPeticion } from '../models/filtro.interface';
 import { CategoriaDTORespuesta } from '../models/categoria.interface';
 import { CalendarioEstadoDTORespuesta } from '../models/calendario-estado.interface';
+import { IndicadorSalidaDtoRespuesta } from '../models/indicador-salida.interface';
 // Eliminar ApiError, ya que el interceptor lo maneja
 
 /**
@@ -21,6 +22,7 @@ export class ScannerApiService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/escaner`;
   private readonly filtroApiUrl = `${environment.apiUrl}/escaner/filtro`;
+  private readonly indicadorSalidaApiUrl = `${environment.apiUrl}/escaner/indicador-salida`;
 
   /**
    * Obtiene todos los escaneres activos
@@ -154,7 +156,26 @@ export class ScannerApiService {
   guardarFiltrosEscaner(idEscaner: number, filtros: FiltroDtoPeticion[]): Observable<FiltroDtoRespuesta[]> {
     return this.http.post<FiltroDtoRespuesta[]>(`${this.filtroApiUrl}/escaner/${idEscaner}`, filtros);
   }
-  
+
+  // ===== MÉTODOS DE INDICADORES DE SALIDA (stop loss / take profit) =====
+  // Catalogo de solo lectura por ahora -- todavia no hay endpoint para
+  // asociar un indicador de salida a un escaner.
+
+  /**
+   * Lista el catálogo de indicadores de salida disponibles
+   */
+  getIndicadoresSalida(): Observable<IndicadorSalidaDtoRespuesta[]> {
+    return this.http.get<IndicadorSalidaDtoRespuesta[]>(this.indicadorSalidaApiUrl);
+  }
+
+  /**
+   * Obtiene un indicador de salida con sus valores por defecto
+   */
+  getIndicadorSalidaPorDefecto(enumIndicadorSalida: string): Observable<IndicadorSalidaDtoRespuesta> {
+    return this.http.get<IndicadorSalidaDtoRespuesta>(`${this.indicadorSalidaApiUrl}/defecto`, {
+      params: { indicador: enumIndicadorSalida }
+    });
+  }
 
   // Eliminar el método handleError, ya que ahora se maneja en el interceptor
 }

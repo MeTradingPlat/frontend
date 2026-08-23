@@ -9,6 +9,7 @@ import { Mercado, MercadoDTORespuesta } from '../models/mercado.interface';
 import { ApiError } from '../../../core/models/api-error';
 import { Filtro, FiltroDtoRespuesta, FiltroDtoPeticion } from '../models/filtro.interface';
 import { Categoria, CategoriaDTORespuesta } from '../models/categoria.interface';
+import { IndicadorSalida, IndicadorSalidaDtoRespuesta } from '../models/indicador-salida.interface';
 import { ValorDTORespuesta, ValorDTOPeticion } from '../models/valor.interface';
 import { ValorTipado } from '../models/parametro.interface';
 import { ValorInteger } from '../models/valor-integer.interface';
@@ -33,6 +34,7 @@ export class ScannerFacadeService {
   public mercados = signal<Mercado[]>([]);
   public categoriasFiltros = signal<Categoria[]>([]);
   public filtrosEscaner = signal<Filtro[]>([]);
+  public indicadoresSalida = signal<IndicadorSalida[]>([]);
   public loading = signal<boolean>(false);
   public error = signal<ApiError | null>(null);
   public selectedScanner = signal<Escaner | null>(null);
@@ -361,6 +363,7 @@ export class ScannerFacadeService {
     this.mercados.set([]);
     this.categoriasFiltros.set([]);
     this.filtrosEscaner.set([]);
+    this.indicadoresSalida.set([]);
     this.error.set(null);
     this.loading.set(false);
     this.selectedScanner.set(null);
@@ -496,6 +499,31 @@ export class ScannerFacadeService {
         return throwError(() => error);
       }),
       finalize(() => this.loading.set(false))
+    );
+  }
+
+  // ===== MÉTODOS DE INDICADORES DE SALIDA (stop loss / take profit) =====
+  // Solo lectura de catalogo por ahora, sin persistencia por escaner.
+
+  /**
+   * Lista el catálogo de indicadores de salida disponibles SIN modificar el
+   * estado global de loading/error -- es una vista previa, no debe bloquear
+   * el resto de la pantalla de configuración si falla.
+   */
+  loadIndicadoresSalidaSilent(): Observable<IndicadorSalida[]> {
+    return this.apiService.getIndicadoresSalida().pipe(
+      map(dtos => dtos.map(dto => this.mapDTOToIndicadorSalida(dto))),
+      tap(indicadores => this.indicadoresSalida.set(indicadores))
+    );
+  }
+
+  /**
+   * Obtiene un indicador de salida con sus valores por defecto SIN modificar
+   * el estado global de loading/error
+   */
+  getIndicadorSalidaPorDefectoSilent(enumIndicadorSalida: string): Observable<IndicadorSalida> {
+    return this.apiService.getIndicadorSalidaPorDefecto(enumIndicadorSalida).pipe(
+      map(dto => this.mapDTOToIndicadorSalida(dto))
     );
   }
 
@@ -713,6 +741,28 @@ export class ScannerFacadeService {
     }
 
     return baseDTO;
+  }
+
+  /**
+   * Convierte un DTO de indicador de salida a modelo de dominio. Reusa
+   * mapDTOToValorTipado y renombra enumParametroIndicadorSalida ->
+   * enumParametro para que sus parametros calcen con la interfaz Parametro
+   * generica y se puedan renderizar con los mismos
+   * app-integer-parameter/app-float-parameter/app-options-parameter que ya
+   * usan los filtros, sin duplicar esos componentes.
+   */
+  private mapDTOToIndicadorSalida(dto: IndicadorSalidaDtoRespuesta): IndicadorSalida {
+    return {
+      enumIndicadorSalida: dto.enumIndicadorSalida,
+      etiquetaNombre: dto.etiquetaNombre,
+      etiquetaDescripcion: dto.etiquetaDescripcion,
+      parametros: (dto.parametros || []).map(param => ({
+        enumParametro: param.enumParametroIndicadorSalida,
+        etiqueta: param.etiqueta,
+        objValorSeleccionado: this.mapDTOToValorTipado(param.objValorSeleccionado),
+        opciones: (param.opciones || []).map(opcion => this.mapDTOToValorTipado(opcion))
+      }))
+    };
   }
 
   /**

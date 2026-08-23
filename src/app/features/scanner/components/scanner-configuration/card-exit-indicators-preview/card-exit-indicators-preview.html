@@ -1,0 +1,37 @@
+<mat-card class="scanner-card preview-card" appearance="outlined">
+  <mat-card-header class="scanner-card-header">
+    <mat-card-title class="scanner-card-title">{{ 'SCANNER.EXIT_INDICATORS' | translate }}</mat-card-title>
+    <span class="preview-badge">{{ 'SCANNER.EXIT_INDICATORS_PREVIEW_BADGE' | translate }}</span>
+  </mat-card-header>
+  <mat-card-content class="scanner-card-content">
+    <p class="preview-note">{{ 'SCANNER.EXIT_INDICATORS_PREVIEW_NOTE' | translate }}</p>
+    <div class="indicators-grid">
+      @for (indicador of indicadores(); track indicador.enumIndicadorSalida) {
+        <mat-card class="indicator-card" appearance="outlined">
+          <mat-card-header class="indicator-card-header">
+            <mat-card-title class="indicator-card-title">{{indicador.etiquetaNombre}}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="indicator-card-content">
+            <p class="indicator-card-description">{{indicador.etiquetaDescripcion}}</p>
+            @for (parametro of indicador.parametros; track parametro.enumParametro) {
+              @switch (parametro.objValorSeleccionado.enumTipoValor) {
+                @case ('INTEGER') {
+                  <app-integer-parameter [(parametro)]="indicador.parametros[$index]" />
+                }
+                @case ('FLOAT') {
+                  <app-float-parameter [(parametro)]="indicador.parametros[$index]" />
+                }
+                @case ('STRING') {
+                  <app-options-parameter [(parametro)]="indicador.parametros[$index]" />
+                }
+                @case ('CONDICIONAL') {
+                  <app-conditional-parameter [(parametro)]="indicador.parametros[$index]" />
+                }
+              }
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
