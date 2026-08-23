@@ -300,7 +300,24 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       downColor: '#ef5350',
       borderVisible: false,
       wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350'
+      wickDownColor: '#ef5350',
+      // autoScale de lightweight-charts solo mira los datos de la serie, no
+      // las price lines (limitacion documentada de la libreria, issue
+      // tradingview/lightweight-charts#1587) -- un pivot lejos de las velas
+      // visibles quedaba fuera del eje vertical, invisible sin hacer zoom
+      // manual. autoscaleInfoProvider es la extension oficial para esto.
+      autoscaleInfoProvider: (original) => {
+        const res = original();
+        if (!res || !this.pivotsActive() || !this.lastPivotsResponse) return res;
+        const precios = [
+          ...this.lastPivotsResponse.resistances.map(r => r.price),
+          ...this.lastPivotsResponse.supports.map(s => s.price)
+        ];
+        if (!precios.length) return res;
+        res.priceRange.minValue = Math.min(res.priceRange.minValue, ...precios);
+        res.priceRange.maxValue = Math.max(res.priceRange.maxValue, ...precios);
+        return res;
+      }
     });
   }
 
