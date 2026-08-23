@@ -117,9 +117,12 @@ export class ScannerListArchives implements OnInit, AfterViewInit {
 
   onExpandScanner(scanner: Escaner): void {
     this.dialog.open(DialogScannerExpand, {
-      width: '90vw',
+      // 90vw en movil queda mas angosto que la propia card sin ampliar (ver
+      // scanner-card.ts::openScannerDialog) -- calc(100vw - 40px) iguala el
+      // padding real de scanner-list-archives.scss (.page-content: 20px).
+      width: window.innerWidth <= 768 ? 'calc(100vw - 40px)' : '90vw',
       maxWidth: '1400px',
-      height: '90vh',
+      height: window.innerWidth <= 768 ? '80vh' : '90vh',
       data: scanner,
       enterAnimationDuration: '300ms',
       exitAnimationDuration: '200ms',

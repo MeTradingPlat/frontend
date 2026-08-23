@@ -136,7 +136,12 @@ export class ScannerCardComponent implements OnInit, OnDestroy {
 
   openScannerDialog(scanner: Escaner): void {
     this.dialog.open(DialogScannerExpand, {
-      width: '90vw',
+      // 90vw en movil quedaba mas angosto que la propia card sin ampliar
+      // (scanner-list.scss usa padding:15px -> ~30px de margen real de
+      // pagina, contra los ~10vw/74px+ que 90vw le resta en un telefono
+      // chico) -- calc(100vw - 30px) iguala ese mismo margen en vez de un
+      // porcentaje que no tiene relacion con el layout real.
+      width: window.innerWidth <= 768 ? 'calc(100vw - 30px)' : '90vw',
       maxWidth: '1400px',
       height: window.innerWidth <= 768 ? '80vh' : '90vh',
       data: scanner,
