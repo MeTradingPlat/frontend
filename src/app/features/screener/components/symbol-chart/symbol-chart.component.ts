@@ -21,7 +21,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import {
-  CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
+  AutoscaleInfo, CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
   LogicalRange, Time, createChart
 } from 'lightweight-charts';
 import { Subscription } from 'rxjs';
@@ -306,9 +306,9 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       // tradingview/lightweight-charts#1587) -- un pivot lejos de las velas
       // visibles quedaba fuera del eje vertical, invisible sin hacer zoom
       // manual. autoscaleInfoProvider es la extension oficial para esto.
-      autoscaleInfoProvider: (original) => {
+      autoscaleInfoProvider: (original: () => AutoscaleInfo | null) => {
         const res = original();
-        if (!res || !this.pivotsActive() || !this.lastPivotsResponse) return res;
+        if (!res || !res.priceRange || !this.pivotsActive() || !this.lastPivotsResponse) return res;
         const precios = [
           ...this.lastPivotsResponse.resistances.map(r => r.price),
           ...this.lastPivotsResponse.supports.map(s => s.price)
