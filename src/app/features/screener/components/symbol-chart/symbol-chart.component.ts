@@ -600,8 +600,15 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.pivotsActive.set(true);
     this.pivotsLoading.set(true);
     this.screenerService.getPivots(this.symbol).subscribe({
+      // El backend responde 204 (exito, sin cuerpo -- no es un error HTTP)
+      // cuando no pudo calcular pivots para el simbolo, asi que response
+      // llega null aca, no al callback de error.
       next: (response) => {
         this.pivotsLoading.set(false);
+        if (!response) {
+          this.pivotsActive.set(false);
+          return;
+        }
         this.drawPivots(response);
       },
       error: () => {
