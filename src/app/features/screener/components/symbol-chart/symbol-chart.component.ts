@@ -29,6 +29,7 @@ import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
 import { TimezoneService } from '../../../../core/services/timezone.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
+import { PivotsResponse } from '../../models/pivots.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
 import { VerticalLinePrimitive } from './drawing/vertical-line-primitive';
 import { PageMaintenance } from '../../../../shared/components/ui/page-maintenance/page-maintenance';
@@ -166,6 +167,8 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly maintenance = signal<boolean>(false);
   readonly drawingTool = signal<DrawingTool>('cursor');
   readonly drawingHint = signal<string | null>(null);
+  readonly pivotsActive = signal(false);
+  readonly pivotsLoading = signal(false);
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
@@ -184,6 +187,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private chart: IChartApi | null = null;
   private series: ISeriesApi<'Candlestick'> | null = null;
   private buyPriceLineRef: IPriceLine | null = null;
+  private pivotPriceLines: IPriceLine[] = [];
   private signalLinePrimitive: VerticalLinePrimitive | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
@@ -317,6 +321,8 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.series = this.addCandlestickSeries();
     this.signalLinePrimitive = null; // se destruyo junto con la serie removida
     this.buyPriceLineRef = null; // se destruyo junto con la serie removida
+    this.pivotPriceLines = []; // se destruyeron junto con la serie removida
+    this.pivotsActive.set(false);
     this.applyBuyPriceLine();
     this.drawingManager?.setSeries(this.series);
     this.isLoading.set(true);
@@ -579,5 +585,53 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       axisLabelVisible: true,
       title: 'Compra (simulada)'
     });
+  }
+
+  // Picos y valles (Pivots) -- exploratorio, con los valores por defecto del
+  // indicador de salida en configuracion de escaner (ATR 14, 5 años D1, 1
+  // nivel por lado). Toggle: un segundo click limpia las lineas sin
+  // reconsultar.
+  togglePivots(): void {
+    if (this.pivotsActive()) {
+      this.pivotsActive.set(false);
+      this.clearPivots();
+      return;
+    }
+    this.pivotsActive.set(true);
+    this.pivotsLoading.set(true);
+    this.screenerService.getPivots(this.symbol).subscribe({
+      next: (response) => {
+        this.pivotsLoading.set(false);
+        this.drawPivots(response);
+      },
+      error: () => {
+        this.pivotsLoading.set(false);
+        this.pivotsActive.set(false);
+      }
+    });
+  }
+
+  private drawPivots(response: PivotsResponse): void {
+    this.clearPivots();
+    if (!this.series) return;
+    for (const resistencia of response.resistances) {
+      this.pivotPriceLines.push(this.series.createPriceLine({
+        price: resistencia.price, color: '#ef5350', lineWidth: 1, lineStyle: 3,
+        axisLabelVisible: true, title: 'Resistencia (pivot)'
+      }));
+    }
+    for (const soporte of response.supports) {
+      this.pivotPriceLines.push(this.series.createPriceLine({
+        price: soporte.price, color: '#26a69a', lineWidth: 1, lineStyle: 3,
+        axisLabelVisible: true, title: 'Soporte (pivot)'
+      }));
+    }
+  }
+
+  private clearPivots(): void {
+    for (const line of this.pivotPriceLines) {
+      this.series?.removePriceLine(line);
+    }
+    this.pivotPriceLines = [];
   }
 }

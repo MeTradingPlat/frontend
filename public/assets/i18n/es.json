@@ -203,6 +203,8 @@
     "TOOL_CURSOR": "Cursor (click sobre una línea para borrarla)",
     "TOOL_TRENDLINE_HINT": "Línea de tendencia: click en dos puntos del gráfico para trazarla",
     "TOOL_HLINE_HINT": "Línea horizontal: click en cualquier parte del gráfico para colocarla",
+    "TOOL_PIVOTS": "Pivots",
+    "TOOL_PIVOTS_HINT": "Busca picos y valles de precio (D1) cercanos al precio actual y los dibuja como soporte/resistencia",
     "HINT_TRENDLINE_START": "Haz click en el punto inicial de la línea",
     "HINT_TRENDLINE_END": "Ahora haz click en el punto final",
     "HINT_HLINE": "Haz click en el gráfico para colocar una línea horizontal",

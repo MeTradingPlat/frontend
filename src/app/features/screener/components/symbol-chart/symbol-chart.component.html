@@ -40,6 +40,21 @@
         <mat-icon>horizontal_rule</mat-icon>
       </mat-button-toggle>
     </mat-button-toggle-group>
+
+    <button
+      mat-stroked-button
+      class="pivots-btn"
+      [class.pivots-btn--active]="pivotsActive()"
+      [disabled]="pivotsLoading()"
+      [matTooltip]="'ASSETS.TOOL_PIVOTS_HINT' | translate"
+      (click)="togglePivots()">
+      @if (pivotsLoading()) {
+        <mat-spinner diameter="16"></mat-spinner>
+      } @else {
+        <mat-icon>terrain</mat-icon>
+      }
+      {{ 'ASSETS.TOOL_PIVOTS' | translate }}
+    </button>
   </div>
 
   @if (drawingHint()) {

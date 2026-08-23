@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Market, PaginatedResponse, Symbol, SymbolDetails, Timeframe } from '../models/screener.models';
 import { HistoricalCandleDTO } from '../models/candle.models';
+import { PivotsResponse } from '../models/pivots.models';
 
 /**
  * ScreenerService
@@ -24,6 +25,10 @@ import { HistoricalCandleDTO } from '../models/candle.models';
 export class ScreenerService {
   private marketDataUrl = environment.marketDataUrl;
   private analysisUrl = environment.technicalAnalysisUrl;
+  // Proxy en scanner-management-service hacia signal-processing-service --
+  // este ultimo no esta expuesto en el gateway (ver gateway/application.yml),
+  // solo se comunica dentro de la red Docker.
+  private pivotsUrl = `${environment.apiUrl}/escaner/pivots`;
   private http = inject(HttpClient);
 
   getMarkets(): Observable<Market[]> {
@@ -70,5 +75,14 @@ export class ScreenerService {
   getTechnicalIndicators(symbol: string): Observable<any> {
     return this.http.get<any>(`${this.analysisUrl}/${symbol}`)
       .pipe(map(response => response.indicators));
+  }
+
+  /**
+   * GET /escaner/pivots/{symbol} — picos/valles de precio (D1) cercanos al
+   * precio actual, con los parametros por defecto del indicador de salida
+   * Pivots (ATR 14, 5 años de histórico, 1 nivel por lado).
+   */
+  getPivots(symbol: string): Observable<PivotsResponse> {
+    return this.http.get<PivotsResponse>(`${this.pivotsUrl}/${symbol}`);
   }
 }

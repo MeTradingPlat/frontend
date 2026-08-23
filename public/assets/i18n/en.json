@@ -203,6 +203,8 @@
     "TOOL_CURSOR": "Cursor (click a line to delete it)",
     "TOOL_TRENDLINE_HINT": "Trend line: click two points on the chart to draw one",
     "TOOL_HLINE_HINT": "Horizontal line: click anywhere on the chart to place one",
+    "TOOL_PIVOTS": "Pivots",
+    "TOOL_PIVOTS_HINT": "Finds price swing highs/lows (D1) near the current price and draws them as support/resistance",
     "HINT_TRENDLINE_START": "Click the starting point of the trend line",
     "HINT_TRENDLINE_END": "Now click the ending point",
     "HINT_HLINE": "Click on the chart to place a horizontal line",

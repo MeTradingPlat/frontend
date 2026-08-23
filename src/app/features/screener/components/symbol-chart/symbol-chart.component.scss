@@ -55,6 +55,23 @@
   }
 }
 
+.pivots-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+
+  &--active {
+    background: var(--mat-sys-secondary-container, rgba(33, 150, 243, 0.15));
+    color: var(--mat-sys-on-secondary-container, #2196f3);
+  }
+}
+
 .drawing-hint {
   align-self: flex-start;
   padding: 0.25rem 0.75rem;
