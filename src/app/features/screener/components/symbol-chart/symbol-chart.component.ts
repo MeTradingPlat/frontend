@@ -618,19 +618,28 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     });
   }
 
+  // Fuerte vs debil se dibujan por separado (no fusionados en un solo
+  // "Resistencia"/"Soporte") -- mismo criterio que la referencia
+  // (PivotsAlpaca: Pico/Valle Fuerte/Debil como 4 lineas distintas). Fuerte
+  // en linea solida mas gruesa (mayor confianza), debil punteada mas fina
+  // (relleno automático cuando no hay suficientes fuertes).
   private drawPivots(response: PivotsResponse): void {
     this.clearPivots();
     if (!this.series) return;
     for (const resistencia of response.resistances) {
+      const esFuerte = resistencia.strength === 'strong';
       this.pivotPriceLines.push(this.series.createPriceLine({
-        price: resistencia.price, color: '#ef5350', lineWidth: 1, lineStyle: 3,
-        axisLabelVisible: true, title: 'Resistencia (pivot)'
+        price: resistencia.price, color: '#ef5350', lineWidth: esFuerte ? 2 : 1,
+        lineStyle: esFuerte ? 2 : 1, axisLabelVisible: true,
+        title: esFuerte ? 'Resistencia fuerte' : 'Resistencia débil'
       }));
     }
     for (const soporte of response.supports) {
+      const esFuerte = soporte.strength === 'strong';
       this.pivotPriceLines.push(this.series.createPriceLine({
-        price: soporte.price, color: '#26a69a', lineWidth: 1, lineStyle: 3,
-        axisLabelVisible: true, title: 'Soporte (pivot)'
+        price: soporte.price, color: '#26a69a', lineWidth: esFuerte ? 2 : 1,
+        lineStyle: esFuerte ? 2 : 1, axisLabelVisible: true,
+        title: esFuerte ? 'Soporte fuerte' : 'Soporte débil'
       }));
     }
   }
