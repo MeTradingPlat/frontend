@@ -209,7 +209,7 @@ export class ScannerList implements OnInit, OnDestroy {
         this.facade.escaners.set(updatedScanners);
       },
       error: (err) => {
-        const errorMessage = err?.error?.mensaje || err?.message || this.translate.instant('SCANNER.STATE_CHANGE_ERROR');
+        const errorMessage = err?.mensaje || err?.error?.mensaje || err?.message || this.translate.instant('SCANNER.STATE_CHANGE_ERROR');
         this.notificationService.showError(errorMessage);
       }
     });

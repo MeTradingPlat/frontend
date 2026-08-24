@@ -23,10 +23,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       let apiError: ApiError;
 
       // Si el backend envía un error estructurado con 'codigo' (gateway
-      // legacy) o 'code' (marketdata-service, ej. MAINTENANCE durante el
-      // refill) -- ambos se mapean al mismo ApiError.
+      // legacy), 'code' (marketdata-service, ej. MAINTENANCE durante el
+      // refill) o 'codigoError' (scanner-management-service, RFC 7807, ej.
+      // GC-0005 "No se puede guardar un escáner mientras está en ejecución")
+      // -- todos se mapean al mismo ApiError. Sin 'codigoError' el mensaje
+      // real del backend se perdia y el usuario veia el generico "Http
+      // failure response for..." (confirmado en vivo el 2026-08-24).
       const backendError = error.error;
-      const code = backendError?.codigo ?? backendError?.code;
+      const code = backendError?.codigo ?? backendError?.code ?? backendError?.codigoError;
       const message = backendError?.mensaje ?? backendError?.message;
       if (code) {
         apiError = {

@@ -388,8 +388,12 @@ export class ScannerConfiguration implements OnInit {
    * - Manejar múltiples filtros del mismo tipo
    */
   private handleValidationErrors(err: any): void {
-    if (err.error && isValidationErrorResponse(err.error)) {
-      const response: ValidationErrorResponse = err.error;
+    // El interceptor aplana el error en ApiError (sin .error) -- sin el
+    // fallback, los errores de validacion de filtros se perdian en el
+    // console.error y el usuario no veia que filtro fallaba.
+    const errorBody = err.error ?? err;
+    if (errorBody && isValidationErrorResponse(errorBody)) {
+      const response: ValidationErrorResponse = errorBody;
       const errors: Record<string, Record<string, string>> = {};
 
       // Mapear errores usando la estructura mejorada del backend
@@ -434,9 +438,12 @@ export class ScannerConfiguration implements OnInit {
     // console.log('err.error.mensaje:', err.error?.mensaje);
     // console.log('=============================');
 
-    // Verificar si es estructura RFC 7807
-    if (err.error && err.error.codigoError && err.error.mensaje) {
-      const mensaje = err.error.mensaje;
+    // Verificar si es estructura RFC 7807 (cruda, con .error) o el ApiError
+    // ya aplanado por el interceptor (codigoError/mensaje a nivel raiz) --
+    // ambos tienen el mismo cuerpo, solo cambia la profundidad.
+    const errorBody = err.error ?? err;
+    if (errorBody && errorBody.codigoError && errorBody.mensaje) {
+      const mensaje = errorBody.mensaje;
       const errors: Record<string, string> = {};
 
       // console.log('Mensaje a parsear:', mensaje);
@@ -486,7 +493,7 @@ export class ScannerConfiguration implements OnInit {
       // Fallback para errores sin estructura esperada
       console.error('Error de validación de scanner en formato inesperado:', err);
       this.scannerErrors.set({
-        general: err.error?.mensaje || err.message || 'Error desconocido'
+        general: err?.mensaje || err.error?.mensaje || err.message || 'Error desconocido'
       });
     }
   }
@@ -496,7 +503,11 @@ export class ScannerConfiguration implements OnInit {
    * Útil para errores como "no se puede modificar un escáner en ejecución".
    */
   private mostrarErrorSnackbar(err: any): void {
-    const errorMessage = err?.error?.mensaje || err?.message
+    // El interceptor ya aplano el error del backend en el ApiError
+    // (codigoError/mensaje a nivel raiz, sin .error) -- sin leer err.mensaje
+    // el snackbar caia siempre en el mensaje generico de traduccion aunque
+    // el backend hubiera mandado el motivo real (ej. GC-0005).
+    const errorMessage = err?.mensaje || err?.error?.mensaje || err?.message
       || this.translate.instant('SCANNER.SAVE_ERROR');
     this.notificationService.showError(errorMessage);
   }
