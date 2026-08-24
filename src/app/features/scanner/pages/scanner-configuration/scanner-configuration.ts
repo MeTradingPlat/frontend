@@ -265,29 +265,32 @@ export class ScannerConfiguration implements OnInit {
     onSuccess: () => void
   ): void {
     if (this.isEditMode() && scannerId) {
-      // Modo edición: actualizar escaner y guardar filtros
-      this.facade.updateEscaner(scannerId, scanner).subscribe({
-        next: (updatedScanner) => {
-          this.scanner.set(updatedScanner);
-          // Siempre guardar filtros usando Silent para no mostrar loading/error global
-          this.facade.guardarFiltrosEscanerSilent(scannerId, filtros).subscribe({
-            next: (filtrosGuardados) => {
-              this.filtros.set(filtrosGuardados);
+      // Modo edición: guardar PRIMERO los filtros y luego el escaner. El
+      // PUT del escaner reinicia uno INICIADO (detener-guardar-iniciar en el
+      // backend) y el reinicio carga la config desde la BD: si los filtros
+      // se guardaran despues, el escaner arrancaria con los filtros viejos
+      // hasta el proximo reinicio manual.
+      this.facade.guardarFiltrosEscanerSilent(scannerId, filtros).subscribe({
+        next: (filtrosGuardados) => {
+          this.filtros.set(filtrosGuardados);
+          this.facade.updateEscaner(scannerId, scanner).subscribe({
+            next: (updatedScanner) => {
+              this.scanner.set(updatedScanner);
               this.validationErrors.set({}); // Limpiar errores de filtros si guardó exitosamente
               this.scannerErrors.set({}); // Limpiar errores de scanner si guardó exitosamente
               onSuccess();
             },
             error: (err) => {
-              console.error('Error al guardar los filtros:', err);
-              this.handleValidationErrors(err);
-              // NO continuar si falla el guardado de filtros
+              console.error('Error al actualizar el escáner:', err);
+              this.handleScannerValidationErrors(err);
+              this.mostrarErrorSnackbar(err);
             }
           });
         },
         error: (err) => {
-          console.error('Error al actualizar el escáner:', err);
-          this.handleScannerValidationErrors(err);
-          this.mostrarErrorSnackbar(err);
+          console.error('Error al guardar los filtros:', err);
+          this.handleValidationErrors(err);
+          // NO continuar si falla el guardado de filtros
         }
       });
     } else {
