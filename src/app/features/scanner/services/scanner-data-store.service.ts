@@ -13,6 +13,13 @@ interface SignalRow {
   metadatos?: string;
 }
 
+// Con 50, el primer lote de un escaner recien iniciado quedaba fuera de la
+// ventana visible: el tab mostraba como "primeras" senales las de ~20 min
+// despues del arranque (confirmado en vivo el 2026-08-24: 169 senales a las
+// 12:29:03, el tab solo mostraba desde las 12:49). El limite sigue acotado
+// para no renderizar listas gigantes.
+const MAX_SIGNALS = 200;
+
 @Injectable({ providedIn: 'root' })
 export class ScannerDataStore {
   private readonly logApi = inject(LogApiService);
@@ -45,7 +52,7 @@ export class ScannerDataStore {
     }
 
     const hoy = this._localToday();
-    this.logApi.getLogsPorEscanerYFecha(scannerId, hoy).subscribe({
+    this.logApi.getLogsPorEscanerYFecha(scannerId, hoy, 0, MAX_SIGNALS).subscribe({
       next: (logs: RegistroLogDTORespuesta[]) => {
         const signals: SignalRow[] = this._logsToSignals(logs);
 
@@ -61,7 +68,7 @@ export class ScannerDataStore {
                 metadatos: n.metadatos
               };
               signals.unshift(s);
-              if (signals.length > 50) signals.length = 50;
+              if (signals.length > MAX_SIGNALS) signals.length = MAX_SIGNALS;
               const entry = this.signalsCache.get(scannerId);
               if (entry) {
                 entry.data = [...signals];
