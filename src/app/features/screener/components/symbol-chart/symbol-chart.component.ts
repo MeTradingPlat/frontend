@@ -285,7 +285,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       autoSize: true,
       layout: { background: { color: 'transparent' }, textColor: '#c9d1d9' },
       grid: { vertLines: { color: '#2a2e39' }, horzLines: { color: '#2a2e39' } },
-      timeScale: { timeVisible: true, secondsVisible: false }
+      // rightOffset deja hueco despues de la ultima vela -- sin esto la vela
+      // en formacion queda pegada al borde derecho, sin espacio para verla
+      // "avanzar" a medida que llegan ticks nuevos.
+      timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 10 }
     });
     this.series = this.addCandlestickSeries();
     this.applyBuyPriceLine();
@@ -606,12 +609,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (this.pivotsActive()) {
       this.pivotsActive.set(false);
       this.clearPivots();
+      this.series?.priceScale().setAutoScale(true);
       return;
     }
     // Mismo simbolo ya consultado (toggle off/on) -- redibuja lo cacheado en
     // vez de volver a pedir. Los niveles son fijos mientras se siga viendo
     // el mismo simbolo; solo cambiar de simbolo invalida lastPivotsResponse
-    // (ver symbolChanged en ngOnChanges).
+    // (ver symbolChanged en ngOnChanges). Sin el alejamiento inicial -- ese
+    // solo aplica la primera vez que se calculan (ver el subscribe de abajo).
     if (this.lastPivotsResponse?.symbol === this.symbol) {
       this.pivotsActive.set(true);
       this.drawPivots(this.lastPivotsResponse);
@@ -631,12 +636,38 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
         }
         this.lastPivotsResponse = response;
         this.drawPivots(response);
+        this.applyInitialPivotZoom(response);
       },
       error: () => {
         this.pivotsLoading.set(false);
         this.pivotsActive.set(false);
       }
     });
+  }
+
+  // Aleja la vista lo justo para asomar los pivots que quedan fuera del
+  // rango natural de las velas visibles -- solo al calcularlos por primera
+  // vez (no en cada redibujo ni en cada tick del stream, que es lo que
+  // causaba el reajuste constante que se veia como si el precio "no se
+  // mantuviera" en timeframes intraday). SOFTEN < 1 para no ir hasta el
+  // pivot mas lejano de una vez, solo acercar la vista sin alejarla tanto
+  // como antes.
+  private static readonly PIVOT_ZOOM_SOFTEN = 0.35;
+
+  private applyInitialPivotZoom(response: PivotsResponse): void {
+    if (!this.series) return;
+    const priceScale = this.series.priceScale();
+    const visible = priceScale.getVisibleRange();
+    if (!visible) return;
+    const precios = [...response.resistances.map(r => r.price), ...response.supports.map(s => s.price)];
+    if (!precios.length) return;
+    const minPivot = Math.min(...precios);
+    const maxPivot = Math.max(...precios);
+    const from = minPivot < visible.from ? visible.from - (visible.from - minPivot) * SymbolChartComponent.PIVOT_ZOOM_SOFTEN : visible.from;
+    const to = maxPivot > visible.to ? visible.to + (maxPivot - visible.to) * SymbolChartComponent.PIVOT_ZOOM_SOFTEN : visible.to;
+    if (from === visible.from && to === visible.to) return;
+    priceScale.setAutoScale(false);
+    priceScale.setVisibleRange({ from, to });
   }
 
   // Fuerte vs debil se dibujan por separado (no fusionados en un solo
