@@ -21,7 +21,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import {
-  AutoscaleInfo, CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
+  CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
   LogicalRange, Time, createChart
 } from 'lightweight-charts';
 import { Subscription } from 'rxjs';
@@ -300,24 +300,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       downColor: '#ef5350',
       borderVisible: false,
       wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
-      // autoScale de lightweight-charts solo mira los datos de la serie, no
-      // las price lines (limitacion documentada de la libreria, issue
-      // tradingview/lightweight-charts#1587) -- un pivot lejos de las velas
-      // visibles quedaba fuera del eje vertical, invisible sin hacer zoom
-      // manual. autoscaleInfoProvider es la extension oficial para esto.
-      autoscaleInfoProvider: (original: () => AutoscaleInfo | null) => {
-        const res = original();
-        if (!res || !res.priceRange || !this.pivotsActive() || !this.lastPivotsResponse) return res;
-        const precios = [
-          ...this.lastPivotsResponse.resistances.map(r => r.price),
-          ...this.lastPivotsResponse.supports.map(s => s.price)
-        ];
-        if (!precios.length) return res;
-        res.priceRange.minValue = Math.min(res.priceRange.minValue, ...precios);
-        res.priceRange.maxValue = Math.max(res.priceRange.maxValue, ...precios);
-        return res;
-      }
+      wickDownColor: '#ef5350'
     });
   }
 
@@ -622,8 +605,16 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   togglePivots(): void {
     if (this.pivotsActive()) {
       this.pivotsActive.set(false);
-      this.lastPivotsResponse = null;
       this.clearPivots();
+      return;
+    }
+    // Mismo simbolo ya consultado (toggle off/on) -- redibuja lo cacheado en
+    // vez de volver a pedir. Los niveles son fijos mientras se siga viendo
+    // el mismo simbolo; solo cambiar de simbolo invalida lastPivotsResponse
+    // (ver symbolChanged en ngOnChanges).
+    if (this.lastPivotsResponse?.symbol === this.symbol) {
+      this.pivotsActive.set(true);
+      this.drawPivots(this.lastPivotsResponse);
       return;
     }
     this.pivotsActive.set(true);
