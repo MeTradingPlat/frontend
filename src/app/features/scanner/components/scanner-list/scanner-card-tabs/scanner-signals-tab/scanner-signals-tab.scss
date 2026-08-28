@@ -49,6 +49,12 @@ table {
   text-align: center;
 }
 
+.numero-cell {
+  width: 48px;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
 .action-icon {
   font-size: 1.2rem;
   cursor: pointer;

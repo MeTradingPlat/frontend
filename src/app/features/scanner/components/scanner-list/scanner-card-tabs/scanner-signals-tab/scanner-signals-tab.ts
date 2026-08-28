@@ -21,6 +21,7 @@ import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 
 interface SignalRow {
   id: number;
+  numero: number;
   timestamp: string;
   symbol: string;
   tipo: string;
@@ -60,7 +61,7 @@ export class ScannerSignalsTab implements OnInit {
 
   scanner = input.required<Escaner>();
 
-  displayedColumns: string[] = ['timestamp', 'symbol', 'tipo', 'details'];
+  displayedColumns: string[] = ['numero', 'timestamp', 'symbol', 'tipo', 'details'];
   dataSource = signal<SignalRow[]>([]);
   loading = signal<boolean>(false);
   availableDates = signal<DateOption[]>([]);

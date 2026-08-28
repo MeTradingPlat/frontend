@@ -31,6 +31,12 @@
 } @else {
   <table mat-table [dataSource]="filteredDataSource()">
 
+    <!-- Numero Column -->
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef>#</th>
+      <td mat-cell *matCellDef="let row" class="numero-cell">{{ row.numero }}</td>
+    </ng-container>
+
     <!-- Timestamp Column -->
     <ng-container matColumnDef="timestamp">
       <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>

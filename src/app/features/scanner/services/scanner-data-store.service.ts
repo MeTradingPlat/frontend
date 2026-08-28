@@ -6,6 +6,10 @@ import { RegistroLogDTORespuesta } from '../models/registro-log.interface';
 
 interface SignalRow {
   id: number;
+  // Posicion cronologica (1 = primera senal del dia, crece con cada una
+  // nueva) -- asignado una sola vez por fila y nunca recalculado, para que
+  // truncar el array al superar MAX_SIGNALS no renumere las que quedan.
+  numero: number;
   timestamp: string;
   symbol: string;
   tipo: string;
@@ -55,12 +59,15 @@ export class ScannerDataStore {
     this.logApi.getLogsPorEscanerYFecha(scannerId, hoy, 0, MAX_SIGNALS).subscribe({
       next: (logs: RegistroLogDTORespuesta[]) => {
         const signals: SignalRow[] = this._logsToSignals(logs);
+        let totalCount = signals.length;
 
         const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
           next: (n: { categoria?: string; id?: string; timestamp: string; symbol?: string; mensaje: string; metadatos?: string }) => {
             if (n.categoria === 'SIGNAL') {
+              totalCount++;
               const s: SignalRow = {
                 id: parseInt(n.id || '0') || 0,
+                numero: totalCount,
                 timestamp: n.timestamp,
                 symbol: n.symbol || '-',
                 tipo: this.extractTipo(n.mensaje),
@@ -90,17 +97,21 @@ export class ScannerDataStore {
   }
 
   private _logsToSignals(logs: RegistroLogDTORespuesta[]): SignalRow[] {
-    return logs
+    const sorted = logs
       .filter((l: RegistroLogDTORespuesta) => l.categoria === 'SIGNAL')
-      .sort((a: RegistroLogDTORespuesta, b: RegistroLogDTORespuesta) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .map((l: RegistroLogDTORespuesta) => ({
-        id: l.idRegistroLog,
-        timestamp: l.timestamp,
-        symbol: l.symbol || '-',
-        tipo: this.extractTipo(l.mensaje),
-        mensaje: l.mensaje,
-        metadatos: l.metadatos
-      }));
+      .sort((a: RegistroLogDTORespuesta, b: RegistroLogDTORespuesta) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    const total = sorted.length;
+    // sorted[0] es la mas reciente -- numero cuenta desde la primera del lote
+    // (indice mas alto) hacia la mas reciente (numero = total).
+    return sorted.map((l: RegistroLogDTORespuesta, i: number) => ({
+      id: l.idRegistroLog,
+      numero: total - i,
+      timestamp: l.timestamp,
+      symbol: l.symbol || '-',
+      tipo: this.extractTipo(l.mensaje),
+      mensaje: l.mensaje,
+      metadatos: l.metadatos
+    }));
   }
 
   private logCache = new Map<number, {
