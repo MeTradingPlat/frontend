@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
   LogicalRange, Time, createChart
@@ -173,6 +173,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
+  // Titulos de createPriceLine() se dibujan desde codigo TS (API de la
+  // libreria de graficos), no desde el HTML -- el pipe `| translate` no
+  // aplica aca, hace falta el servicio para traducir en el momento.
+  private readonly translate = inject(TranslateService);
   // Se calcula una sola vez (no cambia mientras la pestaña siga abierta en
   // el mismo horario de verano/invierno) en vez de recalcularlo en cada
   // vela -- ver toCandlestickData().
@@ -618,7 +622,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       lineWidth: 2,
       lineStyle: 2,
       axisLabelVisible: true,
-      title: 'Compra (simulada)'
+      title: this.translate.instant('ASSETS.SIGNAL_LINE')
     });
   }
 
@@ -707,7 +711,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.pivotPriceLines.push(this.series.createPriceLine({
         price: resistencia.price, color: '#ef5350', lineWidth: esFuerte ? 2 : 1,
         lineStyle: esFuerte ? 2 : 1, axisLabelVisible: true,
-        title: esFuerte ? 'Resistencia fuerte' : 'Resistencia débil'
+        title: this.translate.instant(esFuerte ? 'ASSETS.RESISTANCE_STRONG' : 'ASSETS.RESISTANCE_WEAK')
       }));
     }
     for (const soporte of response.supports) {
@@ -715,7 +719,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.pivotPriceLines.push(this.series.createPriceLine({
         price: soporte.price, color: '#26a69a', lineWidth: esFuerte ? 2 : 1,
         lineStyle: esFuerte ? 2 : 1, axisLabelVisible: true,
-        title: esFuerte ? 'Soporte fuerte' : 'Soporte débil'
+        title: this.translate.instant(esFuerte ? 'ASSETS.SUPPORT_STRONG' : 'ASSETS.SUPPORT_WEAK')
       }));
     }
   }
