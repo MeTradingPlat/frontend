@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -40,6 +41,7 @@ interface DateOption {
     CommonModule,
     ReactiveFormsModule,
     MatTableModule,
+    MatPaginatorModule,
     MatIconModule,
     MatInputModule,
     MatTooltipModule,
@@ -66,6 +68,14 @@ export class ScannerSignalsTab implements OnInit {
   loading = signal<boolean>(false);
   availableDates = signal<DateOption[]>([]);
   selectedDate = signal<string>('');
+
+  // Paginador real (numero de pagina, salto directo) -- solo para una fecha
+  // pasada (foto fija con total conocido). "Hoy" es en vivo via SSE, sin
+  // paginador, como ya funcionaba.
+  readonly pageSize = 50;
+  pageIndex = signal(0);
+  totalElements = signal(0);
+  isViewingToday = computed(() => this.availableDates().find(d => d.value === this.selectedDate())?.isToday ?? true);
 
   searchControl = new FormControl('');
   private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
@@ -105,18 +115,33 @@ export class ScannerSignalsTab implements OnInit {
 
   onDateChange(fecha: string): void {
     this.selectedDate.set(fecha);
+    this.pageIndex.set(0);
     this.loading.set(true);
     this._loadForDate(fecha);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.loading.set(true);
+    this._loadForDate(this.selectedDate());
   }
 
   private _loadForDate(fecha: string): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
     const localeToday = this._localToday();
-    this.dataStore.loadSignals(scannerId, (signals) => {
+    if (fecha === localeToday) {
+      this.dataStore.loadSignals(scannerId, (signals) => {
+        this.dataSource.set(signals);
+        this.loading.set(false);
+      });
+      return;
+    }
+    this.dataStore.loadSignalsForDate(scannerId, fecha, this.pageIndex(), this.pageSize, (signals, totalElements) => {
       this.dataSource.set(signals);
+      this.totalElements.set(totalElements);
       this.loading.set(false);
-    }, fecha !== localeToday ? fecha : undefined);
+    });
   }
 
   private _localToday(): string {

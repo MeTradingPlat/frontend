@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import { LogApiService } from './log-api.service';
 import { NotificacionSseService } from './notificacion-sse.service';
 import { RegistroLogDTORespuesta } from '../models/registro-log.interface';
@@ -38,16 +38,9 @@ export class ScannerDataStore {
     return entry ? entry.data : null;
   }
 
-  loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void, fecha?: string): void {
-    if (fecha) {
-      this.logApi.getLogsPorEscanerYFecha(scannerId, fecha).subscribe({
-        next: (logs: RegistroLogDTORespuesta[]) => {
-          onUpdate(this._logsToSignals(logs));
-        }
-      });
-      return;
-    }
-
+  // Solo para "hoy" (SSE en vivo + cache) -- una fecha pasada usa
+  // loadSignalsForDate, que si pagina de verdad con un total real.
+  loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void): void {
     const cached = this.signalsCache.get(scannerId);
     if (cached) {
       cached.onUpdate = onUpdate;
@@ -91,21 +84,43 @@ export class ScannerDataStore {
     });
   }
 
+  // Fecha pasada = foto fija: a diferencia de "hoy" (SSE en vivo, sin total
+  // fijo que mostrar), tiene sentido un paginador real con numero de pagina
+  // y salto directo (contarSenialesPorEscanerYFecha da el total exacto).
+  loadSignalsForDate(
+    scannerId: number,
+    fecha: string,
+    page: number,
+    pageSize: number,
+    onResult: (signals: SignalRow[], totalElements: number) => void
+  ): void {
+    forkJoin({
+      logs: this.logApi.getLogsPorEscanerYFecha(scannerId, fecha, page, pageSize),
+      total: this.logApi.contarSenialesPorEscanerYFecha(scannerId, fecha)
+    }).subscribe(({ logs, total }) => {
+      // numeroBase = numero de la primera fila (la mas reciente) de ESTA
+      // pagina -- sin esto cada pagina renumeraria desde su propio tamano
+      // (1..50 en todas), en vez de la posicion cronologica real del dia.
+      const numeroBase = total - page * pageSize;
+      onResult(this._logsToSignals(logs, numeroBase), total);
+    });
+  }
+
   private _localToday(): string {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
-  private _logsToSignals(logs: RegistroLogDTORespuesta[]): SignalRow[] {
+  private _logsToSignals(logs: RegistroLogDTORespuesta[], numeroBase?: number): SignalRow[] {
     const sorted = logs
       .filter((l: RegistroLogDTORespuesta) => l.categoria === 'SIGNAL')
       .sort((a: RegistroLogDTORespuesta, b: RegistroLogDTORespuesta) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-    const total = sorted.length;
     // sorted[0] es la mas reciente -- numero cuenta desde la primera del lote
-    // (indice mas alto) hacia la mas reciente (numero = total).
+    // (indice mas alto) hacia la mas reciente (numero = base).
+    const base = numeroBase ?? sorted.length;
     return sorted.map((l: RegistroLogDTORespuesta, i: number) => ({
       id: l.idRegistroLog,
-      numero: total - i,
+      numero: base - i,
       timestamp: l.timestamp,
       symbol: l.symbol || '-',
       tipo: this.extractTipo(l.mensaje),
@@ -125,27 +140,10 @@ export class ScannerDataStore {
   // nunca al onUpdate cerrado sobre el en el momento de creacion -- si no,
   // una instancia de componente destruida se queda "recibiendo" los refrescos
   // en vivo mientras la visible en pantalla nunca se entera.
-  loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void, fecha?: string): { loadMore: () => void } {
+  // Solo para "hoy" (SSE en vivo + cargar mas) -- una fecha pasada usa
+  // loadLogsForDate, que si pagina de verdad con un total real.
+  loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void): { loadMore: () => void } {
     const size = 50;
-
-    if (fecha) {
-      // Vista de una fecha pasada: sin cache ni SSE (igual que loadSignals),
-      // pagina propia por llamada para no pisar la cache "en vivo" de hoy.
-      let page = 0;
-      let data: RegistroLogDTORespuesta[] = [];
-      const fetchDatePage = (p: number): void => {
-        logApi.getRegistroPorEscanerTodas(scannerId, p, size, fecha).subscribe({
-          next: (logs: RegistroLogDTORespuesta[]) => {
-            const hasMore = logs.length === size;
-            data = p === 0 ? logs : [...data, ...logs];
-            page = p;
-            onUpdate(data, hasMore);
-          }
-        });
-      };
-      fetchDatePage(0);
-      return { loadMore: (): void => fetchDatePage(page + 1) };
-    }
 
     // Sin esto, "Hoy" pedia los ultimos N logs sin acotar por fecha -- si el
     // escaner no habia generado nada todavia hoy, esos "ultimos N" terminaban
@@ -187,6 +185,22 @@ export class ScannerDataStore {
         fetchPage((current?.page ?? -1) + 1);
       }
     };
+  }
+
+  // Igual razon que loadSignalsForDate: fecha pasada = foto fija, paginador
+  // real con total en vez de "cargar mas" acumulando paginas.
+  loadLogsForDate(
+    scannerId: number,
+    logApi: LogApiService,
+    fecha: string,
+    page: number,
+    pageSize: number,
+    onResult: (logs: RegistroLogDTORespuesta[], totalElements: number) => void
+  ): void {
+    forkJoin({
+      logs: logApi.getRegistroPorEscanerTodas(scannerId, page, pageSize, fecha),
+      total: logApi.contarRegistrosPorEscanerYFecha(scannerId, fecha)
+    }).subscribe(({ logs, total }) => onResult(logs, total));
   }
 
   release(scannerId: number): void {

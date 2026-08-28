@@ -43,4 +43,14 @@ export class LogApiService {
     const fechaParam = fecha ? `&fecha=${fecha}` : '';
     return this.http.get<RegistroLogDTORespuesta[]>(`${this.apiUrl}/escaner/${idEscaner}/todas?page=${page}&size=${size}${fechaParam}`);
   }
+
+  // Total de una fecha ya cerrada, para el paginador (numeros de pagina y
+  // salto directo) -- "hoy" no lo necesita, sigue con SSE en vivo + cargar mas.
+  contarSenialesPorEscanerYFecha(idEscaner: number, fecha: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/escaner/${idEscaner}/count?fecha=${fecha}`);
+  }
+
+  contarRegistrosPorEscanerYFecha(idEscaner: number, fecha: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/escaner/${idEscaner}/todas/count?fecha=${fecha}`);
+  }
 }

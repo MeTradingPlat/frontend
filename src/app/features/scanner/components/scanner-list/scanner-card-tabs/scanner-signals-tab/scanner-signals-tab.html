@@ -79,5 +79,14 @@
         [class.entrada-row]="row.tipo === 'ENTRADA' || row.tipo === 'NUEVA'"
         [class.salida-row]="row.tipo === 'SALIDA'"></tr>
   </table>
+  @if (!isViewingToday()) {
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex()"
+      [hidePageSize]="true"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  }
 }
 </div>

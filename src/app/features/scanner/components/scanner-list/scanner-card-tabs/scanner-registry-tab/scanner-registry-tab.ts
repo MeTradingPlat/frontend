@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -30,6 +31,7 @@ interface DateOption {
     CommonModule,
     ReactiveFormsModule,
     MatTableModule,
+    MatPaginatorModule,
     MatButtonModule,
     MatChipsModule,
     MatFormFieldModule,
@@ -57,6 +59,14 @@ export class ScannerRegistryTab implements OnInit {
   availableDates = signal<DateOption[]>([]);
   selectedDate = signal<string>('');
   private loadMoreFn?: () => void;
+
+  // Paginador real (numero de pagina, salto directo) -- solo para una fecha
+  // pasada (foto fija con total conocido). "Hoy" sigue con SSE en vivo +
+  // "cargar mas", como ya funcionaba.
+  readonly pageSize = 50;
+  pageIndex = signal(0);
+  totalElements = signal(0);
+  isViewingToday = computed(() => this.availableDates().find(d => d.value === this.selectedDate())?.isToday ?? true);
 
   searchControl = new FormControl('');
   private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
@@ -102,19 +112,34 @@ export class ScannerRegistryTab implements OnInit {
 
   onDateChange(fecha: string): void {
     this.selectedDate.set(fecha);
+    this.pageIndex.set(0);
     this.loading.set(true);
     const localeToday = this._localToday();
     this._loadForDate(fecha !== localeToday ? fecha : undefined);
   }
 
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.loading.set(true);
+    this._loadForDate(this.selectedDate());
+  }
+
   private _loadForDate(fecha?: string): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
+    if (fecha) {
+      this.dataStore.loadLogsForDate(scannerId, this.logApiService, fecha, this.pageIndex(), this.pageSize, (logs, totalElements) => {
+        this.dataSource.set(logs);
+        this.totalElements.set(totalElements);
+        this.loading.set(false);
+      });
+      return;
+    }
     const { loadMore } = this.dataStore.loadLogs(scannerId, this.logApiService, (logs, more) => {
       this.dataSource.set(logs);
       this.hasMore.set(more);
       this.loading.set(false);
-    }, fecha);
+    });
     this.loadMoreFn = loadMore;
   }
 

@@ -108,10 +108,20 @@
         [class.warn-row]="row.nivel === 'WARN'"
         [class.signal-group-row]="row.isGroupHeader"></tr>
   </table>
-  @if (hasMore()) {
-    <button mat-button (click)="onLoadMore()" class="load-more-btn">
-      {{ 'SCANNER.LOAD_MORE' | translate }}
-    </button>
+  @if (isViewingToday()) {
+    @if (hasMore()) {
+      <button mat-button (click)="onLoadMore()" class="load-more-btn">
+        {{ 'SCANNER.LOAD_MORE' | translate }}
+      </button>
+    }
+  } @else {
+    <mat-paginator
+      [length]="totalElements()"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex()"
+      [hidePageSize]="true"
+      (page)="onPageChange($event)">
+    </mat-paginator>
   }
 }
 </div>
