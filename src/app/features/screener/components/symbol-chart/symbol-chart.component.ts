@@ -169,6 +169,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly drawingHint = signal<string | null>(null);
   readonly pivotsActive = signal(false);
   readonly pivotsLoading = signal(false);
+  readonly pivotsEmpty = signal(false);
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
@@ -195,6 +196,15 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private signalLinePrimitive: VerticalLinePrimitive | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
+  // Invalida mensajes en vuelo de una suscripcion anterior: unsubscribe() no
+  // garantiza que un 'history' ya en camino (WebSocket/red movil lenta) deje
+  // de entregarse -- sin esto, cambiar de timeframe rapido (comun en tactil)
+  // podia dejar que ese mensaje tardio pisara el estado ya reseteado de la
+  // nueva suscripcion, dibujando la horizontal (sincronica, no depende del
+  // stream) pero nunca la vertical (depende de handleMessage). Confirmado
+  // reportado en movil tras limpiar cache -- justo el escenario de reconexion
+  // lenta que expone la carrera.
+  private resubscribeGeneration = 0;
 
   private allBars: CandleBar[] = [];
   private oldestTime: number | null = null;
@@ -310,6 +320,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private resubscribe(): void {
     if (!this.symbol || !this.chart) return;
 
+    const generation = ++this.resubscribeGeneration;
     this.streamSubscription?.unsubscribe();
     this.drawingManager?.clear();
     this.allBars = [];
@@ -335,6 +346,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.drawPivots(this.lastPivotsResponse);
     } else {
       this.pivotsActive.set(false);
+      this.pivotsEmpty.set(false);
       this.lastPivotsResponse = null;
     }
     this.applyBuyPriceLine();
@@ -347,8 +359,12 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.streamSubscription = this.candleStream
       .subscribe(this.symbol, this.selectedTimeframe())
       .subscribe({
-        next: (message) => this.handleMessage(message),
+        next: (message) => {
+          if (generation !== this.resubscribeGeneration) return;
+          this.handleMessage(message);
+        },
         error: () => {
+          if (generation !== this.resubscribeGeneration) return;
           this.error.set('No se pudo conectar al stream de velas.');
           this.checkMaintenance();
         }
@@ -422,11 +438,13 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   private loadMoreHistory(barsOverride?: number): void {
     if (this.oldestTime === null) return;
     this.isLoadingMore = true;
+    const generation = this.resubscribeGeneration;
     const endDate = new Date(this.oldestTime * 1000).toISOString();
 
     this.screenerService.getHistoricalCandles(this.symbol, this.selectedTimeframe(), endDate, barsOverride ?? LOAD_MORE_BATCH_SIZE)
       .subscribe({
         next: (older) => {
+          if (generation !== this.resubscribeGeneration) return;
           this.isLoadingMore = false;
           if (!older.length) {
             this.hasMoreHistory = false;
@@ -454,7 +472,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
           // asi que marcar hasMoreHistory=false aca cortaba toda carga futura
           // despues del primer "cargar mas" con una pagina parcial.
         },
-        error: () => { this.isLoadingMore = false; }
+        error: () => {
+          if (generation !== this.resubscribeGeneration) return;
+          this.isLoadingMore = false;
+        }
       });
   }
 
@@ -612,6 +633,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.series?.priceScale().setAutoScale(true);
       return;
     }
+    this.pivotsEmpty.set(false);
     // Mismo simbolo ya consultado (toggle off/on) -- redibuja lo cacheado en
     // vez de volver a pedir. Los niveles son fijos mientras se siga viendo
     // el mismo simbolo; solo cambiar de simbolo invalida lastPivotsResponse
@@ -622,25 +644,27 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.drawPivots(this.lastPivotsResponse);
       return;
     }
-    this.pivotsActive.set(true);
     this.pivotsLoading.set(true);
     this.screenerService.getPivots(this.symbol).subscribe({
       // El backend responde 204 (exito, sin cuerpo -- no es un error HTTP)
       // cuando no pudo calcular pivots para el simbolo, asi que response
-      // llega null aca, no al callback de error.
+      // llega null aca, no al callback de error. Tambien puede responder 200
+      // con resistances/supports vacios (si encontro el simbolo pero ningun
+      // nivel califico) -- en ninguno de los dos casos hay algo que dibujar,
+      // asi que el boton no debe quedar marcado como activo.
       next: (response) => {
         this.pivotsLoading.set(false);
-        if (!response) {
-          this.pivotsActive.set(false);
+        if (!response || (!response.resistances.length && !response.supports.length)) {
+          this.pivotsEmpty.set(true);
           return;
         }
+        this.pivotsActive.set(true);
         this.lastPivotsResponse = response;
         this.drawPivots(response);
         this.applyInitialPivotZoom(response);
       },
       error: () => {
         this.pivotsLoading.set(false);
-        this.pivotsActive.set(false);
       }
     });
   }
