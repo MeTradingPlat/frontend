@@ -55,6 +55,15 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
+// Al ancho minimo, el texto "Detalles"/"Details" del encabezado sobraba lo
+// suficiente para forzar scroll horizontal -- se quita solo el texto, el
+// icono de la fila (details-cell) ya era icon-only y no necesita cambio.
+@media (max-width: 480px) {
+  .col-label {
+    display: none;
+  }
+}
+
 .action-icon {
   font-size: 1.2rem;
   cursor: pointer;
