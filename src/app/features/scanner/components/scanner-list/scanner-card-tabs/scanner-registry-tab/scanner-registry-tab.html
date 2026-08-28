@@ -29,7 +29,7 @@
     <p>{{ 'SCANNER.NO_REGISTRY' | translate }}</p>
   </div>
 } @else {
-  <table mat-table [dataSource]="filteredDataSource()">
+  <table mat-table [dataSource]="groupedDataSource()">
 
     <!-- Timestamp Column -->
     <ng-container matColumnDef="timestamp">
@@ -63,6 +63,14 @@
     <ng-container matColumnDef="mensaje">
       <th mat-header-cell *matHeaderCellDef>{{ 'SCANNER.MESSAGE' | translate }}</th>
       <td mat-cell *matCellDef="let row" class="mensaje-cell">
+        @if (row.isGroupHeader) {
+          <div class="log-signal-group">
+            <span>{{ 'SCANNER.SIGNAL_GROUP_COUNT' | translate: { count: row.groupCount } }}</span>
+            <button mat-button (click)="toggleMinuteGroup(row.groupMinuteKey)">
+              {{ (row.groupExpanded ? 'SCANNER.VIEW_LESS' : 'SCANNER.VIEW_MORE') | translate }}
+            </button>
+          </div>
+        } @else {
         @let event = parseEvent(row);
         @if (event && event.type === 'signal') {
           <div class="log-signal">
@@ -90,13 +98,15 @@
         } @else {
           {{ row.mensaje }}
         }
+        }
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"
         [class.error-row]="row.nivel === 'ERROR'"
-        [class.warn-row]="row.nivel === 'WARN'"></tr>
+        [class.warn-row]="row.nivel === 'WARN'"
+        [class.signal-group-row]="row.isGroupHeader"></tr>
   </table>
   @if (hasMore()) {
     <button mat-button (click)="onLoadMore()" class="load-more-btn">

@@ -16,6 +16,7 @@ import { ScannerDataStore } from '../../../../services/scanner-data-store.servic
 import { RegistroLog } from '../../../../models/registro-log.interface';
 import { MarketDatetimePipe } from '../../../../../../shared/pipes/market-datetime.pipe';
 import { parseLogEvent, ParsedSignalEvent, ParsedScannerEvent } from '../../../../utils/parse-log-event.util';
+import { groupSignalLogs, GroupedRegistroLog } from '../../../../utils/group-signal-logs.util';
 import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
 
 interface DateOption {
@@ -65,6 +66,12 @@ export class ScannerRegistryTab implements OnInit {
     if (!term) return this.dataSource();
     return this.dataSource().filter(row => row.symbol?.toUpperCase().includes(term));
   });
+
+  // Minutos con su grupo de señales expandido ("ver mas") -- por clave de
+  // minuto (no por fila), asi que sigue expandido aunque lleguen mas logs y
+  // el array se reordene con onUpdate().
+  private readonly expandedMinutes = signal<ReadonlySet<string>>(new Set());
+  groupedDataSource = computed<GroupedRegistroLog[]>(() => groupSignalLogs(this.filteredDataSource(), this.expandedMinutes()));
 
   ngOnInit(): void {
     const scannerId = this.scanner().idEscaner;
@@ -124,6 +131,15 @@ export class ScannerRegistryTab implements OnInit {
 
   onLoadMore(): void {
     this.loadMoreFn?.();
+  }
+
+  toggleMinuteGroup(minuteKey: string | undefined): void {
+    if (!minuteKey) return;
+    this.expandedMinutes.update(current => {
+      const next = new Set(current);
+      if (next.has(minuteKey)) next.delete(minuteKey); else next.add(minuteKey);
+      return next;
+    });
   }
 
   parseEvent(row: RegistroLog): ParsedSignalEvent | ParsedScannerEvent | null {

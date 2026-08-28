@@ -94,3 +94,14 @@ table {
   background: color-mix(in srgb, var(--mat-sys-primary) 15%, transparent);
   color: var(--mat-sys-primary);
 }
+
+.signal-group-row {
+  background: color-mix(in srgb, var(--mat-sys-primary) 6%, transparent);
+}
+
+.log-signal-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+}
