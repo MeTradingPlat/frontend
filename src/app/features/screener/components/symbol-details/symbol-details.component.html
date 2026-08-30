@@ -73,6 +73,7 @@
         [initialTimeframe]="activeTimeframe()"
         [markerTime]="markerTime()"
         [markerTimeframe]="activeMatch()?.timeframe"
+        [signalSentTime]="signalSentTime()"
         [buyPriceLine]="data.buyPrice"
         (timeframeChange)="onChartTimeframeChange($event)"
       ></app-symbol-chart>

@@ -179,6 +179,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   @Input() initialTimeframe?: string;
   @Input() markerTime?: number;
   @Input() markerTimeframe?: string;
+  // Instante REAL en que se genero/mando la senal (registros_log.timestamp),
+  // distinto de markerTime (la apertura de la vela que disparo el patron
+  // tecnico) -- una demora del escaner entre que la vela cierra y se
+  // confirma/publica la senal puede caer en una vela DISTINTA y posterior
+  // a la tecnica. Marcador secundario a proposito: la vela tecnica sigue
+  // siendo la referencia principal (por que disparo), este solo muestra
+  // cuanto tardo el aviso en llegar.
+  @Input() signalSentTime?: number;
   @Input() buyPriceLine?: number;
   // Avisa hacia arriba cuando el timeframe cambia DESDE el selector propio
   // del grafico (no desde initialTimeframe) -- simetrico a como
@@ -231,6 +239,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // cambiar de simbolo (comparado via lastPivotsResponse.symbol).
   private lastPivotsResponse: PivotsResponse | null = null;
   private signalLinePrimitive: VerticalLinePrimitive | null = null;
+  private sentLinePrimitive: VerticalLinePrimitive | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
   // Invalida mensajes en vuelo de una suscripcion anterior: unsubscribe() no
@@ -267,6 +276,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // y sin este flag el marcador se quedaba pegado en la apertura para
   // siempre en vez de saltar a la posicion correcta apenas esa vela llega.
   private markerAtCloseInstant = false;
+  // true una vez que applySentMarker() ya encontro la barra que contiene
+  // signalSentTime -- evita reintentar en cada tick en vivo despues de
+  // encontrada, mismo criterio que markerFound.
+  private sentMarkerFound = false;
 
   ngAfterViewInit(): void {
     if (this.initialTimeframe) this.selectedTimeframe.set(this.initialTimeframe);
@@ -288,6 +301,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
         this.markerAtCloseInstant = false;
         this.applyMarker();
       }
+      if (changes['signalSentTime'] && !changes['signalSentTime'].firstChange) this.applySentMarker();
       if (changes['buyPriceLine'] && !changes['buyPriceLine'].firstChange) this.applyBuyPriceLine();
     }
   }
@@ -405,6 +419,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.isLoadingMore = false;
     this.markerFound = false;
     this.markerAtCloseInstant = false;
+    this.sentMarkerFound = false;
     this.pendingViewReset = true;
 
     // Recreate the series instead of series.setData([]): an empty array doesn't
@@ -414,6 +429,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     if (this.series) this.chart.removeSeries(this.series);
     this.series = this.addCandlestickSeries();
     this.signalLinePrimitive = null; // se destruyo junto con la serie removida
+    this.sentLinePrimitive = null; // idem
     this.buyPriceLineRef = null; // se destruyo junto con la serie removida
     this.pivotPriceLines = []; // se destruyeron junto con la serie removida
     if (this.pivotsActive() && this.lastPivotsResponse?.symbol === this.symbol) {
@@ -479,6 +495,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       // ej. ETFs nuevos como RKLZ).
       this.applyBuyPriceLine();
       this.applyMarker();
+      this.applySentMarker();
     } else if (message.type === 'bar') {
       if (!isWellFormed(message.bar)) return;
       // Fuera de la sesion regular con el filtro activo: se ignora del todo
@@ -496,6 +513,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       // historial inicial -- reintentar hasta que applyMarker() la encuentre
       // y salte del fallback (apertura de su propia vela) al cierre real.
       if (this.markerTime !== undefined && !this.markerAtCloseInstant) this.applyMarker();
+      if (this.signalSentTime !== undefined && !this.sentMarkerFound) this.applySentMarker();
     } else if (message.type === 'error') {
       this.error.set(message.message ?? 'Error en el stream de velas.');
       this.checkMaintenance();
@@ -548,6 +566,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
             // scroll normal del usuario lo arrastraba de vuelta a la senal a
             // la fuerza aunque estuviera navegando lejos a proposito.
             if (!this.markerFound) this.applyMarker();
+            if (!this.sentMarkerFound) this.applySentMarker();
           }
           // Solo un batch vacio significa "no hay mas" -- un batch con MENOS
           // de lo pedido no lo significa (confirmado en vivo: una respuesta
@@ -680,6 +699,38 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // cuenta en cada render. Nada de <div> superpuesto ni reintentos.
     this.signalLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, barTime as Time);
     this.series.attachPrimitive(this.signalLinePrimitive);
+  }
+
+  // Marcador secundario: la vela que contiene el instante REAL en que se
+  // genero/publico la senal (signalSentTime), a diferencia de applyMarker
+  // (la vela que disparo el patron tecnico). Un instante de pared no tiene
+  // una "apertura de vela" propia como markerTime, asi que solo busca que
+  // barra ya cargada lo contiene -- sin la conversion de timeframe de
+  // origen que applyMarker necesita, y sin pedir mas historial si todavia
+  // no esta cargada (es informativo, no vale una peticion extra).
+  private applySentMarker(): void {
+    if (this.sentLinePrimitive) {
+      this.series?.detachPrimitive(this.sentLinePrimitive);
+      this.sentLinePrimitive = null;
+    }
+    if (this.signalSentTime === undefined || this.allBars.length === 0 || !this.chart || !this.series) return;
+
+    const target = this.signalSentTime;
+    const period = TIMEFRAME_SECONDS[this.selectedTimeframe()] ?? 60;
+    const idx = this.allBars.findIndex((b, i) => {
+      if (b.time > target) return false;
+      const windowEnd = this.allBars[i + 1]?.time ?? b.time + period;
+      return target < windowEnd;
+    });
+    if (idx === -1) return;
+
+    this.sentMarkerFound = true;
+    const barTime = this.allBars[idx].time + this.displayShift();
+    // Celeste a proposito: distinto del morado (marcador tecnico/linea de
+    // compra), naranja (herramienta de linea horizontal) y verde/rojo de
+    // las velas.
+    this.sentLinePrimitive = new VerticalLinePrimitive(this.chart, this.series, barTime as Time, '#29b6f6', 1);
+    this.series.attachPrimitive(this.sentLinePrimitive);
   }
 
   // Linea horizontal de "precio de entrada simulado" para senales del

@@ -135,16 +135,29 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
     if (match) this.activeMatch.set(match);
   }
 
-  // El backend manda velaTimestamp en UTC pero sin sufijo de zona horaria
-  // (Python le quita el tzinfo antes de serializar) -- un ISO sin 'Z' ni
-  // offset lo interpreta JS como hora LOCAL del navegador, no UTC. Sin este
-  // ajuste, una vela de las 13:30 UTC se leia como 13:30 hora Colombia
-  // (18:30 UTC real), cayendo fuera del rango de velas cargadas y
-  // abortando el marcador silenciosamente por el guard de seguridad.
   markerTime(): number | undefined {
     const vela = this.activeMatch()?.velaTimestamp;
     if (!vela) return undefined;
-    const utcIso = vela.endsWith('Z') ? vela : vela + 'Z';
+    return this.toEpochSeconds(vela);
+  }
+
+  // Instante real en que se genero la senal (registros_log.timestamp),
+  // distinto de la vela tecnica -- ver el comentario de signalSentTime en
+  // symbol-chart.component.ts.
+  signalSentTime(): number | undefined {
+    const generatedAt = this.data.generatedAt;
+    if (!generatedAt) return undefined;
+    return this.toEpochSeconds(generatedAt);
+  }
+
+  // El backend manda estos timestamps en UTC pero sin sufijo de zona
+  // horaria (Python le quita el tzinfo antes de serializar) -- un ISO sin
+  // 'Z' ni offset lo interpreta JS como hora LOCAL del navegador, no UTC.
+  // Sin este ajuste, una vela de las 13:30 UTC se leia como 13:30 hora
+  // Colombia (18:30 UTC real), cayendo fuera del rango de velas cargadas y
+  // abortando el marcador silenciosamente por el guard de seguridad.
+  private toEpochSeconds(isoWithoutZone: string): number {
+    const utcIso = isoWithoutZone.endsWith('Z') ? isoWithoutZone : isoWithoutZone + 'Z';
     return Math.floor(new Date(utcIso).getTime() / 1000);
   }
 
