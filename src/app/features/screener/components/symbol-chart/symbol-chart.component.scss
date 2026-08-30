@@ -72,6 +72,23 @@
   }
 }
 
+.extended-hours-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+
+  &--active {
+    background: var(--mat-sys-secondary-container, rgba(33, 150, 243, 0.15));
+    color: var(--mat-sys-on-secondary-container, #2196f3);
+  }
+}
+
 .drawing-hint {
   align-self: flex-start;
   padding: 0.25rem 0.75rem;
@@ -96,6 +113,36 @@
 .chart-container {
   width: 100%;
   height: 100%;
+}
+
+// Estilo TradingView: OHLC de la vela bajo el cursor (o la ultima cargada
+// sin hover), fijo arriba a la izquierda del grafico. z-index por encima de
+// .chart-overlay a proposito -- solo se renderiza cuando !isLoading(), asi
+// que nunca compite visualmente con el spinner/mensaje de esa capa.
+.ohlc-legend {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: #c9d1d9;
+  pointer-events: none;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+
+  b {
+    font-weight: 600;
+  }
+
+  .ohlc-legend-up b {
+    color: #26a69a;
+  }
+
+  .ohlc-legend-down b {
+    color: #ef5350;
+  }
 }
 
 .chart-overlay {

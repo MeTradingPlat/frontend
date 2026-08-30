@@ -209,6 +209,8 @@
     "TOOL_PIVOTS": "Pivotes",
     "TOOL_PIVOTS_HINT": "Busca picos y valles de precio (D1) cercanos al precio actual y los dibuja como soporte/resistencia",
     "PIVOTS_EMPTY": "No se encontraron pivots cercanos al precio actual de este símbolo",
+    "TOOL_EXTENDED_HOURS": "Horario extendido",
+    "TOOL_EXTENDED_HOURS_HINT": "Incluye pre-market, post-market y operaciones fuera del horario regular (9:30-16:00 ET). Desactivado por defecto, igual que TradingView",
     "SIGNAL_LINE": "Señal",
     "RESISTANCE_STRONG": "Resistencia fuerte",
     "RESISTANCE_WEAK": "Resistencia débil",

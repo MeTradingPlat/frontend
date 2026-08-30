@@ -22,7 +22,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   CandlestickData, CandlestickSeries, IChartApi, IPriceLine, ISeriesApi,
-  LogicalRange, Time, createChart
+  LogicalRange, MouseEventParams, Time, createChart
 } from 'lightweight-charts';
 import { Subscription } from 'rxjs';
 import { CandleStreamService } from '../../services/candle-stream.service';
@@ -110,6 +110,35 @@ function toCandlestickData(bar: CandleBar, shiftSeconds: number): CandlestickDat
 // rotulo del eje cae en la fecha de la sesion sin importar la zona horaria.
 const CALENDAR_TIMEFRAME_IDS = new Set(['D1', 'D2', 'D3', 'W1', 'MO1', 'MO3', 'MO6', 'Y1']);
 
+// El feed de TastyTrade/dxFeed trae actividad las 24 horas (pre-market,
+// post-market, y hasta prints nocturnos de ECN) -- confirmado en vivo el
+// 2026-08-30 con AAPL: mas de 1000 barras M1 en un dia, repartidas en las 24
+// horas UTC, contra las ~390 de una sesion regular. Sitios de referencia
+// como TradingView muestran SOLO la sesion regular por defecto (toggle de
+// "extended hours" aparte) -- sin este mismo filtro, nuestra vela se ve con
+// una escala/forma totalmente distinta a simple vista aunque los datos en si
+// sean correctos, no por un bug de calculo sino por cuantas barras entran en
+// el dia. Solo aplica a timeframes intraday: los de calendario (D1 en
+// adelante) ya son un solo agregado del dia entero, filtrarlos no tiene
+// sentido.
+const NY_TIME_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false
+});
+const REGULAR_SESSION_START_MINUTES = 9 * 60 + 30;
+const REGULAR_SESSION_END_MINUTES = 16 * 60;
+
+function minutesOfDayInNewYork(utcSeconds: number): number {
+  const parts = NY_TIME_FORMATTER.formatToParts(new Date(utcSeconds * 1000));
+  const hour = Number(parts.find(p => p.type === 'hour')?.value ?? '0') % 24;
+  const minute = Number(parts.find(p => p.type === 'minute')?.value ?? '0');
+  return hour * 60 + minute;
+}
+
+function isRegularSession(utcSeconds: number): boolean {
+  const minutes = minutesOfDayInNewYork(utcSeconds);
+  return minutes >= REGULAR_SESSION_START_MINUTES && minutes < REGULAR_SESSION_END_MINUTES;
+}
+
 function isWellFormed(bar: CandleBar): boolean {
   return [bar.time, bar.open, bar.high, bar.low, bar.close].every(v => v !== null && v !== undefined && Number.isFinite(v));
 }
@@ -170,6 +199,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly pivotsActive = signal(false);
   readonly pivotsLoading = signal(false);
   readonly pivotsEmpty = signal(false);
+  // false = solo sesion regular (9:30-16:00 ET), igual que el default de
+  // TradingView -- ver el comentario de isRegularSession mas arriba.
+  readonly extendedHours = signal(false);
+  readonly legend = signal<{ open: number; high: number; low: number; close: number } | null>(null);
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
@@ -276,6 +309,44 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     return PRIMARY_TIMEFRAME_IDS.includes(id);
   }
 
+  isCalendarTimeframe(): boolean {
+    return CALENDAR_TIMEFRAME_IDS.has(this.selectedTimeframe());
+  }
+
+  // Recarga el historial desde cero (igual que un cambio de timeframe) en
+  // vez de filtrar en el momento sobre allBars ya cargado -- applyMarker y
+  // la paginacion (oldestTime/hasMoreHistory) trabajan por INDICE sobre
+  // allBars, y filtrar aparte solo al dibujar habria desalineado esos
+  // indices contra lo que la libreria realmente muestra.
+  toggleExtendedHours(): void {
+    this.extendedHours.update(v => !v);
+    this.resubscribe();
+  }
+
+  private filterSession(bars: CandleBar[]): CandleBar[] {
+    if (this.extendedHours() || this.isCalendarTimeframe()) return bars;
+    return bars.filter(bar => isRegularSession(bar.time));
+  }
+
+  // Legend estilo TradingView: sin hover muestra la ULTIMA barra cargada: se
+  // llama tambien desde handleMessage/loadMoreHistory ademas del crosshair.
+  private updateLegend(bar: { open: number; high: number; low: number; close: number } | undefined | null): void {
+    this.legend.set(bar ? { open: bar.open, high: bar.high, low: bar.low, close: bar.close } : null);
+  }
+
+  private lastBar(): CandleBar | undefined {
+    return this.allBars[this.allBars.length - 1];
+  }
+
+  private onCrosshairMove(param: MouseEventParams<Time>): void {
+    if (!this.series || param.time === undefined) {
+      this.updateLegend(this.lastBar());
+      return;
+    }
+    const data = param.seriesData.get(this.series) as CandlestickData<Time> | undefined;
+    this.updateLegend(data ?? this.lastBar());
+  }
+
   setDrawingTool(tool: DrawingTool): void {
     this.drawingTool.set(tool);
     this.drawingManager?.setMode(tool);
@@ -309,6 +380,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.drawingManager = new ChartDrawingManager(this.chart, hasPending => this.updateHint(hasPending));
     this.drawingManager.setSeries(this.series);
     this.chart.timeScale().subscribeVisibleLogicalRangeChange(range => this.onVisibleRangeChange(range));
+    this.chart.subscribeCrosshairMove(param => this.onCrosshairMove(param));
   }
 
   private addCandlestickSeries(): ISeriesApi<'Candlestick'> {
@@ -389,9 +461,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private handleMessage(message: CandleStreamMessage): void {
     if (message.type === 'history') {
-      this.allBars = sanitizeBars(message.bars);
+      this.allBars = this.filterSession(sanitizeBars(message.bars));
       this.oldestTime = this.allBars.length ? this.allBars[0].time : null;
       this.series?.setData(this.allBars.map(bar => toCandlestickData(bar, this.displayShift())));
+      this.updateLegend(this.lastBar());
       if (this.pendingViewReset) {
         this.pendingViewReset = false;
         this.chart?.timeScale().scrollToRealTime();
@@ -408,8 +481,14 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.applyMarker();
     } else if (message.type === 'bar') {
       if (!isWellFormed(message.bar)) return;
+      // Fuera de la sesion regular con el filtro activo: se ignora del todo
+      // (ni se dibuja ni se guarda en allBars) -- activar "extendido" mas
+      // tarde recarga desde cero via resubscribe(), no depende de haber
+      // acumulado estas barras aca.
+      if (!this.extendedHours() && !this.isCalendarTimeframe() && !isRegularSession(message.bar.time)) return;
       this.mergeLiveBar(message.bar);
       this.series?.update(toCandlestickData(message.bar, this.displayShift()));
+      this.updateLegend(message.bar);
       this.isLoading.set(false);
       this.hasNoData.set(false);
       // La vela que marca el cierre real de la senal (markerTime +
@@ -454,7 +533,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
             this.hasMoreHistory = false;
             return;
           }
-          const olderBars = sanitizeBars(older.map(fromHistoricalDto));
+          const olderBars = this.filterSession(sanitizeBars(older.map(fromHistoricalDto)));
           this.allBars = sanitizeBars([...olderBars, ...this.allBars]);
           if (this.allBars.length) {
             this.oldestTime = this.allBars[0].time;

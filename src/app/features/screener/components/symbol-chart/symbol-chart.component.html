@@ -55,6 +55,18 @@
       }
       {{ 'ASSETS.TOOL_PIVOTS' | translate }}
     </button>
+
+    @if (!isCalendarTimeframe()) {
+      <button
+        mat-stroked-button
+        class="extended-hours-btn"
+        [class.extended-hours-btn--active]="extendedHours()"
+        [matTooltip]="'ASSETS.TOOL_EXTENDED_HOURS_HINT' | translate"
+        (click)="toggleExtendedHours()">
+        <mat-icon>schedule</mat-icon>
+        {{ 'ASSETS.TOOL_EXTENDED_HOURS' | translate }}
+      </button>
+    }
   </div>
 
   @if (drawingHint()) {
@@ -85,6 +97,16 @@
           <span>{{ 'ASSETS.CHART_NO_DATA' | translate }}</span>
         </div>
       }
+    }
+    @if (!isLoading() && !maintenance() && legend(); as l) {
+      <div class="ohlc-legend">
+        <span>O <b>{{ l.open | number:'1.2-4' }}</b></span>
+        <span>H <b>{{ l.high | number:'1.2-4' }}</b></span>
+        <span>L <b>{{ l.low | number:'1.2-4' }}</b></span>
+        <span [class.ohlc-legend-up]="l.close >= l.open" [class.ohlc-legend-down]="l.close < l.open">
+          C <b>{{ l.close | number:'1.2-4' }}</b>
+        </span>
+      </div>
     }
     <div #chartContainer class="chart-container"></div>
   </div>
