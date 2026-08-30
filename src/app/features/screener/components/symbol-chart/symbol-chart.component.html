@@ -106,6 +106,7 @@
         <span [class.ohlc-legend-up]="l.close >= l.open" [class.ohlc-legend-down]="l.close < l.open">
           C <b>{{ l.close | number:'1.2-4' }}</b>
         </span>
+        <span>Vol <b>{{ formatVolume(l.volume) }}</b></span>
       </div>
     }
     <div #chartContainer class="chart-container"></div>

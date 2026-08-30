@@ -139,6 +139,16 @@ function isRegularSession(utcSeconds: number): boolean {
   return minutes >= REGULAR_SESSION_START_MINUTES && minutes < REGULAR_SESSION_END_MINUTES;
 }
 
+// Mismos cortes K/M/B que TradingView usa para el volumen del legend --
+// un numero crudo de 6+ cifras (comun incluso en velas de 1 minuto de
+// simbolos liquidos) no entra legible en el espacio chico del overlay.
+function formatCompactVolume(volume: number): string {
+  if (volume >= 1e9) return (volume / 1e9).toFixed(2) + 'B';
+  if (volume >= 1e6) return (volume / 1e6).toFixed(2) + 'M';
+  if (volume >= 1e3) return (volume / 1e3).toFixed(2) + 'K';
+  return volume.toString();
+}
+
 function isWellFormed(bar: CandleBar): boolean {
   return [bar.time, bar.open, bar.high, bar.low, bar.close].every(v => v !== null && v !== undefined && Number.isFinite(v));
 }
@@ -203,7 +213,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // false = solo sesion regular (9:30-16:00 ET), igual que el default de
   // TradingView -- ver el comentario de isRegularSession mas arriba.
   readonly extendedHours = signal(false);
-  readonly legend = signal<{ open: number; high: number; low: number; close: number } | null>(null);
+  readonly legend = signal<{ open: number; high: number; low: number; close: number; volume: number } | null>(null);
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
@@ -305,6 +315,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     return CALENDAR_TIMEFRAME_IDS.has(this.selectedTimeframe());
   }
 
+  formatVolume(volume: number): string {
+    return formatCompactVolume(volume);
+  }
+
   // Recarga el historial desde cero (igual que un cambio de timeframe) en
   // vez de filtrar en el momento sobre allBars ya cargado -- applyMarker y
   // la paginacion (oldestTime/hasMoreHistory) trabajan por INDICE sobre
@@ -322,8 +336,8 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   // Legend estilo TradingView: sin hover muestra la ULTIMA barra cargada: se
   // llama tambien desde handleMessage/loadMoreHistory ademas del crosshair.
-  private updateLegend(bar: { open: number; high: number; low: number; close: number } | undefined | null): void {
-    this.legend.set(bar ? { open: bar.open, high: bar.high, low: bar.low, close: bar.close } : null);
+  private updateLegend(bar: CandleBar | undefined | null): void {
+    this.legend.set(bar ? { open: bar.open, high: bar.high, low: bar.low, close: bar.close, volume: bar.volume } : null);
   }
 
   private lastBar(): CandleBar | undefined {
@@ -331,12 +345,16 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   }
 
   private onCrosshairMove(param: MouseEventParams<Time>): void {
-    if (!this.series || param.time === undefined) {
+    if (param.time === undefined) {
       this.updateLegend(this.lastBar());
       return;
     }
-    const data = param.seriesData.get(this.series) as CandlestickData<Time> | undefined;
-    this.updateLegend(data ?? this.lastBar());
+    // La serie de velas (param.seriesData) solo trae OHLC, sin volumen -- se
+    // busca la barra propia por tiempo (con el mismo desplazamiento visual
+    // que toCandlestickData le aplico al armar la serie) para completarlo.
+    const shift = this.displayShift();
+    const bar = this.allBars.find(b => b.time + shift === param.time);
+    this.updateLegend(bar ?? this.lastBar());
   }
 
   setDrawingTool(tool: DrawingTool): void {
