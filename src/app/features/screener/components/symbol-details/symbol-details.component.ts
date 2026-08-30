@@ -135,19 +135,16 @@ export class SymbolDetailsComponent implements OnInit, OnDestroy {
     if (match) this.activeMatch.set(match);
   }
 
+  // Instante REAL en que se genero/mando la senal (registros_log.timestamp)
+  // -- no la apertura de la vela tecnica que la disparo, que puede quedar
+  // una o mas velas atras si el escaner tardo en confirmarla y publicarla.
+  // Cae a la vela tecnica solo si esta notificacion no trae generatedAt
+  // (por ejemplo, una mas vieja de antes de que ese campo existiera).
   markerTime(): number | undefined {
-    const vela = this.activeMatch()?.velaTimestamp;
-    if (!vela) return undefined;
-    return this.toEpochSeconds(vela);
-  }
-
-  // Instante real en que se genero la senal (registros_log.timestamp),
-  // distinto de la vela tecnica -- ver el comentario de signalSentTime en
-  // symbol-chart.component.ts.
-  signalSentTime(): number | undefined {
     const generatedAt = this.data.generatedAt;
-    if (!generatedAt) return undefined;
-    return this.toEpochSeconds(generatedAt);
+    if (generatedAt) return this.toEpochSeconds(generatedAt);
+    const vela = this.activeMatch()?.velaTimestamp;
+    return vela ? this.toEpochSeconds(vela) : undefined;
   }
 
   // El backend manda estos timestamps en UTC pero sin sufijo de zona
