@@ -210,9 +210,10 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly pivotsActive = signal(false);
   readonly pivotsLoading = signal(false);
   readonly pivotsEmpty = signal(false);
-  // false = solo sesion regular (9:30-16:00 ET), igual que el default de
-  // TradingView -- ver el comentario de isRegularSession mas arriba.
-  readonly extendedHours = signal(false);
+  // true = horario extendido incluido por defecto (a diferencia del
+  // default de TradingView) -- decision explicita del usuario, ver el
+  // comentario de isRegularSession mas arriba para el porque del filtro.
+  readonly extendedHours = signal(true);
   readonly legend = signal<{ open: number; high: number; low: number; close: number; volume: number } | null>(null);
 
   private readonly candleStream = inject(CandleStreamService);
