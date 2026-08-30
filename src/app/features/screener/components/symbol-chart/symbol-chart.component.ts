@@ -471,8 +471,17 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private handleMessage(message: CandleStreamMessage): void {
     if (message.type === 'history') {
-      this.allBars = this.filterSession(sanitizeBars(message.bars));
-      this.oldestTime = this.allBars.length ? this.allBars[0].time : null;
+      // oldestTime es el CURSOR de paginacion (endDate del proximo pedido),
+      // no "la primera barra que se ve" -- tiene que venir del lote CRUDO,
+      // sin filtrar. Con horario extendido desactivado, un lote de la
+      // sesion regular (~390 min/dia de 1440) puede filtrarse case a casi
+      // nada; usar el primer bar YA FILTRADO como cursor dejaba la
+      // paginacion pidiendo una y otra vez la MISMA ventana cruda (mismo
+      // endDate) sin avanzar nunca hacia atras -- confirmado en vivo con
+      // IBIT: sin horario extendido, ir hacia atras no traia nada nuevo.
+      const rawBars = sanitizeBars(message.bars);
+      this.allBars = this.filterSession(rawBars);
+      this.oldestTime = rawBars.length ? rawBars[0].time : null;
       this.series?.setData(this.allBars.map(bar => toCandlestickData(bar, this.displayShift())));
       this.updateLegend(this.lastBar());
       if (this.pendingViewReset) {
@@ -541,10 +550,17 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
             this.hasMoreHistory = false;
             return;
           }
-          const olderBars = this.filterSession(sanitizeBars(older.map(fromHistoricalDto)));
+          // Cursor del CRUDO, no de lo ya filtrado -- ver el comentario de
+          // oldestTime en el handler de 'history'. Siempre estrictamente
+          // mas viejo que el endDate de este mismo pedido (el backend solo
+          // devuelve barras anteriores a el), asi que garantiza avanzar
+          // hacia atras aunque el filtro deje esta pagina sin nada que
+          // mostrar.
+          const rawOlderBars = sanitizeBars(older.map(fromHistoricalDto));
+          const olderBars = this.filterSession(rawOlderBars);
           this.allBars = sanitizeBars([...olderBars, ...this.allBars]);
+          if (rawOlderBars.length) this.oldestTime = rawOlderBars[0].time;
           if (this.allBars.length) {
-            this.oldestTime = this.allBars[0].time;
             this.series?.setData(this.allBars.map(bar => toCandlestickData(bar, this.displayShift())));
             // La vela real del marcador puede no estar en el lote inicial de
             // historial (solo velas recientes) y llegar recien aqui -- sin
