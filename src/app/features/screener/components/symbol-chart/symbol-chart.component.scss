@@ -119,6 +119,12 @@
 // sin hover), fijo arriba a la izquierda del grafico. z-index por encima de
 // .chart-overlay a proposito -- solo se renderiza cuando !isLoading(), asi
 // que nunca compite visualmente con el spinner/mensaje de esa capa.
+// Pastilla de superficie en vez del truco anterior de solo texto claro +
+// sombra negra -- ese combo se veia bien en tema oscuro (texto claro sobre
+// canvas oscuro) pero era ilegible en tema claro (mismo texto claro, ahora
+// sobre canvas claro, con una sombra negra que solo ensuciaba). surface/
+// on-surface son un par de Material 3 con contraste garantizado en
+// cualquier tema, asi que no hace falta un color fijo por tema aca.
 .ohlc-legend {
   position: absolute;
   top: 8px;
@@ -126,11 +132,13 @@
   z-index: 2;
   display: flex;
   gap: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--mat-sys-surface-container);
   font-size: 0.78rem;
   font-variant-numeric: tabular-nums;
-  color: #c9d1d9;
+  color: var(--mat-sys-on-surface);
   pointer-events: none;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
 
   b {
     font-weight: 600;

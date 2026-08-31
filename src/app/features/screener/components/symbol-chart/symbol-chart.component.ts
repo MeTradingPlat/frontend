@@ -9,6 +9,7 @@ import {
   Output,
   SimpleChanges,
   ViewChild,
+  effect,
   inject,
   signal
 } from '@angular/core';
@@ -28,6 +29,7 @@ import { Subscription } from 'rxjs';
 import { CandleStreamService } from '../../services/candle-stream.service';
 import { ScreenerService } from '../../services/screener.service';
 import { TimezoneService } from '../../../../core/services/timezone.service';
+import { ThemeService } from '../../../../core/services/theme/theme.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
 import { PivotsResponse } from '../../models/pivots.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
@@ -88,6 +90,17 @@ const LOAD_MORE_BATCH_SIZE = 500;
 // timeframe muy fino, sin volver al patron de a LOAD_MORE_BATCH_SIZE que
 // encadenaba decenas de round trips secuenciales.
 const MARKER_JUMP_MAX_BARS = 5000;
+
+// lightweight-charts dibuja en <canvas>, no lee variables --mat-sys-* del
+// tema Material -- estos dos juegos de colores son el equivalente fijo que
+// hay que reaplicar a mano cuando cambia el tema (ver el effect en la
+// clase). Los valores de "dark" son los que ya tenia el chart antes de que
+// existiera tema claro; los de "light" siguen el mismo criterio de
+// contraste que el resto del theming de la app (Material Design 3).
+const CHART_COLORS = {
+  dark: { text: '#c9d1d9', grid: '#2a2e39' },
+  light: { text: '#1a1a1a', grid: '#e0e0e0' }
+};
 
 // shiftSeconds desplaza el tiempo real (UTC) al "tiempo falso" que hace que
 // lightweight-charts, al formatearlo con el reloj local del navegador, lo
@@ -227,6 +240,19 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // vela -- ver toCandlestickData().
   private readonly marketShiftSeconds = inject(TimezoneService).getMarketDisplayShiftSeconds();
   private readonly userOffsetSeconds = inject(TimezoneService).getUserTimezoneOffsetMinutes() * 60;
+
+  // El chart es un <canvas> (lightweight-charts), no CSS -- no puede leer
+  // variables --mat-sys-* del tema, asi que sus colores quedaban fijos para
+  // tema oscuro (confirmado en vivo: texto e grid ilegibles en tema claro).
+  // Este effect reaplica los colores del tema activo cada vez que cambia.
+  private readonly theme = inject(ThemeService);
+  private readonly applyChartTheme = effect(() => {
+    const colors = this.theme.isDark() ? CHART_COLORS.dark : CHART_COLORS.light;
+    this.chart?.applyOptions({
+      layout: { textColor: colors.text },
+      grid: { vertLines: { color: colors.grid }, horzLines: { color: colors.grid } }
+    });
+  });
 
   // displayShift elige el desplazamiento visual segun el timeframe -- ver
   // CALENDAR_TIMEFRAME_IDS: en velas de calendario, el offset UTC del
@@ -377,10 +403,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   }
 
   private initChart(): void {
+    const colors = this.theme.isDark() ? CHART_COLORS.dark : CHART_COLORS.light;
     this.chart = createChart(this.chartContainer.nativeElement, {
       autoSize: true,
-      layout: { background: { color: 'transparent' }, textColor: '#c9d1d9' },
-      grid: { vertLines: { color: '#2a2e39' }, horzLines: { color: '#2a2e39' } },
+      layout: { background: { color: 'transparent' }, textColor: colors.text },
+      grid: { vertLines: { color: colors.grid }, horzLines: { color: colors.grid } },
       // rightOffset deja hueco despues de la ultima vela -- sin esto la vela
       // en formacion queda pegada al borde derecho, sin espacio para verla
       // "avanzar" a medida que llegan ticks nuevos.
