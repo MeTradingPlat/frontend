@@ -29,6 +29,12 @@
     <p>{{ 'SCANNER.NO_SIGNALS' | translate }}</p>
   </div>
 } @else {
+  <!-- cdk-virtual-scroll-viewport: MAX_SIGNALS subio a 15000 (ver
+       scanner-data-store.service.ts) -- sin esto, un escaner activo (ya
+       confirmado en vivo con 521 senales/dia) renderizaria esa cantidad de
+       filas de una sola vez. CdkTable detecta el viewport ancestro y
+       virtualiza sus filas automaticamente, sin cambiar el markup de abajo. -->
+  <cdk-virtual-scroll-viewport itemSize="49" class="signals-viewport">
   <table mat-table [dataSource]="filteredDataSource()">
 
     <!-- Numero Column -->
@@ -79,6 +85,7 @@
         [class.entrada-row]="row.tipo === 'ENTRADA' || row.tipo === 'NUEVA'"
         [class.salida-row]="row.tipo === 'SALIDA'"></tr>
   </table>
+  </cdk-virtual-scroll-viewport>
   @if (!isViewingToday()) {
     <mat-paginator
       [length]="totalElements()"

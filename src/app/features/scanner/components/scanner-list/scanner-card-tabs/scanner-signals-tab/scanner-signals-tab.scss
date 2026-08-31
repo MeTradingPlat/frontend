@@ -27,7 +27,17 @@
 .signals-body {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  // El scroll real ahora lo hace .signals-viewport (cdk-virtual-scroll-
+  // viewport) -- dejarlo tambien aca duplicaria la barra de scroll.
+  display: flex;
+  flex-direction: column;
+}
+
+// itemSize (49px, ver el .html) debe coincidir con el alto real de una fila
+// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas.
+.signals-viewport {
+  flex: 1;
+  min-height: 0;
 }
 
 .date-field {

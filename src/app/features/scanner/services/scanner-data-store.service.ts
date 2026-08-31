@@ -20,9 +20,19 @@ interface SignalRow {
 // Con 50, el primer lote de un escaner recien iniciado quedaba fuera de la
 // ventana visible: el tab mostraba como "primeras" senales las de ~20 min
 // despues del arranque (confirmado en vivo el 2026-08-24: 169 senales a las
-// 12:29:03, el tab solo mostraba desde las 12:49). El limite sigue acotado
-// para no renderizar listas gigantes.
-const MAX_SIGNALS = 200;
+// 12:29:03, el tab solo mostraba desde las 12:49).
+//
+// El limite anterior (200) resulto ser MENOR que el volumen real de un
+// escaner activo -- confirmado en vivo el 2026-08-31: TEST POST MARKET tenia
+// 521 senales guardadas ese dia y volumen test 229, ambos ya truncados a 200
+// en pantalla (las senales viejas se descartaban del array en memoria segun
+// llegaban nuevas por SSE, sin perderse en la base de datos -- solo dejaban
+// de verse). 15000 cubre el universo completo rastreado (~13.2k simbolos,
+// ver MAX_CANDLE_POOL_CONNECTIONS/tracked_symbols en marketdata-service) aun
+// si CADA simbolo disparara una senal el mismo dia. La tabla usa scroll
+// virtual (ver scanner-signals-tab.html) para que esto no cueste renderizar
+// miles de filas de una.
+const MAX_SIGNALS = 15000;
 
 @Injectable({ providedIn: 'root' })
 export class ScannerDataStore {
