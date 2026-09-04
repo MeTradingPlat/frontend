@@ -114,12 +114,36 @@ export class ScannerList implements OnInit, OnDestroy {
     });
   }
 
+  // CREADO/ELIMINADO/ARCHIVADO/DESARCHIVADO no son estados reales de
+  // EnumEstadoEscaner -- son valores que solo este frontend interpreta (ver
+  // GestionarEscanerCUAdapter.publicarCambioLista y
+  // GestionarEstadoEscanerCUAdapter.archivarEscaner/desarchivarEscaner en el
+  // backend) para decidir si la fila se agrega, se quita o se parchea en la
+  // lista en memoria, en vez de un cambio de estado real para patchear.
+  private static readonly ESTADOS_QUE_QUITAN_DE_LA_LISTA = new Set(['ELIMINADO', 'ARCHIVADO']);
+  private static readonly ESTADOS_QUE_REQUIEREN_RECARGA = new Set(['CREADO', 'DESARCHIVADO']);
+
   private handleStateChange(notificacion: any): void {
     if (!notificacion.metadatos) return;
 
     try {
       const metadatos: MetadatosEstadoEscaner = JSON.parse(notificacion.metadatos);
       const idEscaner = notificacion.idEscaner!;
+
+      if (ScannerList.ESTADOS_QUE_REQUIEREN_RECARGA.has(metadatos.estadoNuevo)) {
+        // CREADO: el evento no trae los datos completos del escaner nuevo
+        // (mercados/filtros/tipoEjecucion), y DESARCHIVADO: el escaner no
+        // estaba en la lista local (listarEscaneres excluye archivados) --
+        // en ambos casos hace falta pedirle a la API el estado real en vez
+        // de intentar reconstruirlo a mano.
+        this.facade.loadEscaners(true).subscribe();
+        return;
+      }
+
+      if (ScannerList.ESTADOS_QUE_QUITAN_DE_LA_LISTA.has(metadatos.estadoNuevo)) {
+        this.facade.escaners.set(this.scanners().filter(scanner => scanner.idEscaner !== idEscaner));
+        return;
+      }
 
       // Actualizar el estado local del escaner
       const currentScanners = this.scanners();

@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -19,6 +20,8 @@ import { ScannerFacadeService } from '../../services/scanner-facade.service';
 import { DialogScannerExpand } from '../../components/scanner-list/scanner-card/scanner-dialog/dialog-scanner-expand';
 import { MatCardModule } from '@angular/material/card';
 import { I18nService } from '../../../../core/services/i18n/i18n.service';
+import { NotificacionSseService } from '../../services/notificacion-sse.service';
+import { MetadatosEstadoEscaner } from '../../models/notificacion.interface';
 
 interface ArchivedScannerRow {
   idEscaner: number;
@@ -48,12 +51,20 @@ interface ArchivedScannerRow {
   styleUrl: './scanner-list-archives.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerListArchives implements OnInit, AfterViewInit {
+export class ScannerListArchives implements OnInit, OnDestroy, AfterViewInit {
   private readonly facade = inject(ScannerFacadeService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly translate = inject(TranslateService);
   private readonly i18nService = inject(I18nService);
+  private readonly notificacionSseService = inject(NotificacionSseService);
+
+  // Estados que cambian que fila de esta lista debe existir -- ARCHIVADO la
+  // agrega (o CREADO no aplica aca), DESARCHIVADO/ELIMINADO la quitan. Un
+  // refresco completo es suficiente: esta lista es chica y se ve con poca
+  // frecuencia comparada con la principal, no justifica parchear a mano.
+  private static readonly ESTADOS_QUE_AFECTAN_ARCHIVADOS = new Set(['ARCHIVADO', 'DESARCHIVADO', 'ELIMINADO']);
+  private sseSubscription?: Subscription;
 
   readonly loading = this.facade.loading;
   readonly error = this.facade.error;
@@ -74,6 +85,21 @@ export class ScannerListArchives implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.loadArchivedScanners();
+    this.sseSubscription = this.notificacionSseService.conectar().subscribe(notificacion => {
+      if (notificacion.tipo !== 'SCANNER_STATE' || !notificacion.metadatos) return;
+      try {
+        const metadatos: MetadatosEstadoEscaner = JSON.parse(notificacion.metadatos);
+        if (ScannerListArchives.ESTADOS_QUE_AFECTAN_ARCHIVADOS.has(metadatos.estadoNuevo)) {
+          this.loadArchivedScanners();
+        }
+      } catch (e) {
+        console.error('Error parseando metadatos de estado:', e);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.sseSubscription?.unsubscribe();
   }
 
   ngAfterViewInit(): void {
