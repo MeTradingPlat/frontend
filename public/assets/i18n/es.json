@@ -211,7 +211,6 @@
     "PIVOTS_EMPTY": "No se encontraron pivots cercanos al precio actual de este símbolo",
     "PIVOTS_CONFIG_HINT": "Reconfigurar y recalcular los pivots",
     "PIVOTS_CONFIG_TITLE": "Configurar Pivots",
-    "PIVOTS_CONFIG_DESCRIPTION": "Elegí cómo buscar los picos y valles de precio antes de dibujarlos en el gráfico",
     "PIVOTS_CONFIG_ERROR": "No se pudo cargar la configuración de pivots",
     "PIVOTS_CONFIG_PRICE_REFERENCE_LABEL": "Precio de referencia",
     "PIVOTS_CONFIG_PRICE_LIVE": "En vivo",

@@ -211,7 +211,6 @@
     "PIVOTS_EMPTY": "No pivots found near this symbol's current price",
     "PIVOTS_CONFIG_HINT": "Reconfigure and recalculate pivots",
     "PIVOTS_CONFIG_TITLE": "Configure Pivots",
-    "PIVOTS_CONFIG_DESCRIPTION": "Choose how to search for price swing highs/lows before drawing them on the chart",
     "PIVOTS_CONFIG_ERROR": "Couldn't load the pivots configuration",
     "PIVOTS_CONFIG_PRICE_REFERENCE_LABEL": "Reference price",
     "PIVOTS_CONFIG_PRICE_LIVE": "Live",
