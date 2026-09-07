@@ -214,7 +214,7 @@
     "PIVOTS_CONFIG_ERROR": "Couldn't load the pivots configuration",
     "PIVOTS_CONFIG_PRICE_REFERENCE_LABEL": "Reference price",
     "PIVOTS_CONFIG_PRICE_LIVE": "Live",
-    "PIVOTS_CONFIG_PRICE_OPEN": "Today's open",
+    "PIVOTS_CONFIG_PRICE_OPEN": "Open",
     "PIVOTS_CONFIG_PRICE_PREV_CLOSE": "Previous close",
     "PIVOTS_CONFIG_PARAMETERS_LABEL": "Search parameters",
     "PIVOTS_CONFIG_ATR_HINT": "Measures the symbol's recent volatility -- a longer period makes the pivot search range adjust more slowly to recent volatility changes",
