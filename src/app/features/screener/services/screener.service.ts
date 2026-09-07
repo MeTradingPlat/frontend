@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { Market, PaginatedResponse, Symbol, SymbolDetails, Timeframe } from '../models/screener.models';
 import { HistoricalCandleDTO } from '../models/candle.models';
-import { PivotsResponse } from '../models/pivots.models';
+import { PivotsConfig, PivotsResponse } from '../models/pivots.models';
 
 /**
  * ScreenerService
@@ -79,10 +79,20 @@ export class ScreenerService {
 
   /**
    * GET /escaner/pivots/{symbol} — picos/valles de precio (D1) cercanos al
-   * precio actual, con los parametros por defecto del indicador de salida
-   * Pivots (ATR 14, 5 años de histórico, 1 nivel por lado).
+   * precio actual. Sin config usa los defaults del backend (ver
+   * PivotesRestController); con config, manda los 5 parametros elegidos en
+   * PivotsConfigDialog.
    */
-  getPivots(symbol: string): Observable<PivotsResponse> {
-    return this.http.get<PivotsResponse>(`${this.pivotsUrl}/${symbol}`);
+  getPivots(symbol: string, config?: PivotsConfig): Observable<PivotsResponse> {
+    let params = new HttpParams();
+    if (config) {
+      params = params
+        .set('atrLength', config.atrLength)
+        .set('slipRatioPct', config.slipRatioPct)
+        .set('longitudVelas', config.longitudVelas)
+        .set('aniosHistorico', config.aniosHistorico)
+        .set('numeroPivotes', config.numeroPivotes);
+    }
+    return this.http.get<PivotsResponse>(`${this.pivotsUrl}/${symbol}`, { params });
   }
 }

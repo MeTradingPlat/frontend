@@ -1,0 +1,83 @@
+mat-dialog-content {
+  padding: 0 !important;
+  max-height: 90vh !important;
+}
+
+.dialog-card {
+  width: 480px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  border: none;
+  overflow: hidden;
+
+  .mat-mdc-card-header {
+    display: flex;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--mat-sys-primary);
+    width: 100%;
+    position: relative;
+  }
+
+  .mat-mdc-card-title {
+    color: var(--mat-sys-on-primary);
+  }
+
+  .header-icons {
+    position: absolute;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    color: var(--mat-sys-on-primary);
+
+    i {
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .mat-mdc-card-content {
+    padding: 16px;
+    background-color: var(--mat-sys-surface-container-low);
+  }
+}
+
+.dialog-state {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.dialog-description {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.parameters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 4px 12px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    margin-right: 4px;
+  }
+}

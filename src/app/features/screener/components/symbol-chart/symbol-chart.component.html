@@ -55,6 +55,16 @@
       }
       {{ 'ASSETS.TOOL_PIVOTS' | translate }}
     </button>
+    @if (pivotsActive()) {
+      <button
+        mat-icon-button
+        class="pivots-config-btn"
+        [disabled]="pivotsLoading()"
+        [matTooltip]="'ASSETS.PIVOTS_CONFIG_HINT' | translate"
+        (click)="openPivotsConfig()">
+        <mat-icon>tune</mat-icon>
+      </button>
+    }
 
     @if (!isCalendarTimeframe()) {
       <button

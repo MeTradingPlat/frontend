@@ -16,6 +16,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -31,10 +32,11 @@ import { ScreenerService } from '../../services/screener.service';
 import { TimezoneService } from '../../../../core/services/timezone.service';
 import { ThemeService } from '../../../../core/services/theme/theme.service';
 import { CandleBar, CandleStreamMessage, HistoricalCandleDTO } from '../../models/candle.models';
-import { PivotsResponse } from '../../models/pivots.models';
+import { PivotsConfig, PivotsResponse } from '../../models/pivots.models';
 import { ChartDrawingManager, DrawingTool } from './drawing/chart-drawing-manager';
 import { VerticalLinePrimitive } from './drawing/vertical-line-primitive';
 import { PageMaintenance } from '../../../../shared/components/ui/page-maintenance/page-maintenance';
+import { PivotsConfigDialog } from './pivots-config-dialog/pivots-config-dialog';
 
 interface TimeframeOption {
   id: string;
@@ -191,7 +193,7 @@ function fromHistoricalDto(dto: HistoricalCandleDTO): CandleBar {
   selector: 'app-symbol-chart',
   standalone: true,
   imports: [
-    CommonModule, MatButtonToggleModule, MatButtonModule, MatIconModule, MatMenuModule,
+    CommonModule, MatButtonToggleModule, MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule,
     MatProgressSpinnerModule, MatTooltipModule, TranslateModule, PageMaintenance
   ],
   templateUrl: './symbol-chart.component.html',
@@ -231,6 +233,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private readonly candleStream = inject(CandleStreamService);
   private readonly screenerService = inject(ScreenerService);
+  private readonly dialog = inject(MatDialog);
   // Titulos de createPriceLine() se dibujan desde codigo TS (API de la
   // libreria de graficos), no desde el HTML -- el pipe `| translate` no
   // aplica aca, hace falta el servicio para traducir en el momento.
@@ -268,6 +271,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   // en el chart -- cambiar de timeframe no invalida esta respuesta, solo
   // cambiar de simbolo (comparado via lastPivotsResponse.symbol).
   private lastPivotsResponse: PivotsResponse | null = null;
+  // Config elegida la ultima vez en PivotsConfigDialog -- se reusa para
+  // reabrir la ventana con esos mismos valores (en vez de resetear a los
+  // defaults) y para saber si hay que invalidar lastPivotsResponse cuando
+  // cambia (ver openPivotsConfig).
+  private lastPivotsConfig: PivotsConfig | null = null;
   private signalLinePrimitive: VerticalLinePrimitive | null = null;
   private drawingManager: ChartDrawingManager | null = null;
   private streamSubscription: Subscription | null = null;
@@ -710,10 +718,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     });
   }
 
-  // Picos y valles (Pivots) -- exploratorio, con los valores por defecto del
-  // indicador de salida en configuracion de escaner (ATR 14, 5 años D1, 1
-  // nivel por lado). Toggle: un segundo click limpia las lineas sin
-  // reconsultar.
+  // Picos y valles (Pivots) -- exploratorio. Primer click: abre la ventana
+  // de configuracion (ver openPivotsConfig) en vez de calcular directo con
+  // los defaults -- solo "Calcular" ahi dispara el fetch. Segundo click (ya
+  // activo): toggle rapido, limpia las lineas sin reconsultar ni reabrir la
+  // ventana.
   togglePivots(): void {
     if (this.pivotsActive()) {
       this.pivotsActive.set(false);
@@ -721,19 +730,30 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.series?.priceScale().setAutoScale(true);
       return;
     }
+    this.openPivotsConfig();
+  }
+
+  // Reabre la configuracion con lo ultimo elegido (o los defaults del
+  // backend si nunca se calculo) para recalcular con otros parametros sin
+  // pasar por el toggle rapido de arriba -- boton de engranaje, visible solo
+  // con pivotsActive() (ver symbol-chart.component.html).
+  openPivotsConfig(): void {
+    const dialogRef = this.dialog.open(PivotsConfigDialog, {
+      autoFocus: false,
+      data: { initial: this.lastPivotsConfig ?? undefined }
+    });
+    dialogRef.afterClosed().subscribe((config: PivotsConfig | undefined) => {
+      if (!config) return;
+      this.lastPivotsConfig = config;
+      this.lastPivotsResponse = null; // fuerza a repedir: la config cambio
+      this.fetchAndDrawPivots(config);
+    });
+  }
+
+  private fetchAndDrawPivots(config: PivotsConfig): void {
     this.pivotsEmpty.set(false);
-    // Mismo simbolo ya consultado (toggle off/on) -- redibuja lo cacheado en
-    // vez de volver a pedir. Los niveles son fijos mientras se siga viendo
-    // el mismo simbolo; solo cambiar de simbolo invalida lastPivotsResponse
-    // (ver symbolChanged en ngOnChanges). Sin el alejamiento inicial -- ese
-    // solo aplica la primera vez que se calculan (ver el subscribe de abajo).
-    if (this.lastPivotsResponse?.symbol === this.symbol) {
-      this.pivotsActive.set(true);
-      this.drawPivots(this.lastPivotsResponse);
-      return;
-    }
     this.pivotsLoading.set(true);
-    this.screenerService.getPivots(this.symbol).subscribe({
+    this.screenerService.getPivots(this.symbol, config).subscribe({
       // El backend responde 204 (exito, sin cuerpo -- no es un error HTTP)
       // cuando no pudo calcular pivots para el simbolo, asi que response
       // llega null aca, no al callback de error. Tambien puede responder 200
@@ -757,26 +777,29 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     });
   }
 
-  // Aleja la vista lo justo para asomar los pivots que quedan fuera del
-  // rango natural de las velas visibles -- solo al calcularlos por primera
-  // vez (no en cada redibujo ni en cada tick del stream, que es lo que
-  // causaba el reajuste constante que se veia como si el precio "no se
-  // mantuviera" en timeframes intraday). SOFTEN < 1 para no ir hasta el
-  // pivot mas lejano de una vez, solo acercar la vista sin alejarla tanto
-  // como antes.
-  private static readonly PIVOT_ZOOM_SOFTEN = 0.35;
+  // Aleja la vista lo justo para asomar el pivot MAS CERCANO de cada lado
+  // (uno arriba, uno abajo), no el mas lejano -- con numeroPivotes por
+  // defecto en 5, alejar hasta el 5to nivel de cada lado dejaba las velas
+  // planas e ilegibles para simbolos con pivots dispersos. Solo al
+  // calcularlos por primera vez (no en cada redibujo ni en cada tick del
+  // stream, que es lo que causaba el reajuste constante que se veia como si
+  // el precio "no se mantuviera" en timeframes intraday).
+  private static readonly PIVOT_ZOOM_MARGIN = 0.1;
 
   private applyInitialPivotZoom(response: PivotsResponse): void {
     if (!this.series) return;
     const priceScale = this.series.priceScale();
     const visible = priceScale.getVisibleRange();
     if (!visible) return;
-    const precios = [...response.resistances.map(r => r.price), ...response.supports.map(s => s.price)];
-    if (!precios.length) return;
-    const minPivot = Math.min(...precios);
-    const maxPivot = Math.max(...precios);
-    const from = minPivot < visible.from ? visible.from - (visible.from - minPivot) * SymbolChartComponent.PIVOT_ZOOM_SOFTEN : visible.from;
-    const to = maxPivot > visible.to ? visible.to + (maxPivot - visible.to) * SymbolChartComponent.PIVOT_ZOOM_SOFTEN : visible.to;
+    const nearestResistance = response.resistances.length
+      ? Math.min(...response.resistances.map(r => r.price)) : null;
+    const nearestSupport = response.supports.length
+      ? Math.max(...response.supports.map(s => s.price)) : null;
+    if (nearestResistance === null && nearestSupport === null) return;
+
+    const padding = (visible.to - visible.from) * SymbolChartComponent.PIVOT_ZOOM_MARGIN;
+    const from = nearestSupport !== null && nearestSupport < visible.from ? nearestSupport - padding : visible.from;
+    const to = nearestResistance !== null && nearestResistance > visible.to ? nearestResistance + padding : visible.to;
     if (from === visible.from && to === visible.to) return;
     priceScale.setAutoScale(false);
     priceScale.setVisibleRange({ from, to });
