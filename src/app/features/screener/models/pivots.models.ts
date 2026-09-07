@@ -12,7 +12,13 @@ export interface PivotsResponse {
   supports: PivotLevel[];
 }
 
-// Mismos 5 parametros que acepta GET /escaner/pivots/{symbol} en
+// "live" = ultimo trade real (default, de siempre). "open" = apertura de la
+// vela D1 de HOY (falla si el mercado no abrio todavia). "prev_close" =
+// cierre de la ultima vela D1 YA CERRADA (el dia anterior si hoy sigue
+// abierto). Ver _resolve_current_price en signal-processing-service.
+export type PivotsPriceReference = 'live' | 'open' | 'prev_close';
+
+// Mismos parametros que acepta GET /escaner/pivots/{symbol} en
 // scanner-management-service (y, debajo, signal-processing-service) --
 // ninguno tiene que mandarse, el backend ya trae sus propios defaults.
 export interface PivotsConfig {
@@ -21,4 +27,5 @@ export interface PivotsConfig {
   longitudVelas: number;
   aniosHistorico: number;
   numeroPivotes: number;
+  priceReference: PivotsPriceReference;
 }

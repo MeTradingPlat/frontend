@@ -91,7 +91,8 @@ export class ScreenerService {
         .set('slipRatioPct', config.slipRatioPct)
         .set('longitudVelas', config.longitudVelas)
         .set('aniosHistorico', config.aniosHistorico)
-        .set('numeroPivotes', config.numeroPivotes);
+        .set('numeroPivotes', config.numeroPivotes)
+        .set('priceReference', config.priceReference);
     }
     return this.http.get<PivotsResponse>(`${this.pivotsUrl}/${symbol}`, { params });
   }

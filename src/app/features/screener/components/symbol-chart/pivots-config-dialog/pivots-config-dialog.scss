@@ -3,51 +3,32 @@ mat-dialog-content {
   max-height: 90vh !important;
 }
 
-.dialog-card {
+.dialog-container {
   width: 480px;
   max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+}
+
+.dialog-header {
   display: flex;
-  flex-direction: column;
-  border: none;
-  overflow: hidden;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
 
-  .mat-mdc-card-header {
-    display: flex;
-    box-sizing: border-box;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--mat-sys-primary);
-    width: 100%;
-    position: relative;
-  }
+.dialog-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+}
 
-  .mat-mdc-card-title {
-    color: var(--mat-sys-on-primary);
-  }
-
-  .header-icons {
-    position: absolute;
-    right: 16px;
-    display: flex;
-    align-items: center;
-    color: var(--mat-sys-on-primary);
-
-    i {
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        transform: scale(1.1);
-        opacity: 0.7;
-      }
-    }
-  }
-
-  .mat-mdc-card-content {
-    padding: 16px;
-    background-color: var(--mat-sys-surface-container-low);
-  }
+.dialog-body {
+  padding: 20px;
 }
 
 .dialog-state {
@@ -57,22 +38,65 @@ mat-dialog-content {
 }
 
 .dialog-description {
-  margin: 0 0 16px;
+  margin: 0 0 24px;
   font-size: 13px;
   color: var(--mat-sys-on-surface-variant);
 }
 
-.parameters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 4px 12px;
+.config-section {
+  margin-bottom: 28px;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mat-sys-primary);
+}
+
+.price-reference-toggle {
+  width: 100%;
+
+  ::ng-deep .mat-button-toggle {
+    flex: 1;
+  }
+}
+
+.parameters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.parameter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  app-integer-parameter, app-float-parameter {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.param-hint {
+  font-size: 16px;
+  color: var(--mat-sys-on-surface-variant);
+  cursor: help;
+  flex-shrink: 0;
 }
 
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 28px;
 
   mat-icon {
     font-size: 18px;

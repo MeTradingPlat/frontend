@@ -1,45 +1,63 @@
-<mat-dialog-content appI18nRefresh>
-  <mat-card appearance="outlined" class="dialog-card">
-    <mat-card-header>
-      <mat-card-title>{{ 'ASSETS.PIVOTS_CONFIG_TITLE' | translate }}</mat-card-title>
-      <div class="header-icons">
-        <i mat-dialog-close class="bi bi-x-circle-fill"></i>
+<div class="dialog-container" appI18nRefresh>
+  <header class="dialog-header">
+    <h2 class="dialog-title">{{ 'ASSETS.PIVOTS_CONFIG_TITLE' | translate }}</h2>
+    <button mat-icon-button class="close-btn" mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="dialog-body">
+    @if (loading()) {
+      <div class="dialog-state">
+        <mat-spinner diameter="32"></mat-spinner>
       </div>
-    </mat-card-header>
-    <mat-card-content>
-      @if (loading()) {
-        <div class="dialog-state">
-          <mat-spinner diameter="32"></mat-spinner>
-        </div>
-      } @else if (loadError() || !indicador()) {
-        <div class="dialog-state">
-          <p>{{ 'ASSETS.PIVOTS_CONFIG_ERROR' | translate }}</p>
-        </div>
-      } @else {
-        <p class="dialog-description">{{ 'ASSETS.PIVOTS_CONFIG_DESCRIPTION' | translate }}</p>
-        <div class="parameters-grid">
+    } @else if (loadError() || !indicador()) {
+      <div class="dialog-state">
+        <p>{{ 'ASSETS.PIVOTS_CONFIG_ERROR' | translate }}</p>
+      </div>
+    } @else {
+      <p class="dialog-description">{{ 'ASSETS.PIVOTS_CONFIG_DESCRIPTION' | translate }}</p>
+
+      <section class="config-section">
+        <h3 class="section-title">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_REFERENCE_LABEL' | translate }}</h3>
+        <mat-button-toggle-group
+          class="price-reference-toggle"
+          [value]="priceReference()"
+          (change)="priceReference.set($event.value)">
+          <mat-button-toggle value="live">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_LIVE' | translate }}</mat-button-toggle>
+          <mat-button-toggle value="open">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_OPEN' | translate }}</mat-button-toggle>
+          <mat-button-toggle value="prev_close">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_PREV_CLOSE' | translate }}</mat-button-toggle>
+        </mat-button-toggle-group>
+      </section>
+
+      <section class="config-section">
+        <h3 class="section-title">{{ 'ASSETS.PIVOTS_CONFIG_PARAMETERS_LABEL' | translate }}</h3>
+        <div class="parameters-list">
           @for (parametro of indicador()!.parametros; track parametro.enumParametro; let i = $index) {
-            @switch (parametro.objValorSeleccionado.enumTipoValor) {
-              @case ('INTEGER') {
-                <app-integer-parameter [(parametro)]="indicador()!.parametros[i]" />
+            <div class="parameter-row">
+              @if (hintKey(parametro.enumParametro); as hint) {
+                <i class="bi bi-info-circle-fill param-hint" [matTooltip]="hint | translate"></i>
               }
-              @case ('FLOAT') {
-                <app-float-parameter [(parametro)]="indicador()!.parametros[i]" />
+              @switch (parametro.objValorSeleccionado.enumTipoValor) {
+                @case ('INTEGER') {
+                  <app-integer-parameter [(parametro)]="indicador()!.parametros[i]" />
+                }
+                @case ('FLOAT') {
+                  <app-float-parameter [(parametro)]="indicador()!.parametros[i]" />
+                }
               }
-              @case ('STRING') {
-                <app-options-parameter [(parametro)]="indicador()!.parametros[i]" />
-              }
-            }
+            </div>
           }
         </div>
-        <div class="dialog-actions">
-          <button mat-button mat-dialog-close>{{ 'ASSETS.PIVOTS_CONFIG_CANCEL' | translate }}</button>
-          <button mat-raised-button color="primary" (click)="onCalcular()">
-            <mat-icon>terrain</mat-icon>
-            {{ 'ASSETS.PIVOTS_CONFIG_CALCULATE' | translate }}
-          </button>
-        </div>
-      }
-    </mat-card-content>
-  </mat-card>
-</mat-dialog-content>
+      </section>
+
+      <div class="dialog-actions">
+        <button mat-button mat-dialog-close>{{ 'ASSETS.PIVOTS_CONFIG_CANCEL' | translate }}</button>
+        <button mat-raised-button color="primary" (click)="onCalcular()">
+          <mat-icon>terrain</mat-icon>
+          {{ 'ASSETS.PIVOTS_CONFIG_CALCULATE' | translate }}
+        </button>
+      </div>
+    }
+  </div>
+</div>

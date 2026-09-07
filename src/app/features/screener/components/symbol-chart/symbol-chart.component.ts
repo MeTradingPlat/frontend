@@ -740,6 +740,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   openPivotsConfig(): void {
     const dialogRef = this.dialog.open(PivotsConfigDialog, {
       autoFocus: false,
+      panelClass: 'premium-dialog',
       data: { initial: this.lastPivotsConfig ?? undefined }
     });
     dialogRef.afterClosed().subscribe((config: PivotsConfig | undefined) => {
