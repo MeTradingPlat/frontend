@@ -225,6 +225,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
   readonly pivotsActive = signal(false);
   readonly pivotsLoading = signal(false);
   readonly pivotsEmpty = signal(false);
+  readonly pivotsError = signal<string | null>(null);
   // true = horario extendido incluido por defecto (a diferencia del
   // default de TradingView) -- decision explicita del usuario, ver el
   // comentario de isRegularSession mas arriba para el porque del filtro.
@@ -730,6 +731,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
       this.series?.priceScale().setAutoScale(true);
       return;
     }
+    this.pivotsError.set(null);
     this.openPivotsConfig();
   }
 
@@ -753,6 +755,7 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
 
   private fetchAndDrawPivots(config: PivotsConfig): void {
     this.pivotsEmpty.set(false);
+    this.pivotsError.set(null);
     this.pivotsLoading.set(true);
     this.screenerService.getPivots(this.symbol, config).subscribe({
       // El backend responde 204 (exito, sin cuerpo -- no es un error HTTP)
@@ -772,8 +775,15 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
         this.drawPivots(response);
         this.applyInitialPivotZoom(response);
       },
+      // Antes esto quedaba en silencio total (solo apagaba el spinner) --
+      // un 404 real (ej. priceReference="open" antes de que abra el
+      // mercado) se veia identico a que el boton simplemente no hiciera
+      // nada, sin pista de que la config elegida fallo (confirmado en vivo
+      // el 2026-09-07, reportado como bloqueo CORS que en realidad era este
+      // 404 sin feedback visible).
       error: () => {
         this.pivotsLoading.set(false);
+        this.pivotsError.set('ASSETS.PIVOTS_CONFIG_CALCULATE_ERROR');
       }
     });
   }

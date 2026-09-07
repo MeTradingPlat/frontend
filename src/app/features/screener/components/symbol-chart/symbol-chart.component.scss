@@ -104,6 +104,11 @@
   background: var(--mat-sys-secondary-container, rgba(33, 150, 243, 0.15));
   color: var(--mat-sys-on-secondary-container, #2196f3);
   font-size: 0.8rem;
+
+  &--error {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
 }
 
 .chart-container-outer {
