@@ -33,6 +33,17 @@ const PARAM = {
 } as const;
 const PARAMETROS_VISIBLES: string[] = Object.values(PARAM);
 
+// Defaults ORIGINALES de GET /escaner/pivots/{symbol} (ver
+// PivotesRestController), NO los del catalogo de indicador de salida --
+// difieren en aniosHistorico (4 vs 5) y numeroPivotes (5 vs 1), porque el
+// catalogo sirve a un caso de uso distinto (SL/TP de una posicion abierta,
+// donde 1 nivel alcanza) y puede evolucionar por separado. Esta ventana es
+// la de exploracion del chart: arranca con la config que ya tenia antes de
+// existir este dialogo.
+const BASE_DEFAULTS: PivotsConfig = {
+  atrLength: 14, slipRatioPct: 0.1, longitudVelas: 2, aniosHistorico: 4, numeroPivotes: 5, priceReference: 'live'
+};
+
 @Component({
   selector: 'app-pivots-config-dialog',
   imports: [
@@ -56,7 +67,7 @@ export class PivotsConfigDialog implements OnInit {
   ngOnInit(): void {
     this.facade.getIndicadorSalidaPorDefectoSilent(ENUM_INDICADOR_PIVOTS).subscribe({
       next: (indicador) => {
-        const conValores = this.data.initial ? this.conValoresIniciales(indicador, this.data.initial) : indicador;
+        const conValores = this.conValoresIniciales(indicador, this.data.initial ?? BASE_DEFAULTS);
         this.indicador.set({
           ...conValores,
           parametros: conValores.parametros.filter(p => PARAMETROS_VISIBLES.includes(p.enumParametro))
@@ -70,9 +81,10 @@ export class PivotsConfigDialog implements OnInit {
     });
   }
 
-  // Reabrir la ventana ya con lo que la persona eligio la vez anterior
-  // (en vez de siempre resetear a los defaults del backend) -- ver
-  // openPivotsConfig en symbol-chart.component.ts.
+  // Pisa los valores del catalogo con los que la persona eligio la vez
+  // anterior (ver openPivotsConfig en symbol-chart.component.ts) o, si nunca
+  // calculo, con BASE_DEFAULTS -- nunca se muestran los defaults del
+  // catalogo tal cual (ver el comentario de BASE_DEFAULTS).
   private conValoresIniciales(indicador: IndicadorSalida, initial: PivotsConfig): IndicadorSalida {
     const valoresPorEnum: Record<string, number> = {
       [PARAM.LONGITUD_VELAS]: initial.longitudVelas,

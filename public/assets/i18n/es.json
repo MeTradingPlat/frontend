@@ -225,7 +225,6 @@
     "PIVOTS_CONFIG_NUMERO_HINT": "Cuántos niveles de soporte y de resistencia mostrar como máximo, contando desde el más cercano al precio actual",
     "PIVOTS_CONFIG_CANCEL": "Cancelar",
     "PIVOTS_CONFIG_CALCULATE": "Calcular",
-    "PIVOTS_CONFIG_CALCULATE_ERROR": "No se pudieron calcular los pivots con esa configuración (probá otro precio de referencia o parámetros)",
     "TOOL_EXTENDED_HOURS": "Horario extendido",
     "TOOL_EXTENDED_HOURS_HINT": "Incluye pre-market, post-market y operaciones fuera del horario regular (9:30-16:00 ET). Desactivado por defecto, igual que TradingView",
     "SIGNAL_LINE": "Señal",

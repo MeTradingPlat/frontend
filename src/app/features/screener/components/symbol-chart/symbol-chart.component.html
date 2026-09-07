@@ -85,9 +85,6 @@
   @if (pivotsEmpty()) {
     <div class="drawing-hint">{{ 'ASSETS.PIVOTS_EMPTY' | translate }}</div>
   }
-  @if (pivotsError()) {
-    <div class="drawing-hint drawing-hint--error">{{ pivotsError()! | translate }}</div>
-  }
 
   <div class="chart-container-outer">
     @if (maintenance()) {
