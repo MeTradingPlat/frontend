@@ -151,13 +151,13 @@
 
 // El navbar se achica en movil (ver header-navbar.scss), y styles.scss ya
 // baja el margin-top del host a 100px acorde -- esta altura acotada tiene
-// que seguirlo o queda un hueco/recorte de ~15px. Los campos del filtro
-// tambien pasan al mismo ancho compacto que ya usan los toolbars de
-// Senales/Registro (search-field/date-field) en vez del min-width pensado
-// para escritorio, que en un telefono forzaba un wrap feo o desbordaba. En
-// una fila tan angosta no caben las 3 columnas de contenido junto al ojo --
-// se oculta descripcion y se deja simbolo + mercado + ojo (pedido explicito:
-// mercado es mas util de un vistazo que la descripcion larga).
+// que seguirlo o queda un hueco/recorte de ~15px. flex-wrap:nowrap +
+// flex-basis en % (no min-width fijo, pensado para escritorio) para que
+// busqueda y mercado sigan compartiendo el renglon en vez de apilarse --
+// mismo ajuste que los toolbars de Senales/Registro (search-field/date-field).
+// En una fila tan angosta no caben las 3 columnas de contenido junto al ojo
+// -- se oculta descripcion y se deja simbolo + mercado + ojo (pedido
+// explicito: mercado es mas util de un vistazo que la descripcion larga).
 @media (max-width: 768px) {
   .screener-container {
     padding: 0 12px 12px;
@@ -166,13 +166,16 @@
 
   .filter-section {
     padding: 12px 16px;
+    flex-wrap: nowrap;
 
     .search-field {
-      min-width: 160px;
+      min-width: 0;
+      flex: 1 1 55%;
     }
 
     .market-field {
-      min-width: 140px;
+      min-width: 0;
+      flex: 1 1 45%;
     }
   }
 

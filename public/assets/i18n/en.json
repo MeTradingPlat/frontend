@@ -134,7 +134,6 @@
     "NO_SIGNALS": "No signals yet",
     "SIGNALS_FILTER_LABEL": "Signals from",
     "REGISTRY_FILTER_LABEL": "Registry from",
-    "SEARCH_SYMBOL_LABEL": "Search symbol",
     "TODAY": "Today",
     "SIGNAL_MESSAGE": "Signal generated for {{symbol}} in '{{scannerName}}'",
     "SIGNAL_GROUP_COUNT": "{{count}} signals this minute",
@@ -190,7 +189,6 @@
   },
   "ASSETS": {
     "TITLE": "Assets",
-    "SEARCH_LABEL": "Search symbol or description",
     "MARKET_LABEL": "Filter by Market",
     "LOADING": "Fetching Market Data...",
     "SYMBOL": "Symbol",
