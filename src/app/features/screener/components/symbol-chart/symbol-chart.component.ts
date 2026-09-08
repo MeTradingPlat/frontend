@@ -649,11 +649,22 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     // cargada (sin siguiente todavia) usa el periodo nominal como respaldo.
     const period = TIMEFRAME_SECONDS[this.selectedTimeframe()]
       ?? (this.allBars.length > 1 ? this.allBars[1].time - this.allBars[0].time : 60);
-    const nearestIdx = this.allBars.findIndex((b, i) => {
+    let nearestIdx = this.allBars.findIndex((b, i) => {
       if (b.time > target) return false;
       const windowEnd = this.allBars[i + 1]?.time ?? b.time + period;
       return target < windowEnd;
     });
+    // El objetivo es el momento en que se PUBLICO la senal (ver el
+    // comentario de markerTime en symbol-details.component.ts), no el
+    // cierre de la vela que la disparo -- en un simbolo poco liquido puede
+    // que no vuelva a operar entre el cierre de esa vela y la publicacion
+    // (confirmado en vivo con CTAS: una sola operacion a las 4:38pm, nada
+    // despues, senal publicada a las 4:46pm). Ninguna vela futura va a
+    // "llegar" para ese instante -- ya paso -- asi que en vez de no dibujar
+    // nada se usa la ULTIMA vela cargada como mejor referencia disponible.
+    if (nearestIdx === -1 && this.allBars.length > 0 && target >= this.allBars[this.allBars.length - 1].time) {
+      nearestIdx = this.allBars.length - 1;
+    }
     if (nearestIdx === -1) {
       const first = this.allBars[0].time;
       if (target < first && this.hasMoreHistory && !this.isLoadingMore) {
