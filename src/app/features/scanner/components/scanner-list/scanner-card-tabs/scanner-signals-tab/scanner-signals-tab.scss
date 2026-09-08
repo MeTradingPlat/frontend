@@ -137,10 +137,17 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
+// opacity va en el span interno, no en la celda -- ponerla en el <td>
+// tambien apagaba el brillo del borde/linea divisoria de esa columna,
+// haciendola ver mas delgada que las de sus vecinas (confirmado con
+// captura de pantalla el 2026-09-08).
 .numero-cell {
   width: 48px;
-  opacity: 0.6;
   font-variant-numeric: tabular-nums;
+
+  span {
+    opacity: 0.6;
+  }
 }
 
 .action-icon {
