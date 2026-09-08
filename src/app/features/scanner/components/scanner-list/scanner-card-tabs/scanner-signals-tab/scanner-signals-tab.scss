@@ -33,12 +33,15 @@
   flex-direction: column;
 }
 
-// itemSize (60px, ver el .html) debe coincidir con el alto real de una fila
-// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas. 60px (en
-// vez de los 49px de una sola linea) es lo que ocupa timestamp-cell partida
-// en 2 renglones (ver mas abajo) -- .mat-mdc-row de abajo fija ese mismo
-// alto para TODAS las filas, asi que virtual-scroll y layout real coinciden
-// aunque el resto de columnas siga siendo de una sola linea.
+// itemSize (68px, ver el .html) debe coincidir con el alto real de una fila
+// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas. 68px (en
+// vez de los 49px de una sola linea) es lo que necesita timestamp-cell
+// partida en 2 renglones (ver mas abajo) con margen de sobra -- 60px se
+// quedaba corto por unos pixeles y la linea de la hora quedaba cortada por
+// el borde inferior de la fila (confirmado con captura de pantalla el
+// 2026-09-08). .mat-mdc-row de abajo fija ese mismo alto para TODAS las
+// filas, asi que virtual-scroll y layout real coinciden aunque el resto de
+// columnas siga siendo de una sola linea.
 .signals-viewport {
   flex: 1;
   min-height: 0;
@@ -97,7 +100,7 @@ table {
 // que virtual-scroll calculo, y vuelve el desfase/hueco que ya se habia
 // resuelto una vez para celular (ver el comentario mas abajo).
 .mat-mdc-row {
-  height: 60px;
+  height: 68px;
 }
 
 .details-cell {
