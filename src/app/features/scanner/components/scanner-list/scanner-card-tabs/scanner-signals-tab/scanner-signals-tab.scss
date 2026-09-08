@@ -33,8 +33,12 @@
   flex-direction: column;
 }
 
-// itemSize (49px, ver el .html) debe coincidir con el alto real de una fila
-// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas.
+// itemSize (60px, ver el .html) debe coincidir con el alto real de una fila
+// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas. 60px (en
+// vez de los 49px de una sola linea) es lo que ocupa timestamp-cell partida
+// en 2 renglones (ver mas abajo) -- .mat-mdc-row de abajo fija ese mismo
+// alto para TODAS las filas, asi que virtual-scroll y layout real coinciden
+// aunque el resto de columnas siga siendo de una sola linea.
 .signals-viewport {
   flex: 1;
   min-height: 0;
@@ -87,8 +91,37 @@ table {
   text-overflow: ellipsis;
 }
 
+// Fija el alto de fila al mismo valor que itemSize (ver el comentario de
+// .signals-viewport) -- sin esto, timestamp-cell partida en 2 renglones
+// (mas alta que las demas columnas) estira la fila real por encima de lo
+// que virtual-scroll calculo, y vuelve el desfase/hueco que ya se habia
+// resuelto una vez para celular (ver el comentario mas abajo).
+.mat-mdc-row {
+  height: 60px;
+}
+
 .details-cell {
   text-align: center;
+}
+
+// timestamp-cell es la unica columna que envuelve a 2 renglones a proposito
+// (ver el comentario del matColumnDef en el .html) -- .mat-mdc-cell de
+// arriba pone nowrap para el resto, aca se anula sola.
+.timestamp-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.timestamp-date {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.timestamp-time {
+  font-variant-numeric: tabular-nums;
 }
 
 .numero-cell {

@@ -33,7 +33,7 @@
        confirmado en vivo con 521 senales/dia) renderizaria esa cantidad de
        filas de una sola vez. CdkTable detecta el viewport ancestro y
        virtualiza sus filas automaticamente, sin cambiar el markup de abajo. -->
-  <cdk-virtual-scroll-viewport itemSize="49" class="signals-viewport">
+  <cdk-virtual-scroll-viewport itemSize="60" class="signals-viewport">
   <table mat-table [dataSource]="filteredDataSource()">
 
     <!-- Numero Column -->
@@ -42,10 +42,16 @@
       <td mat-cell *matCellDef="let row" class="numero-cell">{{ row.numero }}</td>
     </ng-container>
 
-    <!-- Timestamp Column -->
+    <!-- Timestamp Column: fecha y hora en renglones separados -- una sola
+         linea (DD/MM/YYYY, HH:MM:SS ET) obligaba a scroll horizontal en la
+         tarjeta de escaner (ver itemSize mas abajo, ajustado al alto de 2
+         renglones). -->
     <ng-container matColumnDef="timestamp">
       <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>
-      <td mat-cell *matCellDef="let row" class="timestamp-cell">{{ row.timestamp | marketDatetime : true }}</td>
+      <td mat-cell *matCellDef="let row" class="timestamp-cell">
+        <div class="timestamp-date">{{ row.timestamp | marketDate }}</div>
+        <div class="timestamp-time">{{ row.timestamp | marketTime : true }}</div>
+      </td>
     </ng-container>
 
     <!-- Symbol Column -->

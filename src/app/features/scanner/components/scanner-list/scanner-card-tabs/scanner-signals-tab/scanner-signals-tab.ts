@@ -16,7 +16,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { Escaner } from '../../../../models/escaner.interface';
 import { ScannerDataStore } from '../../../../services/scanner-data-store.service';
 import { LogApiService } from '../../../../services/log-api.service';
-import { MarketDatetimePipe } from '../../../../../../shared/pipes/market-datetime.pipe';
+import { MarketDatePipe } from '../../../../../../shared/pipes/market-date.pipe';
+import { MarketTimePipe } from '../../../../../../shared/pipes/market-time.pipe';
 import { SymbolDetailsComponent } from '../../../../../screener/components/symbol-details/symbol-details.component';
 import { SignalFilterMatch } from '../../../../../screener/models/candle.models';
 import { I18nService } from '../../../../../../core/services/i18n/i18n.service';
@@ -51,7 +52,8 @@ interface DateOption {
     MatFormFieldModule,
     MatSelectModule,
     TranslatePipe,
-    MarketDatetimePipe
+    MarketDatePipe,
+    MarketTimePipe
   ],
   templateUrl: './scanner-signals-tab.html',
   styleUrl: './scanner-signals-tab.scss',
