@@ -33,15 +33,15 @@
   flex-direction: column;
 }
 
-// itemSize (68px, ver el .html) debe coincidir con el alto real de una fila
-// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas. 68px (en
-// vez de los 49px de una sola linea) es lo que necesita timestamp-cell
-// partida en 2 renglones (ver mas abajo) con margen de sobra -- 60px se
-// quedaba corto por unos pixeles y la linea de la hora quedaba cortada por
-// el borde inferior de la fila (confirmado con captura de pantalla el
-// 2026-09-08). .mat-mdc-row de abajo fija ese mismo alto para TODAS las
-// filas, asi que virtual-scroll y layout real coinciden aunque el resto de
-// columnas siga siendo de una sola linea.
+// itemSize (76px, ver el .html) debe coincidir con el alto real de una fila
+// -- si no coincide, cdk-virtual-scroll deja huecos o corta filas. Subido
+// dos veces (49 -> 60 -> 68px) y timestamp-cell seguia tocando el borde
+// inferior en captura de pantalla real -- en vez de seguir afinando de a
+// poco, 76px le da margen de sobra a las 2 lineas de fecha/hora, y
+// .timestamp-cell mas abajo fuerza overflow:hidden como respaldo (si el
+// contenido real igual pidiera mas alto que esto, se recorta en vez de
+// desbordar sobre la fila siguiente y romper la posicion que calculo
+// virtual-scroll). .mat-mdc-row fija ese mismo alto para TODAS las filas.
 .signals-viewport {
   flex: 1;
   min-height: 0;
@@ -100,7 +100,7 @@ table {
 // que virtual-scroll calculo, y vuelve el desfase/hueco que ya se habia
 // resuelto una vez para celular (ver el comentario mas abajo).
 .mat-mdc-row {
-  height: 68px;
+  height: 76px;
 }
 
 .details-cell {
@@ -115,7 +115,10 @@ table {
   flex-direction: column;
   justify-content: center;
   white-space: normal;
-  line-height: 1.3;
+  line-height: 1.2;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .timestamp-date {
