@@ -74,8 +74,17 @@ table {
   background-color: transparent;
 }
 
+// itemSize="49" (ver el comentario de .signals-viewport) asume que cada
+// fila mide una sola linea de texto -- en una tarjeta angosta en modo
+// celular, timestamp-cell/symbol-cell podian envolver a 2 lineas y crecer
+// mas alto que esos 49px, lo que el virtual-scroll interpretaba como hueco
+// vacio entre filas (confirmado: eso es "el margen" que se ve de mas en
+// celular vs. escritorio, donde la columna es ancha y nunca envuelve).
 .mat-mdc-cell {
   vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .details-cell {
