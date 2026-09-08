@@ -46,6 +46,29 @@
   --mat-form-field-container-vertical-padding: 8px;
 }
 
+// Con la tarjeta de escaner en modo celular, el ancho disponible es el de
+// la tarjeta (no el de la pantalla) -- el min-width de .search-field (160px)
+// + el ancho fijo de .date-field (195px) no entraban en una tarjeta angosta
+// y el flex-wrap de .signals-toolbar los apilaba uno arriba del otro. Ambos
+// se encogen a flex-basis en vez de un ancho fijo para seguir compartiendo
+// el renglon.
+@media (max-width: 768px) {
+  .signals-toolbar {
+    flex-wrap: nowrap;
+
+    .search-field {
+      min-width: 0;
+      flex: 1 1 55%;
+    }
+  }
+
+  .date-field {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 45%;
+  }
+}
+
 table {
   width: 100%;
   background-color: transparent;

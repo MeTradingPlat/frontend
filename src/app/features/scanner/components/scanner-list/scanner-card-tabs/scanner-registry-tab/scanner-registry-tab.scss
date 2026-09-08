@@ -30,6 +30,26 @@
   --mat-form-field-container-vertical-padding: 8px;
 }
 
+// Mismo motivo que scanner-signals-tab.scss: en la tarjeta de escaner en
+// modo celular el ancho disponible es el de la tarjeta, no el de la
+// pantalla, y los anchos fijos de arriba no entraban en un mismo renglon.
+@media (max-width: 768px) {
+  .registry-toolbar {
+    flex-wrap: nowrap;
+
+    .search-field {
+      min-width: 0;
+      flex: 1 1 55%;
+    }
+  }
+
+  .date-field {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 45%;
+  }
+}
+
 .registry-body {
   flex: 1;
   min-height: 0;
