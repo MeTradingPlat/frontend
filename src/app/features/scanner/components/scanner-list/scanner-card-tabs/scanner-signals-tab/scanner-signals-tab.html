@@ -49,8 +49,10 @@
     <ng-container matColumnDef="timestamp">
       <th mat-header-cell *matHeaderCellDef>{{ 'NEWS.DATE' | translate }}</th>
       <td mat-cell *matCellDef="let row" class="timestamp-cell">
-        <div class="timestamp-date">{{ row.timestamp | marketDate }}</div>
-        <div class="timestamp-time">{{ row.timestamp | marketTime : true }}</div>
+        <div class="timestamp-cell-inner">
+          <div class="timestamp-date">{{ row.timestamp | marketDate }}</div>
+          <div class="timestamp-time">{{ row.timestamp | marketTime : true }}</div>
+        </div>
       </td>
     </ng-container>
 

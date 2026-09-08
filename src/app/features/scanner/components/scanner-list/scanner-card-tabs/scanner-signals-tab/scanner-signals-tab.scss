@@ -109,16 +109,23 @@ table {
 
 // timestamp-cell es la unica columna que envuelve a 2 renglones a proposito
 // (ver el comentario del matColumnDef en el .html) -- .mat-mdc-cell de
-// arriba pone nowrap para el resto, aca se anula sola.
+// arriba pone nowrap para el resto, aca se anula sola. El flex de centrado
+// va en .timestamp-cell-inner (un <div> DENTRO del <td>), nunca en el <td>
+// mismo: ponerle display:flex al <td> lo saca del layout de tabla normal,
+// donde el navegador iguala solo la altura de todas las celdas de una fila
+// -- confirmado con el DOM real el 2026-09-08, esta celda quedaba mas baja
+// que sus vecinas (symbol-cell, tipo) por eso mismo.
 .timestamp-cell {
+  white-space: normal;
+  overflow: hidden;
+}
+
+.timestamp-cell-inner {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  white-space: normal;
-  line-height: 1.2;
   height: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
+  line-height: 1.2;
 }
 
 .timestamp-date {
