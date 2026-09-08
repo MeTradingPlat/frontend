@@ -452,15 +452,35 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     this.markerFound = false;
     this.pendingViewReset = true;
 
-    // Recreate the series instead of series.setData([]): an empty array doesn't
-    // reliably reset a series that already has data, which left the previous
-    // timeframe's bars on screen when the new one had none (e.g. a thin M1
-    // history on a closed market) instead of showing an empty chart.
-    if (this.series) this.chart.removeSeries(this.series);
-    this.series = this.addCandlestickSeries();
-    this.signalLinePrimitive = null; // se destruyo junto con la serie removida
-    this.buyPriceLineRef = null; // se destruyo junto con la serie removida
-    this.pivotPriceLines = []; // se destruyeron junto con la serie removida
+    // Reusa la serie en vez de destruirla y crear una nueva -- removeSeries()
+    // bloquea el hilo principal (confirmado: tradingview/lightweight-charts
+    // issue #2049 "Removing lots of series can be slow"), y con cuantos
+    // cambios de timeframe/reaperturas del grafico hace un dia de trading
+    // normal eso se siente como lentitud creciente (confirmado en vivo el
+    // 2026-09-08: memoria que solo baja "al rato", patron clasico de presion
+    // de GC por el churn de recrear la serie en vez de fuga real). setData([])
+    // limpia de inmediato antes de pedir los datos nuevos -- el patron
+    // oficialmente recomendado por la libreria en v5 (nuestra version); el
+    // motivo original de recrear (una version vieja donde el array vacio no
+    // limpiaba de verdad, issue #752) no aparece reproducido en v5.
+    //
+    // Los primitivos/lineas de precio SI hay que soltarlos a mano antes --
+    // removeSeries() los destruia solo como efecto secundario, reusar la
+    // serie ya no lo hace.
+    if (this.series) {
+      if (this.signalLinePrimitive) {
+        this.series.detachPrimitive(this.signalLinePrimitive);
+        this.signalLinePrimitive = null;
+      }
+      if (this.buyPriceLineRef) {
+        this.series.removePriceLine(this.buyPriceLineRef);
+        this.buyPriceLineRef = null;
+      }
+      this.clearPivots();
+      this.series.setData([]);
+    } else {
+      this.series = this.addCandlestickSeries();
+    }
     if (this.pivotsActive() && this.lastPivotsResponse?.symbol === this.symbol) {
       // Mismo simbolo, solo cambio el timeframe visible -- redibuja sobre la
       // serie nueva sin volver a pedir (los pivots no dependen de este timeframe).
