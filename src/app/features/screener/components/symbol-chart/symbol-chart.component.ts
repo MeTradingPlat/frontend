@@ -772,7 +772,11 @@ export class SymbolChartComponent implements AfterViewInit, OnChanges, OnDestroy
     const dialogRef = this.dialog.open(PivotsConfigDialog, {
       autoFocus: false,
       panelClass: 'premium-dialog',
-      data: { initial: this.lastPivotsConfig ?? undefined }
+      // signalPrice: mismo precio que la linea horizontal de "entrada
+      // simulada" (buyPriceLine) -- undefined para un simbolo abierto desde
+      // Activos (sin senal) o una senal que no trae precio, lo que el
+      // dialogo usa para decidir si ofrece la opcion "precio de la senal".
+      data: { initial: this.lastPivotsConfig ?? undefined, signalPrice: this.buyPriceLine }
     });
     dialogRef.afterClosed().subscribe((config: PivotsConfig | undefined) => {
       if (!config) return;

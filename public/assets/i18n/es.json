@@ -214,6 +214,7 @@
     "PIVOTS_CONFIG_PRICE_LIVE": "En vivo",
     "PIVOTS_CONFIG_PRICE_OPEN": "Apertura",
     "PIVOTS_CONFIG_PRICE_PREV_CLOSE": "Cierre anterior",
+    "PIVOTS_CONFIG_PRICE_SIGNAL": "Precio de la señal",
     "PIVOTS_CONFIG_PARAMETERS_LABEL": "Parámetros de búsqueda",
     "PIVOTS_CONFIG_ATR_HINT": "Mide la volatilidad reciente del símbolo -- a mayor período, el rango de búsqueda de pivots se ajusta más lento a cambios recientes de volatilidad",
     "PIVOTS_CONFIG_SLIP_HINT": "Qué tan cerca tienen que estar dos pivots en precio para fusionarse en uno solo, como proporción de la volatilidad (ATR)",

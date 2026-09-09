@@ -56,13 +56,26 @@ const BASE_DEFAULTS: PivotsConfig = {
 })
 export class PivotsConfigDialog implements OnInit {
   readonly dialogRef = inject(MatDialogRef<PivotsConfigDialog>);
-  readonly data: { initial?: PivotsConfig } = inject(MAT_DIALOG_DATA, { optional: true }) || {};
+  readonly data: { initial?: PivotsConfig; signalPrice?: number } = inject(MAT_DIALOG_DATA, { optional: true }) || {};
   private readonly facade = inject(ScannerFacadeService);
+
+  // Solo hay precio de senal cuando el grafico se abrio DESDE una senal Y
+  // esa senal trae precio (hay senales que no lo tienen, ver el comentario
+  // de PivotsPriceReference) -- la opcion "precio de la senal" del toggle
+  // de abajo no se ofrece en ningun otro caso.
+  readonly hasSignalPrice = this.data.signalPrice !== undefined;
 
   readonly loading = signal(true);
   readonly loadError = signal(false);
   readonly indicador = signal<IndicadorSalida | null>(null);
-  readonly priceReference = signal<PivotsPriceReference>(this.data.initial?.priceReference ?? 'live');
+  // Si la ultima config guardada era 'signal' pero esta apertura no trae
+  // precio de senal (otro simbolo, o uno abierto sin senal desde Activos),
+  // cae a 'live' -- la opcion guardada ya no aplica aca.
+  readonly priceReference = signal<PivotsPriceReference>(
+    this.data.initial?.priceReference === 'signal' && !this.hasSignalPrice
+      ? 'live'
+      : this.data.initial?.priceReference ?? 'live'
+  );
 
   ngOnInit(): void {
     this.facade.getIndicadorSalidaPorDefectoSilent(ENUM_INDICADOR_PIVOTS).subscribe({
@@ -133,6 +146,7 @@ export class PivotsConfigDialog implements OnInit {
       aniosHistorico: valorDe(PARAM.ANIOS_HISTORICO),
       numeroPivotes: valorDe(PARAM.NUMERO_PIVOTES),
       priceReference: this.priceReference(),
+      signalPrice: this.priceReference() === 'signal' ? this.data.signalPrice : undefined,
     } satisfies PivotsConfig);
   }
 }

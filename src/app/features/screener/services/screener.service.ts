@@ -93,6 +93,9 @@ export class ScreenerService {
         .set('aniosHistorico', config.aniosHistorico)
         .set('numeroPivotes', config.numeroPivotes)
         .set('priceReference', config.priceReference);
+      if (config.priceReference === 'signal' && config.signalPrice !== undefined) {
+        params = params.set('explicitPrice', config.signalPrice);
+      }
     }
     return this.http.get<PivotsResponse>(`${this.pivotsUrl}/${symbol}`, { params });
   }

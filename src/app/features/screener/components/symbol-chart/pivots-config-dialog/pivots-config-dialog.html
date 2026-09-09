@@ -25,6 +25,9 @@
           <mat-button-toggle value="live">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_LIVE' | translate }}</mat-button-toggle>
           <mat-button-toggle value="open">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_OPEN' | translate }}</mat-button-toggle>
           <mat-button-toggle value="prev_close">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_PREV_CLOSE' | translate }}</mat-button-toggle>
+          @if (hasSignalPrice) {
+            <mat-button-toggle value="signal">{{ 'ASSETS.PIVOTS_CONFIG_PRICE_SIGNAL' | translate }}</mat-button-toggle>
+          }
         </mat-button-toggle-group>
       </section>
 
