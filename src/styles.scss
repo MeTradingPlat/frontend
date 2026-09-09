@@ -176,10 +176,14 @@ body.dark-mode {
 // (.details-container, ver symbol-details.component.scss) y esta superficie
 // solo recorta (overflow: hidden) para que el scroll quede inset dentro de
 // las esquinas curvas.
-.premium-dialog .mdc-dialog__surface,
-.premium-dialog .mat-mdc-dialog-surface {
-  overflow: hidden !important;
-  background-color: var(--mat-sys-surface-container) !important;
+.premium-dialog {
+  .mdc-dialog__surface,
+  .mat-mdc-dialog-surface {
+    overflow: hidden !important;
+    background-color: var(--mat-sys-surface-container) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
 }
 
 // Responsive adjustments for pages with header navbar
