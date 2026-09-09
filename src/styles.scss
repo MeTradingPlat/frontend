@@ -39,6 +39,8 @@ body {
       surface: #18191a,
       surface-container: #18191a,
       surface-container-low: #18191a,
+      surface-container-high: #242526,
+      surface-container-highest: #3a3b3c,
     ));
 
     // Black shadows barely read against a near-black background, so dark
@@ -54,6 +56,8 @@ body {
       surface: #ffffff,
       surface-container: #ffffff,
       surface-container-low: #ffffff,
+      surface-container-high: #f0f2f5,
+      surface-container-highest: #e4e6eb,
     ));
 
     --app-card-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -175,6 +179,7 @@ body.dark-mode {
 .premium-dialog .mdc-dialog__surface,
 .premium-dialog .mat-mdc-dialog-surface {
   overflow: hidden !important;
+  background-color: var(--mat-sys-surface-container) !important;
 }
 
 // Responsive adjustments for pages with header navbar

@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 mat-dialog-content {
   padding: 0 !important;
   max-height: 90vh !important;
@@ -7,6 +12,8 @@ mat-dialog-content {
   width: 480px;
   max-width: 90vw;
   max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   background-color: var(--mat-sys-surface-container);
   color: var(--mat-sys-on-surface);
