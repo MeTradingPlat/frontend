@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -18,6 +19,7 @@ import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
   imports: [
     MatCardModule,
     MatButtonModule,
+    MatDividerModule,
     MatIconModule,
     MatSlideToggleModule,
     MatTooltipModule,

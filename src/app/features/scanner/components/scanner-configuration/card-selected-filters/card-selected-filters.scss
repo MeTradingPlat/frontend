@@ -118,6 +118,38 @@
     }
   }
 
+  // Fila compacta para el toggle de revision en tiempo real -- separada del
+  // resto con un divisor, mismo lenguaje visual que el toggle de
+  // multiples-senales en card-time (icono + etiqueta corta + switch).
+  .filter-card-realtime {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 14px;
+    background-color: transparent;
+
+    &__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--mat-sys-on-surface-variant);
+
+      i {
+        font-size: 12px;
+        color: var(--mat-sys-primary);
+      }
+    }
+
+    // El switch nativo de Material queda grande para el tamaño de estas
+    // tarjetas compactas -- se reduce con transform en vez de reimplementar
+    // el componente.
+    ::ng-deep .mdc-switch {
+      transform: scale(0.8);
+      transform-origin: right center;
+    }
+  }
+
   .filter-card-footer {
     background-color: transparent;
     padding: 6px 14px 10px;
