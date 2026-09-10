@@ -555,7 +555,8 @@ export class ScannerFacadeService {
       objTipoEjecucion: {
         etiqueta: dto.objTipoEjecucion?.etiqueta || '',
         enumTipoEjecucion: dto.objTipoEjecucion?.enumTipoEjecucion || ''
-      }
+      },
+      permitirMultiplesSenales: dto.permitirMultiplesSenales || false
     };
   }
 
@@ -584,7 +585,8 @@ export class ScannerFacadeService {
       })),
       objTipoEjecucion: {
         enumTipoEjecucion: escaner.objTipoEjecucion?.enumTipoEjecucion || ''
-      }
+      },
+      permitirMultiplesSenales: escaner.permitirMultiplesSenales || false
     };
   }
 
@@ -619,6 +621,7 @@ export class ScannerFacadeService {
       } : undefined,
       enumTipoFiltro: dto.enumTipoFiltro,
       etiquetaTipoFiltro: dto.etiquetaTipoFiltro,
+      revisionTiempoReal: dto.revisionTiempoReal || false,
       parametros: (dto.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
         etiqueta: param.etiqueta,
@@ -634,6 +637,7 @@ export class ScannerFacadeService {
   private mapFiltroToDTO(filtro: Filtro): FiltroDtoPeticion {
     return {
       enumFiltro: filtro.enumFiltro,
+      revisionTiempoReal: filtro.revisionTiempoReal || false,
       parametros: (filtro.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
         objValorSeleccionado: this.mapValorTipadoToDTO(param.objValorSeleccionado)

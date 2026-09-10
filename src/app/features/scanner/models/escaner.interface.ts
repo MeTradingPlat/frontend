@@ -12,6 +12,7 @@ export interface Escaner {
     mercados: Mercado[];
     objEstado?: EstadoEscaner;
     objTipoEjecucion: TipoEjecucion;
+    permitirMultiplesSenales: boolean;
 }
 
 export interface EscanerDTOPeticion {
@@ -21,6 +22,7 @@ export interface EscanerDTOPeticion {
     horaFin: string;
     mercados: MercadoDTOPeticion[];
     objTipoEjecucion: TipoEjecucionDTOPeticion;
+    permitirMultiplesSenales: boolean;
 }
 
 export interface EscanerDTORespuesta {
@@ -33,4 +35,5 @@ export interface EscanerDTORespuesta {
     mercados: MercadoDTORespuesta[];
     objEstado: EstadoEscanerDTORespuesta;
     objTipoEjecucion: TipoEjecucionDTORespuesta;
+    permitirMultiplesSenales: boolean;
 }

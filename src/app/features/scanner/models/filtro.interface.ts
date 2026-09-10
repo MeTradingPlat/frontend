@@ -9,6 +9,7 @@ export interface Filtro{
     parametros: Parametro[];
     enumTipoFiltro?: string;
     etiquetaTipoFiltro?: string;
+    revisionTiempoReal?: boolean;
 }
 
 export interface FiltroDtoRespuesta {
@@ -19,9 +20,11 @@ export interface FiltroDtoRespuesta {
     parametros: ParametroDTORespuesta[];
     enumTipoFiltro?: string;
     etiquetaTipoFiltro?: string;
+    revisionTiempoReal?: boolean;
 }
 
 export interface FiltroDtoPeticion {
     enumFiltro: string;
     parametros: ParametroDTOPeticion[];
+    revisionTiempoReal?: boolean;
 }

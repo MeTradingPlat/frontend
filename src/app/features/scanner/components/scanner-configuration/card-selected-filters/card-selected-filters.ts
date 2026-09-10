@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Filtro } from '../../../models/filtro.interface';
@@ -18,6 +19,7 @@ import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
+    MatSlideToggleModule,
     MatTooltipModule,
     TranslatePipe,
     ConditionalParameter,
@@ -35,6 +37,7 @@ export class CardSelectedFilters {
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
+  toggleRealtime = output<{ index: number; checked: boolean }>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
 
@@ -44,6 +47,10 @@ export class CardSelectedFilters {
 
   onRemoveFilter(index: number): void {
     this.removeFilter.emit(index);
+  }
+
+  onToggleRealtime(index: number, checked: boolean): void {
+    this.toggleRealtime.emit({ index, checked });
   }
 
   getFilterErrors(filtroEnum: string): Record<string, string> | undefined {

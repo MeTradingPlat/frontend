@@ -171,7 +171,8 @@ export class ScannerConfiguration implements OnInit {
       objTipoEjecucion: {
         etiqueta: '',
         enumTipoEjecucion: 'UNA_VEZ'  // Valor por defecto
-      }
+      },
+      permitirMultiplesSenales: false
     };
   }
 
@@ -363,6 +364,13 @@ export class ScannerConfiguration implements OnInit {
   onRemoveFilter(index: number): void {
     const currentFilters = this.filtros();
     this.filtros.set(currentFilters.filter((_, i) => i !== index));
+  }
+
+  onToggleRealtime(event: { index: number; checked: boolean }): void {
+    const currentFilters = this.filtros();
+    this.filtros.set(currentFilters.map((f, i) =>
+      i === event.index ? { ...f, revisionTiempoReal: event.checked } : f
+    ));
   }
 
   /**

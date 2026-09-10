@@ -48,6 +48,12 @@
               <i class="bi" [class]="getFilterTypeIcon(filtro.enumTipoFiltro)"></i>
               {{filtro.etiquetaTipoFiltro}}
             </span>
+            <mat-slide-toggle
+              [checked]="filtro.revisionTiempoReal || false"
+              (change)="onToggleRealtime($index, $event.checked)"
+              [matTooltip]="'SCANNER.REALTIME_REVIEW_HINT' | translate">
+              {{ 'SCANNER.REALTIME_REVIEW' | translate }}
+            </mat-slide-toggle>
           </mat-card-footer>
         </mat-card>
       }

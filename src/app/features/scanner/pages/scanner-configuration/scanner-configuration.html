@@ -17,7 +17,8 @@
       [filtros]="filtros()"
       [validationErrors]="validationErrors()"
       (openAddDialog)="onOpenAddDialog()"
-      (removeFilter)="onRemoveFilter($event)"/>
+      (removeFilter)="onRemoveFilter($event)"
+      (toggleRealtime)="onToggleRealtime($event)"/>
     <app-card-exit-indicators-preview/>
   }
 </div>
