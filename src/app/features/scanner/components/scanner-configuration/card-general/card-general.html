@@ -33,11 +33,5 @@
         <mat-error>{{errors()['descripcion']}}</mat-error>
       }
     </mat-form-field>
-
-    <mat-slide-toggle
-      [checked]="scanner().permitirMultiplesSenales"
-      (change)="onPermitirMultiplesSenalesChange($event.checked)">
-      {{ 'SCANNER.ALLOW_MULTIPLE_SIGNALS' | translate }}
-    </mat-slide-toggle>
   </mat-card-content>
 </mat-card>

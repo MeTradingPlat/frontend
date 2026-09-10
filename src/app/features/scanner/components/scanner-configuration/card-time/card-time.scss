@@ -41,6 +41,36 @@
 
 }
 
+// Fila de configuracion tipo "settings list item" de Material Design:
+// etiqueta + texto de apoyo de una linea a la izquierda, control a la
+// derecha -- mismo patron que Material usa para switches con descripcion
+// (ver https://m3.material.io/components/lists/guidelines).
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 4px 0;
+}
+
+.setting-row__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.setting-row__label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+}
+
+.setting-row__hint {
+    font-size: 0.75rem;
+    color: var(--mat-sys-on-surface-variant);
+}
+
 .session-shortcuts {
     display: flex;
     margin-bottom: 12px;

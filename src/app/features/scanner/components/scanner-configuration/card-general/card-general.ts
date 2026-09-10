@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, effect, input, model } from '@angul
 import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from "@angular/material/card";
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormControl, FormGroupDirective, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -27,7 +26,6 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
     MatCardContent,
     MatFormFieldModule,
     MatInputModule,
-    MatSlideToggleModule,
     ReactiveFormsModule,
     TranslatePipe,
     I18nRefreshDirective
@@ -64,9 +62,5 @@ export class CardGeneral {
     this.descripcionControl.valueChanges.subscribe(value => {
       this.scanner.update(s => ({ ...s, descripcion: value }));
     });
-  }
-
-  onPermitirMultiplesSenalesChange(checked: boolean): void {
-    this.scanner.update(s => ({ ...s, permitirMultiplesSenales: checked }));
   }
 }

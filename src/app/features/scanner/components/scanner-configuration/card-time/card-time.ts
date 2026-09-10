@@ -8,6 +8,8 @@ import { MatCardModule } from '@angular/material/card';
 import { ErrorStateMatcher, provideNativeDateAdapter } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslatePipe } from '@ngx-translate/core';
 import { TimezoneService } from '../../../../../core/services/timezone.service';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
@@ -34,7 +36,7 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
 
 @Component({
   selector: 'app-card-time',
-  imports: [MatFormFieldModule, MatInputModule, MatTimepickerModule, MatCardModule, MatSelectModule, MatButtonToggleModule, ReactiveFormsModule, TranslatePipe, I18nRefreshDirective],
+  imports: [MatFormFieldModule, MatInputModule, MatTimepickerModule, MatCardModule, MatSelectModule, MatButtonToggleModule, MatDividerModule, MatSlideToggleModule, ReactiveFormsModule, TranslatePipe, I18nRefreshDirective],
   templateUrl: './card-time.html',
   providers: [provideNativeDateAdapter()],
   styleUrl: './card-time.scss',
@@ -143,6 +145,10 @@ export class CardTime {
         }
       }));
     });
+  }
+
+  onPermitirMultiplesSenalesChange(checked: boolean): void {
+    this.scanner.update(s => ({ ...s, permitirMultiplesSenales: checked }));
   }
 
   /** Carga una sesion fija de mercado -- el picker ya esta en hora de

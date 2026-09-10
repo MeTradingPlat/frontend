@@ -47,5 +47,18 @@
         <mat-error>{{errors()['horaFin']}}</mat-error>
       }
     </mat-form-field>
+
+    <mat-divider/>
+
+    <div class="setting-row">
+      <div class="setting-row__text">
+        <span class="setting-row__label">{{ 'SCANNER.ALLOW_MULTIPLE_SIGNALS' | translate }}</span>
+        <span class="setting-row__hint">{{ 'SCANNER.ALLOW_MULTIPLE_SIGNALS_HINT' | translate }}</span>
+      </div>
+      <mat-slide-toggle
+        [checked]="scanner().permitirMultiplesSenales"
+        (change)="onPermitirMultiplesSenalesChange($event.checked)"
+        [aria-label]="'SCANNER.ALLOW_MULTIPLE_SIGNALS' | translate"/>
+    </div>
   </mat-card-content>
 </mat-card>
