@@ -373,6 +373,16 @@ export class ScannerConfiguration implements OnInit {
     ));
   }
 
+  // Un solo grupo alternativo compartido por escaner alcanza para el caso
+  // real (elegir entre 2 variantes del mismo paso) -- el modelo admite mas
+  // de un numero de grupo, pero la UI no lo expone todavia (ver plan).
+  onToggleAlternativo(event: { index: number; checked: boolean }): void {
+    const currentFilters = this.filtros();
+    this.filtros.set(currentFilters.map((f, i) =>
+      i === event.index ? { ...f, grupoAlternativo: event.checked ? 1 : undefined } : f
+    ));
+  }
+
   /**
    * Maneja errores de validación de filtros usando la nueva estructura del backend.
    *

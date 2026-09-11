@@ -10,6 +10,7 @@ export interface Filtro{
     enumTipoFiltro?: string;
     etiquetaTipoFiltro?: string;
     revisionTiempoReal?: boolean;
+    grupoAlternativo?: number;
 }
 
 export interface FiltroDtoRespuesta {
@@ -21,10 +22,12 @@ export interface FiltroDtoRespuesta {
     enumTipoFiltro?: string;
     etiquetaTipoFiltro?: string;
     revisionTiempoReal?: boolean;
+    grupoAlternativo?: number;
 }
 
 export interface FiltroDtoPeticion {
     enumFiltro: string;
     parametros: ParametroDTOPeticion[];
     revisionTiempoReal?: boolean;
+    grupoAlternativo?: number;
 }

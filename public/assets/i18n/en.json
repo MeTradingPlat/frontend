@@ -78,6 +78,8 @@
     "REMOVE_FILTER": "Remove filter",
     "REALTIME_REVIEW": "Real-time",
     "REALTIME_REVIEW_HINT": "Reviews this filter as soon as a live candle closes, instead of waiting for the scanner's normal cycle (~60s). Only makes sense for short-timeframe filters (M1/M3).",
+    "ALTERNATIVE_FILTER": "Alternative",
+    "ALTERNATIVE_FILTER_HINT": "If you turn this on for 2 or more filters in the same timeframe, only ONE needs to match instead of requiring all of them.",
     "EXIT_INDICATORS": "Exit Indicators (Stop Loss / Take Profit)",
     "EXIT_INDICATORS_PREVIEW_BADGE": "Preview",
     "EXIT_INDICATORS_PREVIEW_NOTE": "Exit indicator catalog — not yet saved with the scanner.",

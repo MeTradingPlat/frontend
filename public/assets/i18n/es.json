@@ -78,6 +78,8 @@
     "REMOVE_FILTER": "Eliminar filtro",
     "REALTIME_REVIEW": "Tiempo real",
     "REALTIME_REVIEW_HINT": "Revisa este filtro apenas cierra una vela en vivo, en vez de esperar el ciclo normal del escáner (~60s). Solo tiene sentido para filtros de temporalidad corta (M1/M3).",
+    "ALTERNATIVE_FILTER": "Alternativa",
+    "ALTERNATIVE_FILTER_HINT": "Si activas esto en 2 o más filtros de la misma temporalidad, basta con que UNO se cumpla, en vez de exigir todos.",
     "EXIT_INDICATORS": "Indicadores de Salida (Stop Loss / Take Profit)",
     "EXIT_INDICATORS_PREVIEW_BADGE": "Vista previa",
     "EXIT_INDICATORS_PREVIEW_NOTE": "Catálogo de indicadores de salida — todavía no se guardan con el escáner.",

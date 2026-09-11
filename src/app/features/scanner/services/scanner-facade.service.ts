@@ -622,6 +622,7 @@ export class ScannerFacadeService {
       enumTipoFiltro: dto.enumTipoFiltro,
       etiquetaTipoFiltro: dto.etiquetaTipoFiltro,
       revisionTiempoReal: dto.revisionTiempoReal || false,
+      grupoAlternativo: dto.grupoAlternativo,
       parametros: (dto.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
         etiqueta: param.etiqueta,
@@ -638,6 +639,7 @@ export class ScannerFacadeService {
     return {
       enumFiltro: filtro.enumFiltro,
       revisionTiempoReal: filtro.revisionTiempoReal || false,
+      grupoAlternativo: filtro.grupoAlternativo,
       parametros: (filtro.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
         objValorSeleccionado: this.mapValorTipadoToDTO(param.objValorSeleccionado)

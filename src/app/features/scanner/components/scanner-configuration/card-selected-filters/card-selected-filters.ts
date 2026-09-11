@@ -40,6 +40,7 @@ export class CardSelectedFilters {
   openAddDialog = output<void>();
   removeFilter = output<number>();
   toggleRealtime = output<{ index: number; checked: boolean }>();
+  toggleAlternativo = output<{ index: number; checked: boolean }>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
 
@@ -53,6 +54,10 @@ export class CardSelectedFilters {
 
   onToggleRealtime(index: number, checked: boolean): void {
     this.toggleRealtime.emit({ index, checked });
+  }
+
+  onToggleAlternativo(index: number, checked: boolean): void {
+    this.toggleAlternativo.emit({ index, checked });
   }
 
   getFilterErrors(filtroEnum: string): Record<string, string> | undefined {

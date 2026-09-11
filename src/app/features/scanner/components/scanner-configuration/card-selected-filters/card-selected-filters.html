@@ -56,6 +56,17 @@
               [aria-label]="'SCANNER.REALTIME_REVIEW' | translate"/>
           </div>
 
+          <div class="filter-card-alternativo" [matTooltip]="'SCANNER.ALTERNATIVE_FILTER_HINT' | translate">
+            <span class="filter-card-alternativo__label">
+              <i class="bi bi-shuffle"></i>
+              {{ 'SCANNER.ALTERNATIVE_FILTER' | translate }}
+            </span>
+            <mat-slide-toggle
+              [checked]="!!filtro.grupoAlternativo"
+              (change)="onToggleAlternativo($index, $event.checked)"
+              [aria-label]="'SCANNER.ALTERNATIVE_FILTER' | translate"/>
+          </div>
+
           <mat-card-footer class="filter-card-footer">
             <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
             <span class="filter-card-tipo">
