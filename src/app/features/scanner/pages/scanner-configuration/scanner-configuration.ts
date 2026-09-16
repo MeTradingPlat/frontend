@@ -366,13 +366,6 @@ export class ScannerConfiguration implements OnInit {
     this.filtros.set(currentFilters.filter((_, i) => i !== index));
   }
 
-  onToggleRealtime(event: { index: number; checked: boolean }): void {
-    const currentFilters = this.filtros();
-    this.filtros.set(currentFilters.map((f, i) =>
-      i === event.index ? { ...f, revisionTiempoReal: event.checked } : f
-    ));
-  }
-
   // Un solo grupo alternativo compartido por escaner alcanza para el caso
   // real (elegir entre 2 variantes del mismo paso) -- el modelo admite mas
   // de un numero de grupo, pero la UI no lo expone todavia (ver plan).

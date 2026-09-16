@@ -45,17 +45,6 @@
 
           <mat-divider/>
 
-          <div class="filter-card-realtime" [matTooltip]="'SCANNER.REALTIME_REVIEW_HINT' | translate">
-            <span class="filter-card-realtime__label">
-              <i class="bi bi-lightning-charge-fill"></i>
-              {{ 'SCANNER.REALTIME_REVIEW' | translate }}
-            </span>
-            <mat-slide-toggle
-              [checked]="filtro.revisionTiempoReal || false"
-              (change)="onToggleRealtime($index, $event.checked)"
-              [aria-label]="'SCANNER.REALTIME_REVIEW' | translate"/>
-          </div>
-
           <div class="filter-card-alternativo" [matTooltip]="'SCANNER.ALTERNATIVE_FILTER_HINT' | translate">
             <span class="filter-card-alternativo__label">
               <i class="bi bi-shuffle"></i>

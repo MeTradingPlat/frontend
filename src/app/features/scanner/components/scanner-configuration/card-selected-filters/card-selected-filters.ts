@@ -39,7 +39,6 @@ export class CardSelectedFilters {
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
-  toggleRealtime = output<{ index: number; checked: boolean }>();
   toggleAlternativo = output<{ index: number; checked: boolean }>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
@@ -50,10 +49,6 @@ export class CardSelectedFilters {
 
   onRemoveFilter(index: number): void {
     this.removeFilter.emit(index);
-  }
-
-  onToggleRealtime(index: number, checked: boolean): void {
-    this.toggleRealtime.emit({ index, checked });
   }
 
   onToggleAlternativo(index: number, checked: boolean): void {

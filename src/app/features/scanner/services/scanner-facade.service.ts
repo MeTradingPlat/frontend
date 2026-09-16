@@ -621,7 +621,6 @@ export class ScannerFacadeService {
       } : undefined,
       enumTipoFiltro: dto.enumTipoFiltro,
       etiquetaTipoFiltro: dto.etiquetaTipoFiltro,
-      revisionTiempoReal: dto.revisionTiempoReal || false,
       grupoAlternativo: dto.grupoAlternativo,
       parametros: (dto.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
@@ -638,7 +637,6 @@ export class ScannerFacadeService {
   private mapFiltroToDTO(filtro: Filtro): FiltroDtoPeticion {
     return {
       enumFiltro: filtro.enumFiltro,
-      revisionTiempoReal: filtro.revisionTiempoReal || false,
       grupoAlternativo: filtro.grupoAlternativo,
       parametros: (filtro.parametros || []).map(param => ({
         enumParametro: param.enumParametro,
