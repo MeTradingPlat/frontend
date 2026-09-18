@@ -28,6 +28,7 @@
     <p>{{ 'SCANNER.NO_REGISTRY' | translate }}</p>
   </div>
 } @else {
+  <div class="registry-viewport">
   <table mat-table [dataSource]="groupedDataSource()">
 
     <!-- Timestamp Column -->
@@ -107,21 +108,14 @@
         [class.warn-row]="row.nivel === 'WARN'"
         [class.signal-group-row]="row.isGroupHeader"></tr>
   </table>
-  @if (isViewingToday()) {
-    @if (hasMore()) {
-      <button mat-button (click)="onLoadMore()" class="load-more-btn">
-        {{ 'SCANNER.LOAD_MORE' | translate }}
-      </button>
-    }
-  } @else {
-    <mat-paginator
-      [length]="totalElements()"
-      [pageSize]="pageSize"
-      [pageIndex]="pageIndex()"
-      [hidePageSize]="true"
-      [showFirstLastButtons]="true"
-      (page)="onPageChange($event)">
-    </mat-paginator>
-  }
+  </div>
+  <mat-paginator
+    [length]="totalElements()"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex()"
+    [hidePageSize]="true"
+    [showFirstLastButtons]="true"
+    (page)="onPageChange($event)">
+  </mat-paginator>
 }
 </div>

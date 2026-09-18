@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -45,7 +45,7 @@ interface DateOption {
   styleUrl: './scanner-registry-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerRegistryTab implements OnInit {
+export class ScannerRegistryTab implements OnInit, OnDestroy {
   private readonly logApiService = inject(LogApiService);
   private readonly dataStore = inject(ScannerDataStore);
   private readonly i18n = inject(I18nService);
@@ -55,18 +55,15 @@ export class ScannerRegistryTab implements OnInit {
   displayedColumns: string[] = ['timestamp', 'nivel', 'categoria', 'mensaje'];
   dataSource = signal<RegistroLog[]>([]);
   loading = signal<boolean>(false);
-  hasMore = signal<boolean>(false);
   availableDates = signal<DateOption[]>([]);
   selectedDate = signal<string>('');
-  private loadMoreFn?: () => void;
 
-  // Paginador real (numero de pagina, salto directo) -- solo para una fecha
-  // pasada (foto fija con total conocido). "Hoy" sigue con SSE en vivo +
-  // "cargar mas", como ya funcionaba.
+  // Paginador real (50 por pagina, salto directo) para cualquier fecha,
+  // incluido "hoy" -- ver loadRegistryLive en ScannerDataStore, mismo patron
+  // que la pestana de Senales.
   readonly pageSize = 50;
   pageIndex = signal(0);
   totalElements = signal(0);
-  isViewingToday = computed(() => this.availableDates().find(d => d.value === this.selectedDate())?.isToday ?? true);
 
   searchControl = new FormControl('');
   private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
@@ -100,12 +97,12 @@ export class ScannerRegistryTab implements OnInit {
         ];
         this.availableDates.set(dates);
         this.selectedDate.set(localeToday);
-        this._loadForDate(undefined);
+        this._loadForDate(localeToday);
       },
       error: () => {
         this.availableDates.set([{ value: localeToday, isToday: true }]);
         this.selectedDate.set(localeToday);
-        this._loadForDate(undefined);
+        this._loadForDate(localeToday);
       }
     });
   }
@@ -114,8 +111,7 @@ export class ScannerRegistryTab implements OnInit {
     this.selectedDate.set(fecha);
     this.pageIndex.set(0);
     this.loading.set(true);
-    const localeToday = this._localToday();
-    this._loadForDate(fecha !== localeToday ? fecha : undefined);
+    this._loadForDate(fecha);
   }
 
   onPageChange(event: PageEvent): void {
@@ -124,23 +120,24 @@ export class ScannerRegistryTab implements OnInit {
     this._loadForDate(this.selectedDate());
   }
 
-  private _loadForDate(fecha?: string): void {
+  private _loadForDate(fecha: string): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
-    if (fecha) {
-      this.dataStore.loadLogsForDate(scannerId, this.logApiService, fecha, this.pageIndex(), this.pageSize, (logs, totalElements) => {
-        this.dataSource.set(logs);
-        this.totalElements.set(totalElements);
-        this.loading.set(false);
-      });
+    const onResult = (logs: RegistroLog[], totalElements: number): void => {
+      this.dataSource.set(logs);
+      this.totalElements.set(totalElements);
+      this.loading.set(false);
+    };
+    if (fecha === this._localToday()) {
+      this.dataStore.loadRegistryLive(scannerId, this.logApiService, fecha, this.pageIndex(), this.pageSize, onResult);
       return;
     }
-    const { loadMore } = this.dataStore.loadLogs(scannerId, this.logApiService, (logs, more) => {
-      this.dataSource.set(logs);
-      this.hasMore.set(more);
-      this.loading.set(false);
-    });
-    this.loadMoreFn = loadMore;
+    this.dataStore.loadLogsForDate(scannerId, this.logApiService, fecha, this.pageIndex(), this.pageSize, onResult);
+  }
+
+  ngOnDestroy(): void {
+    const scannerId = this.scanner().idEscaner;
+    if (scannerId) this.dataStore.releaseLiveRegistry(scannerId);
   }
 
   private _localToday(): string {
@@ -152,10 +149,6 @@ export class ScannerRegistryTab implements OnInit {
     const d = new Date(dateStr + 'T00:00:00');
     const locale = this.i18n.currentLocale() === 'en' ? 'en-US' : 'es-CO';
     return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
-  }
-
-  onLoadMore(): void {
-    this.loadMoreFn?.();
   }
 
   toggleMinuteGroup(minuteKey: string | undefined): void {

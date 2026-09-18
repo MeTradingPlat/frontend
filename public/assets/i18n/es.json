@@ -193,7 +193,13 @@
     "RETRY": "Reintentar",
     "LOADING_CONTENT": "Cargando contenido",
     "LOADING": "Cargando...",
-    "MAINTENANCE": "El servicio está en mantenimiento (refill de datos). Por favor espere e intente de nuevo en unos minutos."
+    "MAINTENANCE": "El servicio está en mantenimiento (refill de datos). Por favor espere e intente de nuevo en unos minutos.",
+    "PAGINATOR_ITEMS_PER_PAGE": "Elementos por página:",
+    "PAGINATOR_NEXT_PAGE": "Página siguiente",
+    "PAGINATOR_PREVIOUS_PAGE": "Página anterior",
+    "PAGINATOR_FIRST_PAGE": "Primera página",
+    "PAGINATOR_LAST_PAGE": "Última página",
+    "PAGINATOR_RANGE_OF": "de"
   },
   "ASSETS": {
     "TITLE": "Activos",

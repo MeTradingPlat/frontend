@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { languageInterceptor } from './core/interceptors/language.interceptor';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error-interceptor';
@@ -12,6 +13,7 @@ import { provideAppInitializer, inject } from '@angular/core';
 import { I18nService } from './core/services/i18n/i18n.service';
 import { ThemeService } from './core/services/theme/theme.service';
 import { AppVersionService } from './core/services/version/app-version.service';
+import { TranslatedPaginatorIntl } from './core/services/i18n/translated-paginator-intl.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -40,6 +42,7 @@ export const appConfig: ApplicationConfig = {
       theme.init();
       version.init();
       return i18n.init();
-    })
+    }),
+    { provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl }
   ]
 };

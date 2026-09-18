@@ -86,11 +86,6 @@ export class ScannerDataStore {
     this.liveSignalsLastRequest.delete(scannerId);
   }
 
-  private _localToday(): string {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
-
   private _logsToSignals(logs: RegistroLogDTORespuesta[], numeroBase?: number): SignalRow[] {
     const sorted = logs
       .filter((l: RegistroLogDTORespuesta) => l.categoria === 'SIGNAL')
@@ -109,62 +104,43 @@ export class ScannerDataStore {
     }));
   }
 
-  private logCache = new Map<number, {
-    data: RegistroLogDTORespuesta[]; page: number; hasMore: boolean; sub?: Subscription;
-    onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void;
+  private readonly liveRegistrySub = new Map<number, Subscription>();
+  private readonly liveRegistryLastRequest = new Map<number, {
+    fecha: string; page: number; pageSize: number; onResult: (logs: RegistroLogDTORespuesta[], totalElements: number) => void;
   }>();
 
-  // Mismo problema y misma solucion que loadSignals: la conexion SSE se crea
-  // una sola vez por scannerId, asi que fetchPage siempre debe llamar al
-  // onUpdate GUARDADO EN LA CACHE (reasignado en cada llamada a loadLogs),
-  // nunca al onUpdate cerrado sobre el en el momento de creacion -- si no,
-  // una instancia de componente destruida se queda "recibiendo" los refrescos
-  // en vivo mientras la visible en pantalla nunca se entera.
-  // Solo para "hoy" (SSE en vivo + cargar mas) -- una fecha pasada usa
-  // loadLogsForDate, que si pagina de verdad con un total real.
-  loadLogs(scannerId: number, logApi: LogApiService, onUpdate: (data: RegistroLogDTORespuesta[], hasMore: boolean) => void): { loadMore: () => void } {
-    const size = 50;
+  // Mismo patron que loadSignalsLive: "hoy" pagina de verdad (50 por pagina)
+  // en vez de acumular con "cargar mas". Aqui SI se refresca con cualquier
+  // categoria de log (no solo SIGNAL), porque el registro muestra todos los
+  // tipos de evento.
+  loadRegistryLive(
+    scannerId: number,
+    logApi: LogApiService,
+    fecha: string,
+    page: number,
+    pageSize: number,
+    onResult: (logs: RegistroLogDTORespuesta[], totalElements: number) => void
+  ): void {
+    this.liveRegistryLastRequest.set(scannerId, { fecha, page, pageSize, onResult });
+    this.loadLogsForDate(scannerId, logApi, fecha, page, pageSize, onResult);
 
-    // Sin esto, "Hoy" pedia los ultimos N logs sin acotar por fecha -- si el
-    // escaner no habia generado nada todavia hoy, esos "ultimos N" terminaban
-    // siendo literalmente los mismos del dia mas reciente con actividad,
-    // mostrando exactamente lo mismo que elegir esa fecha a mano.
-    const hoy = this._localToday();
-    const fetchPage = (p: number): void => {
-      logApi.getRegistroPorEscanerTodas(scannerId, p, size, hoy).subscribe({
-        next: (logs: RegistroLogDTORespuesta[]) => {
-          const hasMore = logs.length === size;
-          const entry = this.logCache.get(scannerId);
-          const data = p === 0 ? logs : [...(entry?.data || []), ...logs];
-          const currentOnUpdate = entry?.onUpdate ?? onUpdate;
-          this.logCache.set(scannerId, { data, page: p, hasMore, sub: entry?.sub, onUpdate: currentOnUpdate });
-          currentOnUpdate(data, hasMore);
+    if (!this.liveRegistrySub.has(scannerId)) {
+      const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
+        next: () => {
+          const last = this.liveRegistryLastRequest.get(scannerId);
+          if (last && last.page === 0) {
+            this.loadLogsForDate(scannerId, logApi, last.fecha, last.page, last.pageSize, last.onResult);
+          }
         }
       });
-    };
-
-    let entry = this.logCache.get(scannerId);
-    if (entry) {
-      entry.onUpdate = onUpdate;
-      if (entry.page >= 0) onUpdate(entry.data, entry.hasMore);
-    } else {
-      entry = { data: [], page: -1, hasMore: true, onUpdate };
-      this.logCache.set(scannerId, entry);
-      fetchPage(0);
+      this.liveRegistrySub.set(scannerId, sub);
     }
+  }
 
-    if (!entry.sub) {
-      entry.sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-        next: (): void => fetchPage(0)
-      });
-    }
-
-    return {
-      loadMore: (): void => {
-        const current = this.logCache.get(scannerId);
-        fetchPage((current?.page ?? -1) + 1);
-      }
-    };
+  releaseLiveRegistry(scannerId: number): void {
+    this.liveRegistrySub.get(scannerId)?.unsubscribe();
+    this.liveRegistrySub.delete(scannerId);
+    this.liveRegistryLastRequest.delete(scannerId);
   }
 
   // Igual razon que loadSignalsForDate: fecha pasada = foto fija, paginador

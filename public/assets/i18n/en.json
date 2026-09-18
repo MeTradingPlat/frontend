@@ -193,7 +193,13 @@
     "RETRY": "Retry",
     "LOADING_CONTENT": "Loading content",
     "LOADING": "Loading...",
-    "MAINTENANCE": "The service is under maintenance (data refill). Please wait and try again in a few minutes."
+    "MAINTENANCE": "The service is under maintenance (data refill). Please wait and try again in a few minutes.",
+    "PAGINATOR_ITEMS_PER_PAGE": "Items per page:",
+    "PAGINATOR_NEXT_PAGE": "Next page",
+    "PAGINATOR_PREVIOUS_PAGE": "Previous page",
+    "PAGINATOR_FIRST_PAGE": "First page",
+    "PAGINATOR_LAST_PAGE": "Last page",
+    "PAGINATOR_RANGE_OF": "of"
   },
   "ASSETS": {
     "TITLE": "Assets",
