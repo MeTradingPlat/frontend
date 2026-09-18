@@ -7,8 +7,8 @@ import { RegistroLogDTORespuesta } from '../models/registro-log.interface';
 interface SignalRow {
   id: number;
   // Posicion cronologica (1 = primera senal del dia, crece con cada una
-  // nueva) -- asignado una sola vez por fila y nunca recalculado, para que
-  // truncar el array al superar MAX_SIGNALS no renumere las que quedan.
+  // nueva) -- calculada desde el total real que da el backend (ver
+  // numeroBase en _logsToSignals), no un contador local.
   numero: number;
   timestamp: string;
   symbol: string;
@@ -17,82 +17,10 @@ interface SignalRow {
   metadatos?: string;
 }
 
-// Con 50, el primer lote de un escaner recien iniciado quedaba fuera de la
-// ventana visible: el tab mostraba como "primeras" senales las de ~20 min
-// despues del arranque (confirmado en vivo el 2026-08-24: 169 senales a las
-// 12:29:03, el tab solo mostraba desde las 12:49).
-//
-// El limite anterior (200) resulto ser MENOR que el volumen real de un
-// escaner activo -- confirmado en vivo el 2026-08-31: TEST POST MARKET tenia
-// 521 senales guardadas ese dia y volumen test 229, ambos ya truncados a 200
-// en pantalla (las senales viejas se descartaban del array en memoria segun
-// llegaban nuevas por SSE, sin perderse en la base de datos -- solo dejaban
-// de verse). 15000 cubre el universo completo rastreado (~13.2k simbolos,
-// ver MAX_CANDLE_POOL_CONNECTIONS/tracked_symbols en marketdata-service) aun
-// si CADA simbolo disparara una senal el mismo dia. La tabla usa scroll
-// virtual (ver scanner-signals-tab.html) para que esto no cueste renderizar
-// miles de filas de una.
-const MAX_SIGNALS = 15000;
-
 @Injectable({ providedIn: 'root' })
 export class ScannerDataStore {
   private readonly logApi = inject(LogApiService);
   private readonly sse = inject(NotificacionSseService);
-
-  private readonly signalsCache = new Map<number, {
-    data: SignalRow[]; sub: Subscription; onUpdate: (signals: SignalRow[]) => void;
-  }>();
-
-  getSignals(scannerId: number): SignalRow[] | null {
-    const entry = this.signalsCache.get(scannerId);
-    return entry ? entry.data : null;
-  }
-
-  // Solo para "hoy" (SSE en vivo + cache) -- una fecha pasada usa
-  // loadSignalsForDate, que si pagina de verdad con un total real.
-  loadSignals(scannerId: number, onUpdate: (signals: SignalRow[]) => void): void {
-    const cached = this.signalsCache.get(scannerId);
-    if (cached) {
-      cached.onUpdate = onUpdate;
-      onUpdate(cached.data);
-      return;
-    }
-
-    const hoy = this._localToday();
-    this.logApi.getLogsPorEscanerYFecha(scannerId, hoy, 0, MAX_SIGNALS).subscribe({
-      next: (logs: RegistroLogDTORespuesta[]) => {
-        const signals: SignalRow[] = this._logsToSignals(logs);
-        let totalCount = signals.length;
-
-        const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
-          next: (n: { categoria?: string; id?: string; timestamp: string; symbol?: string; mensaje: string; metadatos?: string }) => {
-            if (n.categoria === 'SIGNAL') {
-              totalCount++;
-              const s: SignalRow = {
-                id: parseInt(n.id || '0') || 0,
-                numero: totalCount,
-                timestamp: n.timestamp,
-                symbol: n.symbol || '-',
-                tipo: this.extractTipo(n.mensaje),
-                mensaje: n.mensaje,
-                metadatos: n.metadatos
-              };
-              signals.unshift(s);
-              if (signals.length > MAX_SIGNALS) signals.length = MAX_SIGNALS;
-              const entry = this.signalsCache.get(scannerId);
-              if (entry) {
-                entry.data = [...signals];
-                entry.onUpdate(entry.data);
-              }
-            }
-          }
-        });
-
-        this.signalsCache.set(scannerId, { data: signals, sub, onUpdate });
-        onUpdate(signals);
-      }
-    });
-  }
 
   // Fecha pasada = foto fija: a diferencia de "hoy" (SSE en vivo, sin total
   // fijo que mostrar), tiene sentido un paginador real con numero de pagina
@@ -114,6 +42,48 @@ export class ScannerDataStore {
       const numeroBase = total - page * pageSize;
       onResult(this._logsToSignals(logs, numeroBase), total);
     });
+  }
+
+  private readonly liveSignalsSub = new Map<number, Subscription>();
+  private readonly liveSignalsLastRequest = new Map<number, {
+    fecha: string; page: number; pageSize: number; onResult: (signals: SignalRow[], totalElements: number) => void;
+  }>();
+
+  // "Hoy" con paginador real (igual que loadSignalsForDate, mismo endpoint de
+  // conteo) en vez de traer hasta 15000 filas de una -- antes un escaner sin
+  // pre-filtros (ej. universo completo) podia acumular miles de senales en
+  // un dia y el tab las cargaba TODAS al abrir. Ahora solo pide la pagina
+  // pedida (50 por defecto), y una senal nueva por SSE solo dispara un
+  // refresco silencioso si el que mira esta tab sigue en la pagina 0 (la mas
+  // reciente) -- si ya avanzo de pagina, una senal nueva no lo saca de ahi.
+  loadSignalsLive(
+    scannerId: number,
+    fecha: string,
+    page: number,
+    pageSize: number,
+    onResult: (signals: SignalRow[], totalElements: number) => void
+  ): void {
+    this.liveSignalsLastRequest.set(scannerId, { fecha, page, pageSize, onResult });
+    this.loadSignalsForDate(scannerId, fecha, page, pageSize, onResult);
+
+    if (!this.liveSignalsSub.has(scannerId)) {
+      const sub = this.sse.conectarPorEscaner(scannerId).subscribe({
+        next: (n: { categoria?: string }) => {
+          if (n.categoria !== 'SIGNAL') return;
+          const last = this.liveSignalsLastRequest.get(scannerId);
+          if (last && last.page === 0) {
+            this.loadSignalsForDate(scannerId, last.fecha, last.page, last.pageSize, last.onResult);
+          }
+        }
+      });
+      this.liveSignalsSub.set(scannerId, sub);
+    }
+  }
+
+  releaseLiveSignals(scannerId: number): void {
+    this.liveSignalsSub.get(scannerId)?.unsubscribe();
+    this.liveSignalsSub.delete(scannerId);
+    this.liveSignalsLastRequest.delete(scannerId);
   }
 
   private _localToday(): string {
@@ -211,14 +181,6 @@ export class ScannerDataStore {
       logs: logApi.getRegistroPorEscanerTodas(scannerId, page, pageSize, fecha),
       total: logApi.contarRegistrosPorEscanerYFecha(scannerId, fecha)
     }).subscribe(({ logs, total }) => onResult(logs, total));
-  }
-
-  release(scannerId: number): void {
-    const entry = this.signalsCache.get(scannerId);
-    if (entry) {
-      entry.sub?.unsubscribe();
-      this.signalsCache.delete(scannerId);
-    }
   }
 
   private extractTipo(mensaje: string): string {

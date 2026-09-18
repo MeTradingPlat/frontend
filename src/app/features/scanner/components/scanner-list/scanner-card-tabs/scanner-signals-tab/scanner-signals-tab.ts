@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -59,7 +59,7 @@ interface DateOption {
   styleUrl: './scanner-signals-tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ScannerSignalsTab implements OnInit {
+export class ScannerSignalsTab implements OnInit, OnDestroy {
   private readonly dataStore = inject(ScannerDataStore);
   private readonly logApi = inject(LogApiService);
   private readonly dialog = inject(MatDialog);
@@ -73,13 +73,13 @@ export class ScannerSignalsTab implements OnInit {
   availableDates = signal<DateOption[]>([]);
   selectedDate = signal<string>('');
 
-  // Paginador real (numero de pagina, salto directo) -- solo para una fecha
-  // pasada (foto fija con total conocido). "Hoy" es en vivo via SSE, sin
-  // paginador, como ya funcionaba.
+  // Paginador real para cualquier fecha, incluido "hoy" -- antes "hoy" traia
+  // hasta 15000 filas de una sola vez (ver MAX_SIGNALS, ya retirado de
+  // ScannerDataStore); ahora pide de a 50 igual que una fecha pasada, y una
+  // senal nueva por SSE solo refresca la pagina 0 (ver loadSignalsLive).
   readonly pageSize = 50;
   pageIndex = signal(0);
   totalElements = signal(0);
-  isViewingToday = computed(() => this.availableDates().find(d => d.value === this.selectedDate())?.isToday ?? true);
 
   searchControl = new FormControl('');
   private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
@@ -134,18 +134,21 @@ export class ScannerSignalsTab implements OnInit {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
     const localeToday = this._localToday();
-    if (fecha === localeToday) {
-      this.dataStore.loadSignals(scannerId, (signals) => {
-        this.dataSource.set(signals);
-        this.loading.set(false);
-      });
-      return;
-    }
-    this.dataStore.loadSignalsForDate(scannerId, fecha, this.pageIndex(), this.pageSize, (signals, totalElements) => {
+    const onResult = (signals: SignalRow[], totalElements: number): void => {
       this.dataSource.set(signals);
       this.totalElements.set(totalElements);
       this.loading.set(false);
-    });
+    };
+    if (fecha === localeToday) {
+      this.dataStore.loadSignalsLive(scannerId, fecha, this.pageIndex(), this.pageSize, onResult);
+      return;
+    }
+    this.dataStore.loadSignalsForDate(scannerId, fecha, this.pageIndex(), this.pageSize, onResult);
+  }
+
+  ngOnDestroy(): void {
+    const scannerId = this.scanner().idEscaner;
+    if (scannerId) this.dataStore.releaseLiveSignals(scannerId);
   }
 
   private _localToday(): string {

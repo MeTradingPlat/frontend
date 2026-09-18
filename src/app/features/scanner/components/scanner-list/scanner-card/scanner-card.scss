@@ -9,7 +9,13 @@
 }
 
 .scanner-card {
-    height: 480px;
+    // 480px alcanzaba justo para la lista con scroll virtual, pero cuando el
+    // paginador aparece (fecha pasada en Señales/Registro, ver
+    // scanner-signals-tab.html) le resta ~56-64px al viewport de filas --
+    // con eso, el itemSize de 76px (scanner-signals-tab.scss) apenas
+    // alcanzaba para 1 fila completa. 620px deja margen para al menos 2-3
+    // filas visibles incluso con el paginador puesto.
+    height: 620px;
     overflow: visible;
     transition: all 0.3s ease;
     display: flex;
