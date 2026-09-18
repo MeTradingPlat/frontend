@@ -39,7 +39,11 @@ export function groupSignalLogs(rows: RegistroLog[], expandedMinutes: ReadonlySe
       const expanded = expandedMinutes.has(minuteKey);
       result.push({ ...row, isGroupHeader: true, groupCount: group.length, groupMinuteKey: minuteKey, groupExpanded: expanded });
       if (expanded) {
-        for (const signal of group) result.push({ ...signal });
+        // groupMinuteKey tambien va en las filas hijas (no solo el header) --
+        // sin esto, una vez expandido, las filas reveladas se veian
+        // identicas a una fila normal sin grupo, y no quedaba claro cuales
+        // pertenecian al "N señales en este minuto" de arriba.
+        for (const signal of group) result.push({ ...signal, groupMinuteKey: minuteKey });
       }
     }
     i = j;

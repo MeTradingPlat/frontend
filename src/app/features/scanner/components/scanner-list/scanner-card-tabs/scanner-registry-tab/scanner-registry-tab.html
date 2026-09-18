@@ -106,7 +106,7 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"
         [class.error-row]="row.nivel === 'ERROR'"
         [class.warn-row]="row.nivel === 'WARN'"
-        [class.signal-group-row]="row.isGroupHeader"></tr>
+        [class.signal-group-row]="!!row.groupMinuteKey"></tr>
   </table>
   </div>
   <mat-paginator
