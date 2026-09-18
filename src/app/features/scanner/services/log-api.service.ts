@@ -53,4 +53,24 @@ export class LogApiService {
   contarRegistrosPorEscanerYFecha(idEscaner: number, fecha: string): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/escaner/${idEscaner}/todas/count?fecha=${fecha}`);
   }
+
+  // Busqueda por simbolo en TODO el historial del escaner (no solo lo ya
+  // cargado en pantalla), paginada igual que el resto -- categoria=SIGNAL,
+  // para la pestana "Senales".
+  buscarPorEscanerYSimbolo(idEscaner: number, simbolo: string, page: number = 0, size: number = 50): Observable<RegistroLogDTORespuesta[]> {
+    return this.http.get<RegistroLogDTORespuesta[]>(`${this.apiUrl}/escaner/${idEscaner}/buscar?simbolo=${encodeURIComponent(simbolo)}&page=${page}&size=${size}`);
+  }
+
+  contarPorEscanerYSimbolo(idEscaner: number, simbolo: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/escaner/${idEscaner}/buscar/count?simbolo=${encodeURIComponent(simbolo)}`);
+  }
+
+  // Igual pero sin filtro de categoria, para la pestana "Registro".
+  buscarPorEscanerYSimboloTodas(idEscaner: number, simbolo: string, page: number = 0, size: number = 50): Observable<RegistroLogDTORespuesta[]> {
+    return this.http.get<RegistroLogDTORespuesta[]>(`${this.apiUrl}/escaner/${idEscaner}/todas/buscar?simbolo=${encodeURIComponent(simbolo)}&page=${page}&size=${size}`);
+  }
+
+  contarPorEscanerYSimboloTodas(idEscaner: number, simbolo: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/escaner/${idEscaner}/todas/buscar/count?simbolo=${encodeURIComponent(simbolo)}`);
+  }
 }

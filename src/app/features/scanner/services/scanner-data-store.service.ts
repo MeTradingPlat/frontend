@@ -44,6 +44,25 @@ export class ScannerDataStore {
     });
   }
 
+  // Busqueda por simbolo en TODO el historial (no solo la pagina/fecha
+  // actual) -- paginada igual que loadSignalsForDate, pero contra el
+  // endpoint /buscar del backend en vez de /count+fecha.
+  searchSignals(
+    scannerId: number,
+    simbolo: string,
+    page: number,
+    pageSize: number,
+    onResult: (signals: SignalRow[], totalElements: number) => void
+  ): void {
+    forkJoin({
+      logs: this.logApi.buscarPorEscanerYSimbolo(scannerId, simbolo, page, pageSize),
+      total: this.logApi.contarPorEscanerYSimbolo(scannerId, simbolo)
+    }).subscribe(({ logs, total }) => {
+      const numeroBase = total - page * pageSize;
+      onResult(this._logsToSignals(logs, numeroBase), total);
+    });
+  }
+
   private readonly liveSignalsSub = new Map<number, Subscription>();
   private readonly liveSignalsLastRequest = new Map<number, {
     fecha: string; page: number; pageSize: number; onResult: (signals: SignalRow[], totalElements: number) => void;
@@ -156,6 +175,22 @@ export class ScannerDataStore {
     forkJoin({
       logs: logApi.getRegistroPorEscanerTodas(scannerId, page, pageSize, fecha),
       total: logApi.contarRegistrosPorEscanerYFecha(scannerId, fecha)
+    }).subscribe(({ logs, total }) => onResult(logs, total));
+  }
+
+  // Igual que searchSignals pero sin filtro de categoria, para la pestana
+  // "Registro".
+  searchRegistry(
+    scannerId: number,
+    logApi: LogApiService,
+    simbolo: string,
+    page: number,
+    pageSize: number,
+    onResult: (logs: RegistroLogDTORespuesta[], totalElements: number) => void
+  ): void {
+    forkJoin({
+      logs: logApi.buscarPorEscanerYSimboloTodas(scannerId, simbolo, page, pageSize),
+      total: logApi.contarPorEscanerYSimboloTodas(scannerId, simbolo)
     }).subscribe(({ logs, total }) => onResult(logs, total));
   }
 

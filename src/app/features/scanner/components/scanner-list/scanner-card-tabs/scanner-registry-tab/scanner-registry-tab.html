@@ -23,7 +23,7 @@
   <div class="loading-container">
     <p>{{ 'SCANNER.LOADING_REGISTRY' | translate }}</p>
   </div>
-} @else if (filteredDataSource().length === 0) {
+} @else if (dataSource().length === 0) {
   <div class="empty-state">
     <p>{{ 'SCANNER.NO_REGISTRY' | translate }}</p>
   </div>

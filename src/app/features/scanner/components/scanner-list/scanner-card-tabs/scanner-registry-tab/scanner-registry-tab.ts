@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
@@ -49,6 +50,7 @@ export class ScannerRegistryTab implements OnInit, OnDestroy {
   private readonly logApiService = inject(LogApiService);
   private readonly dataStore = inject(ScannerDataStore);
   private readonly i18n = inject(I18nService);
+  private readonly destroyRef = inject(DestroyRef);
 
   scanner = input.required<Escaner>();
 
@@ -66,21 +68,30 @@ export class ScannerRegistryTab implements OnInit, OnDestroy {
   totalElements = signal(0);
 
   searchControl = new FormControl('');
-  private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
-
-  filteredDataSource = computed(() => {
-    const term = (this.searchTerm() || '').trim().toUpperCase();
-    if (!term) return this.dataSource();
-    return this.dataSource().filter(row => row.symbol?.toUpperCase().includes(term));
-  });
+  // Mismo patron que scanner-signals-tab: con termino activo, _loadForDate
+  // ignora la fecha seleccionada y busca en TODO el historial via
+  // ScannerDataStore.searchRegistry (no solo la pagina ya cargada).
+  private readonly searchTerm = signal('');
 
   // Minutos con su grupo de señales expandido ("ver mas") -- por clave de
   // minuto (no por fila), asi que sigue expandido aunque lleguen mas logs y
   // el array se reordene con onUpdate().
   private readonly expandedMinutes = signal<ReadonlySet<string>>(new Set());
-  groupedDataSource = computed<GroupedRegistroLog[]>(() => groupSignalLogs(this.filteredDataSource(), this.expandedMinutes()));
+  groupedDataSource = computed<GroupedRegistroLog[]>(() => groupSignalLogs(this.dataSource(), this.expandedMinutes()));
 
   ngOnInit(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      map(v => (v || '').trim().toUpperCase()),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(term => {
+      this.searchTerm.set(term);
+      this.pageIndex.set(0);
+      this.loading.set(true);
+      this._loadForDate(this.selectedDate());
+    });
+
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
     this.loading.set(true);
@@ -128,6 +139,11 @@ export class ScannerRegistryTab implements OnInit, OnDestroy {
       this.totalElements.set(totalElements);
       this.loading.set(false);
     };
+    const term = this.searchTerm();
+    if (term) {
+      this.dataStore.searchRegistry(scannerId, this.logApiService, term, this.pageIndex(), this.pageSize, onResult);
+      return;
+    }
     if (fecha === this._localToday()) {
       this.dataStore.loadRegistryLive(scannerId, this.logApiService, fecha, this.pageIndex(), this.pageSize, onResult);
       return;

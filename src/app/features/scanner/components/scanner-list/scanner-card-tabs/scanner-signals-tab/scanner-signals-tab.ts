@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -64,6 +65,7 @@ export class ScannerSignalsTab implements OnInit, OnDestroy {
   private readonly logApi = inject(LogApiService);
   private readonly dialog = inject(MatDialog);
   private readonly i18n = inject(I18nService);
+  private readonly destroyRef = inject(DestroyRef);
 
   scanner = input.required<Escaner>();
 
@@ -82,15 +84,26 @@ export class ScannerSignalsTab implements OnInit, OnDestroy {
   totalElements = signal(0);
 
   searchControl = new FormControl('');
-  private readonly searchTerm = toSignal(this.searchControl.valueChanges, { initialValue: '' });
-
-  filteredDataSource = computed(() => {
-    const term = (this.searchTerm() || '').trim().toUpperCase();
-    if (!term) return this.dataSource();
-    return this.dataSource().filter(row => row.symbol?.toUpperCase().includes(term));
-  });
+  // '' cuando no hay busqueda activa -- en ese caso _loadForDate sigue
+  // paginando por fecha (o "en vivo" para hoy) como siempre. Con termino,
+  // ignora la fecha seleccionada y busca en TODO el historial del escaner
+  // via ScannerDataStore.searchSignals (no solo la pagina ya cargada en
+  // pantalla, que es lo que hacia el filtro client-side anterior).
+  private readonly searchTerm = signal('');
 
   ngOnInit(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      map(v => (v || '').trim().toUpperCase()),
+      distinctUntilChanged(),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(term => {
+      this.searchTerm.set(term);
+      this.pageIndex.set(0);
+      this.loading.set(true);
+      this._loadForDate(this.selectedDate());
+    });
+
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
     this.loading.set(true);
@@ -133,13 +146,17 @@ export class ScannerSignalsTab implements OnInit, OnDestroy {
   private _loadForDate(fecha: string): void {
     const scannerId = this.scanner().idEscaner;
     if (!scannerId) return;
-    const localeToday = this._localToday();
     const onResult = (signals: SignalRow[], totalElements: number): void => {
       this.dataSource.set(signals);
       this.totalElements.set(totalElements);
       this.loading.set(false);
     };
-    if (fecha === localeToday) {
+    const term = this.searchTerm();
+    if (term) {
+      this.dataStore.searchSignals(scannerId, term, this.pageIndex(), this.pageSize, onResult);
+      return;
+    }
+    if (fecha === this._localToday()) {
       this.dataStore.loadSignalsLive(scannerId, fecha, this.pageIndex(), this.pageSize, onResult);
       return;
     }
