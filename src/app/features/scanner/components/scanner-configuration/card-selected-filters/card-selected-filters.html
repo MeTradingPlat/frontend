@@ -9,9 +9,16 @@
   <mat-card-content class="scanner-card-content">
     <div class="filters-grid">
       @for (filtro of filtros(); track $index) {
-        <mat-card class="filter-card" appearance="outlined">
+        <mat-card class="filter-card" appearance="outlined" [class.filter-card--con-grupo]="!!filtro.grupoAlternativo">
           <mat-card-header class="filter-card-header">
-            <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
+            <div class="filter-card-header-left">
+              @if (alternativeGroupLetter(filtro.grupoAlternativo); as letra) {
+                <span class="filter-card-group-badge"
+                  [attr.data-grupo]="letra"
+                  [matTooltip]="('SCANNER.ALTERNATIVE_GROUP_HINT' | translate: { letra })">{{letra}}</span>
+              }
+              <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
+            </div>
             <i class="bi bi-x-circle-fill remove-filter-icon"
               (click)="onRemoveFilter($index)"
               [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
@@ -45,15 +52,22 @@
 
           <mat-divider/>
 
-          <div class="filter-card-alternativo" [matTooltip]="'SCANNER.ALTERNATIVE_FILTER_HINT' | translate">
+          <div class="filter-card-alternativo" [matTooltip]="'SCANNER.ALTERNATIVE_GROUP_TOOLTIP' | translate">
             <span class="filter-card-alternativo__label">
               <i class="bi bi-shuffle"></i>
-              {{ 'SCANNER.ALTERNATIVE_FILTER' | translate }}
+              {{ 'SCANNER.ALTERNATIVE_GROUP_LABEL' | translate }}
             </span>
-            <mat-slide-toggle
-              [checked]="!!filtro.grupoAlternativo"
-              (change)="onToggleAlternativo($index, $event.checked)"
-              [aria-label]="'SCANNER.ALTERNATIVE_FILTER' | translate"/>
+            <mat-select class="filter-card-alternativo__select"
+              [value]="filtro.grupoAlternativo ?? null"
+              (selectionChange)="onAlternativeGroupChange($index, $event.value ?? undefined)"
+              [aria-label]="'SCANNER.ALTERNATIVE_GROUP_LABEL' | translate">
+              <mat-option [value]="null">{{ 'SCANNER.ALTERNATIVE_GROUP_NONE' | translate }}</mat-option>
+              @for (grupo of alternativeGroupOptions; track grupo.value) {
+                <mat-option [value]="grupo.value">
+                  {{ 'SCANNER.ALTERNATIVE_GROUP_OPTION' | translate: { letra: grupo.letter } }}
+                </mat-option>
+              }
+            </mat-select>
           </div>
 
           <mat-card-footer class="filter-card-footer">

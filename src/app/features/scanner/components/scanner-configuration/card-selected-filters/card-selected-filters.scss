@@ -61,6 +61,12 @@
     justify-content: space-between;
     padding: 10px 14px 6px;
 
+    .filter-card-header-left {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+    }
+
     .filter-card-title {
       color: var(--mat-sys-on-surface);
       font-size: 13px;
@@ -141,10 +147,51 @@
       }
     }
 
-    ::ng-deep .mdc-switch {
-      transform: scale(0.8);
-      transform-origin: right center;
+    &__select {
+      width: 108px;
+      font-size: 12px;
+
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        padding: 0 8px;
+      }
     }
+  }
+
+  // Insignia con la letra del grupo alternativo, en el encabezado de la
+  // tarjeta -- misma letra y color en TODAS las tarjetas que comparten
+  // grupoAlternativo, para que se note a simple vista cuales estan unidas
+  // (antes el toggle no dejaba ninguna marca visible entre tarjetas).
+  .filter-card-group-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    margin-right: 6px;
+
+    $alternative-group-colors: (
+      A: #1e88e5,
+      B: #fb8c00,
+      C: #43a047,
+      D: #8e24aa,
+      E: #d81b60,
+      F: #6d4c41,
+    );
+
+    @each $letra, $color in $alternative-group-colors {
+      &[data-grupo='#{$letra}'] {
+        background-color: $color;
+      }
+    }
+  }
+
+  .filter-card--con-grupo {
+    border-left: 3px solid var(--mat-sys-tertiary);
   }
 
   .filter-card-footer {

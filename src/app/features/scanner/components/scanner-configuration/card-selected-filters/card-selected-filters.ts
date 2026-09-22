@@ -3,7 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Filtro } from '../../../models/filtro.interface';
@@ -13,6 +13,7 @@ import { IntegerParameter } from './integer-parameter/integer-parameter';
 import { OptionsParameter } from './options-parameter/options-parameter';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
+import { ALTERNATIVE_GROUP_OPTIONS, alternativeGroupLetter } from '../../../utils/alternative-group.util';
 
 @Component({
   selector: 'app-card-selected-filters',
@@ -21,7 +22,7 @@ import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
     MatButtonModule,
     MatDividerModule,
     MatIconModule,
-    MatSlideToggleModule,
+    MatSelectModule,
     MatTooltipModule,
     TranslatePipe,
     ConditionalParameter,
@@ -39,9 +40,11 @@ export class CardSelectedFilters {
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
-  toggleAlternativo = output<{ index: number; checked: boolean }>();
+  alternativeGroupChange = output<{ index: number; grupo: number | undefined }>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
+  readonly alternativeGroupOptions = ALTERNATIVE_GROUP_OPTIONS;
+  readonly alternativeGroupLetter = alternativeGroupLetter;
 
   onAddFilter(): void {
     this.openAddDialog.emit();
@@ -51,8 +54,8 @@ export class CardSelectedFilters {
     this.removeFilter.emit(index);
   }
 
-  onToggleAlternativo(index: number, checked: boolean): void {
-    this.toggleAlternativo.emit({ index, checked });
+  onAlternativeGroupChange(index: number, grupo: number | undefined): void {
+    this.alternativeGroupChange.emit({ index, grupo });
   }
 
   getFilterErrors(filtroEnum: string): Record<string, string> | undefined {
