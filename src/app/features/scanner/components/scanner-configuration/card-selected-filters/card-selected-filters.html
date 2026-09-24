@@ -7,6 +7,17 @@
     </div>
   </mat-card-header>
   <mat-card-content class="scanner-card-content">
+    <div class="setting-row">
+      <div class="setting-row__text">
+        <span class="setting-row__label">{{ 'SCANNER.ANY_TECHNICAL_FILTER' | translate }}</span>
+        <span class="setting-row__hint">{{ 'SCANNER.ANY_TECHNICAL_FILTER_HINT' | translate }}</span>
+      </div>
+      <mat-slide-toggle
+        [checked]="anyMode()"
+        (change)="onAnyModeChange($event.checked)"
+        [aria-label]="'SCANNER.ANY_TECHNICAL_FILTER' | translate"/>
+    </div>
+
     @for (section of sections(); track section.key) {
       <section class="filter-section">
         <h3 class="filter-section-header">
@@ -16,93 +27,64 @@
             @case ('DINAMICO') { {{ 'SCANNER.FILTER_SECTION_DYNAMIC' | translate }} }
             @default { {{ 'SCANNER.FILTER_SECTION_TECHNICAL' | translate: { timeframe: section.timeframe } }} }
           }
+          @if (anyMode() && section.tipo === 'TECNICO' && section.items.length > 1) {
+            <span class="filter-section-mode">{{ 'SCANNER.ANY_ONE_BADGE' | translate }}</span>
+          }
           <span class="filter-section-count">{{ section.items.length }}</span>
         </h3>
 
-        @if (section.required.length) {
-          <div class="filters-grid">
-            @for (item of section.required; track item.index) {
-              <ng-container *ngTemplateOutlet="filterCard; context: { item: item, section: section }" />
-            }
-          </div>
-        }
+        <div class="filters-grid">
+          @for (item of section.items; track item.index) {
+            @let filtro = item.filtro;
+            <mat-card class="filter-card" appearance="outlined">
+              <mat-card-header class="filter-card-header">
+                <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
+                <i class="bi bi-x-circle-fill remove-filter-icon"
+                  (click)="onRemoveFilter(item.index)"
+                  [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
+              </mat-card-header>
+              <mat-card-content class="filter-card-content">
+                @for (parametro of filtro.parametros; track parametro.enumParametro) {
+                  @switch (parametro.objValorSeleccionado.enumTipoValor) {
+                    @case ('INTEGER') {
+                      <app-integer-parameter
+                        [(parametro)]="filtro.parametros[$index]"
+                        (parametroChange)="onParameterChanged()"
+                        [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                    }
+                    @case ('FLOAT') {
+                      <app-float-parameter
+                        [(parametro)]="filtro.parametros[$index]"
+                        (parametroChange)="onParameterChanged()"
+                        [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                    }
+                    @case ('STRING') {
+                      <app-options-parameter
+                        [(parametro)]="filtro.parametros[$index]"
+                        (parametroChange)="onParameterChanged()"
+                        [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                    }
+                    @case ('CONDICIONAL') {
+                      <app-conditional-parameter
+                        [(parametro)]="filtro.parametros[$index]"
+                        (parametroChange)="onParameterChanged()"
+                        [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+                    }
+                  }
+                }
+              </mat-card-content>
 
-        @if (section.alternatives.length) {
-          <div class="alternatives-box">
-            <div class="alternatives-box-title">
-              <i class="bi bi-shuffle"></i>
-              {{ 'SCANNER.ALTERNATIVES_BOX_TITLE' | translate }}
-            </div>
-            <div class="filters-grid">
-              @for (item of section.alternatives; track item.index) {
-                <ng-container *ngTemplateOutlet="filterCard; context: { item: item, section: section }" />
-              }
-            </div>
-          </div>
-        }
+              <mat-card-footer class="filter-card-footer">
+                <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
+                <span class="filter-card-tipo">
+                  <i class="bi" [class]="getFilterTypeIcon(filtro.enumTipoFiltro)"></i>
+                  {{filtro.etiquetaTipoFiltro}}
+                </span>
+              </mat-card-footer>
+            </mat-card>
+          }
+        </div>
       </section>
     }
   </mat-card-content>
 </mat-card>
-
-<ng-template #filterCard let-item="item" let-section="section">
-  @let filtro = item.filtro;
-  <mat-card class="filter-card" appearance="outlined">
-    <mat-card-header class="filter-card-header">
-      <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
-      <i class="bi bi-x-circle-fill remove-filter-icon"
-        (click)="onRemoveFilter(item.index)"
-        [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
-    </mat-card-header>
-    <mat-card-content class="filter-card-content">
-      @for (parametro of filtro.parametros; track parametro.enumParametro) {
-        @switch (parametro.objValorSeleccionado.enumTipoValor) {
-          @case ('INTEGER') {
-            <app-integer-parameter
-              [(parametro)]="filtro.parametros[$index]"
-              (parametroChange)="onParameterChanged()"
-              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-          }
-          @case ('FLOAT') {
-            <app-float-parameter
-              [(parametro)]="filtro.parametros[$index]"
-              (parametroChange)="onParameterChanged()"
-              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-          }
-          @case ('STRING') {
-            <app-options-parameter
-              [(parametro)]="filtro.parametros[$index]"
-              (parametroChange)="onParameterChanged()"
-              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-          }
-          @case ('CONDICIONAL') {
-            <app-conditional-parameter
-              [(parametro)]="filtro.parametros[$index]"
-              (parametroChange)="onParameterChanged()"
-              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-          }
-        }
-      }
-    </mat-card-content>
-
-    <mat-divider/>
-
-    <div class="filter-card-alternativo"
-      [matTooltip]="(section.items.length < 2 && filtro.grupoAlternativo == null ? 'SCANNER.ALTERNATIVE_NEEDS_ANOTHER' : 'SCANNER.ALTERNATIVE_TOGGLE_TOOLTIP') | translate">
-      <mat-slide-toggle
-        [checked]="filtro.grupoAlternativo != null"
-        [disabled]="section.items.length < 2 && filtro.grupoAlternativo == null"
-        (change)="onToggleAlternative(section, item.index, $event.checked)">
-        {{ 'SCANNER.ALTERNATIVE_TOGGLE_LABEL' | translate }}
-      </mat-slide-toggle>
-    </div>
-
-    <mat-card-footer class="filter-card-footer">
-      <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
-      <span class="filter-card-tipo">
-        <i class="bi" [class]="getFilterTypeIcon(filtro.enumTipoFiltro)"></i>
-        {{filtro.etiquetaTipoFiltro}}
-      </span>
-    </mat-card-footer>
-  </mat-card>
-</ng-template>

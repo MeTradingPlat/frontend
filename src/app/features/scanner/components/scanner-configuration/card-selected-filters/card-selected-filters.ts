@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,7 +13,7 @@ import { IntegerParameter } from './integer-parameter/integer-parameter';
 import { OptionsParameter } from './options-parameter/options-parameter';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
-import { FilterSection, buildFilterSections, groupIdForSection } from '../../../utils/filter-sections.util';
+import { buildFilterSections } from '../../../utils/filter-sections.util';
 
 @Component({
   selector: 'app-card-selected-filters',
@@ -24,7 +23,6 @@ import { FilterSection, buildFilterSections, groupIdForSection } from '../../../
     MatDividerModule,
     MatIconModule,
     MatSlideToggleModule,
-    NgTemplateOutlet,
     MatTooltipModule,
     TranslatePipe,
     ConditionalParameter,
@@ -47,7 +45,9 @@ export class CardSelectedFilters {
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
-  alternativeGroupChange = output<{ index: number; grupo: number | undefined }>();
+  anyMode = input<boolean>(false);
+  anyModeChange = output<boolean>();
+  filtersChanged = output<void>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
 
@@ -61,11 +61,11 @@ export class CardSelectedFilters {
 
   onParameterChanged(): void {
     this.parameterVersion.update(version => version + 1);
+    this.filtersChanged.emit();
   }
 
-  onToggleAlternative(section: FilterSection, index: number, alternative: boolean): void {
-    const grupo = alternative ? groupIdForSection(section, this.sections()) : undefined;
-    this.alternativeGroupChange.emit({ index, grupo });
+  onAnyModeChange(enabled: boolean): void {
+    this.anyModeChange.emit(enabled);
   }
 
   getFilterErrors(filtroEnum: string): Record<string, string> | undefined {
