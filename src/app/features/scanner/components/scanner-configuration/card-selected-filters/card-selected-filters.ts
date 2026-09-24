@@ -14,7 +14,6 @@ import { OptionsParameter } from './options-parameter/options-parameter';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
 import { ALTERNATIVE_GROUP_OPTIONS, alternativeGroupLetter } from '../../../utils/alternative-group.util';
-import { mixedTimeframeGroups } from '../../../utils/mixed-timeframe-groups.util';
 import { buildFilterSections, groupOwnerBySection } from '../../../utils/filter-sections.util';
 
 @Component({
@@ -39,7 +38,6 @@ import { buildFilterSections, groupOwnerBySection } from '../../../utils/filter-
 })
 export class CardSelectedFilters {
   filtros = input.required<Filtro[]>();
-  mixedGroups = computed(() => mixedTimeframeGroups(this.filtros()));
   sections = computed(() => buildFilterSections(this.filtros()));
   private groupOwners = computed(() => groupOwnerBySection(this.sections()));
   validationErrors = input<Record<string, Record<string, string>>>({});
@@ -61,6 +59,10 @@ export class CardSelectedFilters {
 
   onAlternativeGroupChange(index: number, grupo: number | undefined): void {
     this.alternativeGroupChange.emit({ index, grupo });
+  }
+
+  isMisplacedInGroup(sectionKey: string, grupo: number | null | undefined): boolean {
+    return grupo != null && this.isGroupTakenElsewhere(sectionKey, grupo);
   }
 
   isGroupTakenElsewhere(sectionKey: string, grupo: number): boolean {

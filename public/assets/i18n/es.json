@@ -81,7 +81,7 @@
     "ALTERNATIVE_GROUP_NONE": "Ninguno",
     "ALTERNATIVE_GROUP_OPTION": "Grupo {{letra}}",
     "ALTERNATIVE_GROUP_HINT": "Grupo {{letra}}: basta que se cumpla uno.",
-    "ALTERNATIVE_GROUP_MIXED_TIMEFRAMES": "Temporalidades distintas: se exigen todos.",
+    "ALTERNATIVE_GROUP_MIXED_TIMEFRAMES": "La temporalidad no coincide con la de su grupo: se exigirá siempre.",
     "FILTER_SECTION_STATIC": "Estáticos",
     "FILTER_SECTION_DYNAMIC": "Dinámicos",
     "FILTER_SECTION_TECHNICAL": "Técnicos · {{timeframe}}",

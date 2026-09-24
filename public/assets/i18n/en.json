@@ -81,7 +81,7 @@
     "ALTERNATIVE_GROUP_NONE": "None",
     "ALTERNATIVE_GROUP_OPTION": "Group {{letra}}",
     "ALTERNATIVE_GROUP_HINT": "Group {{letra}}: only one needs to match.",
-    "ALTERNATIVE_GROUP_MIXED_TIMEFRAMES": "Different timeframes: all are required.",
+    "ALTERNATIVE_GROUP_MIXED_TIMEFRAMES": "Its timeframe differs from its group: it will always be required.",
     "FILTER_SECTION_STATIC": "Static",
     "FILTER_SECTION_DYNAMIC": "Dynamic",
     "FILTER_SECTION_TECHNICAL": "Technical · {{timeframe}}",

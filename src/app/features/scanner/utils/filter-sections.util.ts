@@ -40,7 +40,7 @@ export function groupOwnerBySection(sections: FilterSection[]): Map<number, stri
   const owners = new Map<number, string>();
   for (const section of sections) {
     for (const { filtro } of section.items) {
-      if (filtro.grupoAlternativo !== undefined && !owners.has(filtro.grupoAlternativo)) {
+      if (filtro.grupoAlternativo != null && !owners.has(filtro.grupoAlternativo)) {
         owners.set(filtro.grupoAlternativo, section.key);
       }
     }

@@ -16,14 +16,3 @@ export function filterTimeframeKey(filtro: Filtro): string {
 export function filterTimeframeLabel(filtro: Filtro): string {
   return findTimeframeParameter(filtro)?.objValorSeleccionado.etiqueta || filterTimeframeKey(filtro);
 }
-
-export function mixedTimeframeGroups(filtros: Filtro[]): Set<number> {
-  const timeframesPorGrupo = new Map<number, Set<string>>();
-  for (const filtro of filtros) {
-    if (filtro.grupoAlternativo === undefined) continue;
-    const timeframes = timeframesPorGrupo.get(filtro.grupoAlternativo) ?? new Set<string>();
-    timeframes.add(filterTimeframeKey(filtro));
-    timeframesPorGrupo.set(filtro.grupoAlternativo, timeframes);
-  }
-  return new Set([...timeframesPorGrupo].filter(([, tfs]) => tfs.size > 1).map(([grupo]) => grupo));
-}

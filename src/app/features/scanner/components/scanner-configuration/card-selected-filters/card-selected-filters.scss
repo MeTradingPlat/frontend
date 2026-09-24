@@ -238,6 +238,11 @@ $alternative-group-colors: (
     }
   }
 
+  .filter-card--group-error,
+  .filter-card--group-error.filter-card--con-grupo {
+    border: 2px solid var(--mat-sys-error);
+  }
+
   .filter-card--con-grupo {
     border-left: 3px solid var(--mat-sys-tertiary);
   }

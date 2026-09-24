@@ -22,7 +22,7 @@
       @for (item of section.items; track item.index) {
         @let filtro = item.filtro;
         @let letra = alternativeGroupLetter(filtro.grupoAlternativo);
-        <mat-card class="filter-card" appearance="outlined" [class.filter-card--con-grupo]="!!letra" [attr.data-grupo]="letra">
+        <mat-card class="filter-card" appearance="outlined" [class.filter-card--con-grupo]="!!letra" [class.filter-card--group-error]="isMisplacedInGroup(section.key, filtro.grupoAlternativo)" [attr.data-grupo]="letra">
           <mat-card-header class="filter-card-header">
             <div class="filter-card-header-left">
               @if (letra) {
@@ -82,7 +82,7 @@
               }
             </mat-select>
           </div>
-          @if (filtro.grupoAlternativo !== undefined && mixedGroups().has(filtro.grupoAlternativo)) {
+          @if (isMisplacedInGroup(section.key, filtro.grupoAlternativo)) {
             <div class="filter-card-alternativo__warning">
               <i class="bi bi-exclamation-triangle-fill"></i>
               {{ 'SCANNER.ALTERNATIVE_GROUP_MIXED_TIMEFRAMES' | translate }}
