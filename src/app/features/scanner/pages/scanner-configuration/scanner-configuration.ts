@@ -1,4 +1,3 @@
-import { applyAnyFilterMode } from '../../utils/any-filter-mode.util';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, model, OnInit, signal, untracked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -49,7 +48,6 @@ export class ScannerConfiguration implements OnInit {
   readonly backPath = "/escaneres";
   readonly scanner = model<Escaner>(this.createEmptyScanner());
   readonly filtros = model<Filtro[]>([]);
-  readonly anyFilterMode = signal(false);
   readonly validationErrors = signal<Record<string, Record<string, string>>>({});
   readonly scannerErrors = signal<Record<string, string>>({});
   readonly loading = this.facade.loading;
@@ -154,8 +152,6 @@ export class ScannerConfiguration implements OnInit {
     this.facade.loadFiltrosEscaner(idEscaner, forceRefresh).subscribe({
       next: (filtros) => {
         this.filtros.set(filtros);
-        this.anyFilterMode.set(filtros.some(f => f.grupoAlternativo != null));
-        this.reapplyAnyFilterMode();
       },
       error: (error) => {
         console.error('Error al cargar los filtros del escáner:', error);
@@ -356,7 +352,6 @@ export class ScannerConfiguration implements OnInit {
           next: (filtroConDefecto) => {
             const currentFilters = this.filtros();
             this.filtros.set([...currentFilters, filtroConDefecto]);
-            this.reapplyAnyFilterMode();
           },
           error: (err) => {
             console.error('Error al obtener filtro por defecto:', err);
@@ -369,22 +364,6 @@ export class ScannerConfiguration implements OnInit {
   onRemoveFilter(index: number): void {
     const currentFilters = this.filtros();
     this.filtros.set(currentFilters.filter((_, i) => i !== index));
-    this.reapplyAnyFilterMode();
-  }
-
-  onAnyFilterModeChange(enabled: boolean): void {
-    this.anyFilterMode.set(enabled);
-    this.filtros.set(applyAnyFilterMode(this.filtros(), enabled));
-  }
-
-  onFiltersChanged(): void {
-    this.reapplyAnyFilterMode();
-  }
-
-  private reapplyAnyFilterMode(): void {
-    if (this.anyFilterMode()) {
-      this.filtros.set(applyAnyFilterMode(this.filtros(), true));
-    }
   }
 
   /**
