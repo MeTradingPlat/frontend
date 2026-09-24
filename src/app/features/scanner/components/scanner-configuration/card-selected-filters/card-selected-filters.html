@@ -60,21 +60,25 @@
           @case ('INTEGER') {
             <app-integer-parameter
               [(parametro)]="filtro.parametros[$index]"
+              (parametroChange)="onParameterChanged()"
               [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
           }
           @case ('FLOAT') {
             <app-float-parameter
               [(parametro)]="filtro.parametros[$index]"
+              (parametroChange)="onParameterChanged()"
               [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
           }
           @case ('STRING') {
             <app-options-parameter
               [(parametro)]="filtro.parametros[$index]"
+              (parametroChange)="onParameterChanged()"
               [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
           }
           @case ('CONDICIONAL') {
             <app-conditional-parameter
               [(parametro)]="filtro.parametros[$index]"
+              (parametroChange)="onParameterChanged()"
               [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
           }
         }

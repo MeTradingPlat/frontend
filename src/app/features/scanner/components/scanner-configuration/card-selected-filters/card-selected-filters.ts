@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -39,7 +39,11 @@ import { FilterSection, buildFilterSections, groupIdForSection } from '../../../
 })
 export class CardSelectedFilters {
   filtros = input.required<Filtro[]>();
-  sections = computed(() => buildFilterSections(this.filtros()));
+  private parameterVersion = signal(0);
+  sections = computed(() => {
+    this.parameterVersion();
+    return buildFilterSections(this.filtros());
+  });
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
@@ -53,6 +57,10 @@ export class CardSelectedFilters {
 
   onRemoveFilter(index: number): void {
     this.removeFilter.emit(index);
+  }
+
+  onParameterChanged(): void {
+    this.parameterVersion.update(version => version + 1);
   }
 
   onToggleAlternative(section: FilterSection, index: number, alternative: boolean): void {
