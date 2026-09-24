@@ -81,6 +81,7 @@
     "ALTERNATIVE_GROUP_NONE": "None",
     "ALTERNATIVE_GROUP_OPTION": "Group {{letra}}",
     "ALTERNATIVE_GROUP_HINT": "Group {{letra}}: this filter or another one in group {{letra}} (same timeframe) needs to match.",
+    "ALTERNATIVE_GROUP_MIXED_TIMEFRAMES": "This group mixes different timeframes: they do not act as alternatives and all of its filters will be required.",
     "EXIT_INDICATORS": "Exit Indicators (Stop Loss / Take Profit)",
     "EXIT_INDICATORS_PREVIEW_BADGE": "Preview",
     "EXIT_INDICATORS_PREVIEW_NOTE": "Exit indicator catalog — not yet saved with the scanner.",

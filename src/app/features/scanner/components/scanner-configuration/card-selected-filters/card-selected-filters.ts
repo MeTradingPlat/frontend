@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -14,6 +14,7 @@ import { OptionsParameter } from './options-parameter/options-parameter';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
 import { ALTERNATIVE_GROUP_OPTIONS, alternativeGroupLetter } from '../../../utils/alternative-group.util';
+import { mixedTimeframeGroups } from '../../../utils/mixed-timeframe-groups.util';
 
 @Component({
   selector: 'app-card-selected-filters',
@@ -37,6 +38,7 @@ import { ALTERNATIVE_GROUP_OPTIONS, alternativeGroupLetter } from '../../../util
 })
 export class CardSelectedFilters {
   filtros = input.required<Filtro[]>();
+  mixedGroups = computed(() => mixedTimeframeGroups(this.filtros()));
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();

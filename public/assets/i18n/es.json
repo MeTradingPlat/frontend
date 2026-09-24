@@ -81,6 +81,7 @@
     "ALTERNATIVE_GROUP_NONE": "Ninguno",
     "ALTERNATIVE_GROUP_OPTION": "Grupo {{letra}}",
     "ALTERNATIVE_GROUP_HINT": "Grupo {{letra}}: basta con que este filtro u otro del grupo {{letra}} (de la misma temporalidad) se cumpla.",
+    "ALTERNATIVE_GROUP_MIXED_TIMEFRAMES": "Este grupo mezcla temporalidades distintas: no funcionan como alternativas y se exigirán todos los filtros.",
     "EXIT_INDICATORS": "Indicadores de Salida (Stop Loss / Take Profit)",
     "EXIT_INDICATORS_PREVIEW_BADGE": "Vista previa",
     "EXIT_INDICATORS_PREVIEW_NOTE": "Catálogo de indicadores de salida — todavía no se guardan con el escáner.",

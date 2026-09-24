@@ -69,6 +69,12 @@
               }
             </mat-select>
           </div>
+          @if (filtro.grupoAlternativo !== undefined && mixedGroups().has(filtro.grupoAlternativo)) {
+            <div class="filter-card-alternativo__warning">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              {{ 'SCANNER.ALTERNATIVE_GROUP_MIXED_TIMEFRAMES' | translate }}
+            </div>
+          }
 
           <mat-card-footer class="filter-card-footer">
             <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>

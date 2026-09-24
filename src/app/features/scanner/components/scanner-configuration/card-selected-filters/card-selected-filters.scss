@@ -190,6 +190,19 @@
     }
   }
 
+  .filter-card-alternativo__warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 2px 14px 6px;
+    font-size: 11px;
+    color: var(--mat-sys-error);
+
+    i {
+      margin-top: 1px;
+    }
+  }
+
   .filter-card--con-grupo {
     border-left: 3px solid var(--mat-sys-tertiary);
   }
