@@ -7,12 +7,25 @@
     </div>
   </mat-card-header>
   <mat-card-content class="scanner-card-content">
+    @for (section of sections(); track section.key) {
+    <section class="filter-section">
+      <h3 class="filter-section-header">
+        <i class="bi" [class]="getFilterTypeIcon(section.tipo)"></i>
+        @switch (section.tipo) {
+          @case ('ESTATICO') { {{ 'SCANNER.FILTER_SECTION_STATIC' | translate }} }
+          @case ('DINAMICO') { {{ 'SCANNER.FILTER_SECTION_DYNAMIC' | translate }} }
+          @default { {{ 'SCANNER.FILTER_SECTION_TECHNICAL' | translate: { timeframe: section.timeframe } }} }
+        }
+        <span class="filter-section-count">{{ section.items.length }}</span>
+      </h3>
     <div class="filters-grid">
-      @for (filtro of filtros(); track $index) {
-        <mat-card class="filter-card" appearance="outlined" [class.filter-card--con-grupo]="!!filtro.grupoAlternativo">
+      @for (item of section.items; track item.index) {
+        @let filtro = item.filtro;
+        @let letra = alternativeGroupLetter(filtro.grupoAlternativo);
+        <mat-card class="filter-card" appearance="outlined" [class.filter-card--con-grupo]="!!letra" [attr.data-grupo]="letra">
           <mat-card-header class="filter-card-header">
             <div class="filter-card-header-left">
-              @if (alternativeGroupLetter(filtro.grupoAlternativo); as letra) {
+              @if (letra) {
                 <span class="filter-card-group-badge"
                   [attr.data-grupo]="letra"
                   [matTooltip]="('SCANNER.ALTERNATIVE_GROUP_HINT' | translate: { letra })">{{letra}}</span>
@@ -20,7 +33,7 @@
               <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
             </div>
             <i class="bi bi-x-circle-fill remove-filter-icon"
-              (click)="onRemoveFilter($index)"
+              (click)="onRemoveFilter(item.index)"
               [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
           </mat-card-header>
           <mat-card-content class="filter-card-content">
@@ -59,11 +72,11 @@
             </span>
             <mat-select class="filter-card-alternativo__select"
               [value]="filtro.grupoAlternativo ?? null"
-              (selectionChange)="onAlternativeGroupChange($index, $event.value ?? undefined)"
+              (selectionChange)="onAlternativeGroupChange(item.index, $event.value ?? undefined)"
               [aria-label]="'SCANNER.ALTERNATIVE_GROUP_LABEL' | translate">
               <mat-option [value]="null">{{ 'SCANNER.ALTERNATIVE_GROUP_NONE' | translate }}</mat-option>
               @for (grupo of alternativeGroupOptions; track grupo.value) {
-                <mat-option [value]="grupo.value">
+                <mat-option [value]="grupo.value" [disabled]="isGroupTakenElsewhere(section.key, grupo.value)">
                   {{ 'SCANNER.ALTERNATIVE_GROUP_OPTION' | translate: { letra: grupo.letter } }}
                 </mat-option>
               }
@@ -86,5 +99,7 @@
         </mat-card>
       }
     </div>
+    </section>
+    }
   </mat-card-content>
 </mat-card>

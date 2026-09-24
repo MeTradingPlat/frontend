@@ -3,7 +3,7 @@ import { Filtro } from '../models/filtro.interface';
 const TIMEFRAME_PARAMETER_PREFIX = 'TIMEFRAME';
 const NO_TIMEFRAME_KEY = 'DEFAULT';
 
-function filterTimeframeKey(filtro: Filtro): string {
+export function filterTimeframeKey(filtro: Filtro): string {
   const parametro = filtro.parametros.find(p => p.enumParametro.startsWith(TIMEFRAME_PARAMETER_PREFIX));
   const valor = (parametro?.objValorSeleccionado as { valor?: unknown } | undefined)?.valor;
   return typeof valor === 'string' && valor ? valor.replace(/^_/, '') : NO_TIMEFRAME_KEY;

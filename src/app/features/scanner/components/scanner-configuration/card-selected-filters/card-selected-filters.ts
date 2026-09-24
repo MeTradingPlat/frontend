@@ -15,6 +15,7 @@ import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refr
 import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
 import { ALTERNATIVE_GROUP_OPTIONS, alternativeGroupLetter } from '../../../utils/alternative-group.util';
 import { mixedTimeframeGroups } from '../../../utils/mixed-timeframe-groups.util';
+import { buildFilterSections, groupOwnerBySection } from '../../../utils/filter-sections.util';
 
 @Component({
   selector: 'app-card-selected-filters',
@@ -39,6 +40,8 @@ import { mixedTimeframeGroups } from '../../../utils/mixed-timeframe-groups.util
 export class CardSelectedFilters {
   filtros = input.required<Filtro[]>();
   mixedGroups = computed(() => mixedTimeframeGroups(this.filtros()));
+  sections = computed(() => buildFilterSections(this.filtros()));
+  private groupOwners = computed(() => groupOwnerBySection(this.sections()));
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
@@ -58,6 +61,11 @@ export class CardSelectedFilters {
 
   onAlternativeGroupChange(index: number, grupo: number | undefined): void {
     this.alternativeGroupChange.emit({ index, grupo });
+  }
+
+  isGroupTakenElsewhere(sectionKey: string, grupo: number): boolean {
+    const owner = this.groupOwners().get(grupo);
+    return owner !== undefined && owner !== sectionKey;
   }
 
   getFilterErrors(filtroEnum: string): Record<string, string> | undefined {

@@ -1,3 +1,12 @@
+$alternative-group-colors: (
+  A: #1e88e5,
+  B: #fb8c00,
+  C: #43a047,
+  D: #8e24aa,
+  E: #d81b60,
+  F: #6d4c41,
+);
+
 :host {
   max-width: 1230px;
   min-width: 345px;
@@ -41,6 +50,35 @@
         opacity: 0.7;
       }
     }
+  }
+}
+
+.filter-section {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filter-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+
+  .filter-section-count {
+    margin-left: auto;
+    font-weight: 500;
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background-color: var(--mat-sys-surface-container-high);
   }
 }
 
@@ -174,19 +212,16 @@
     color: #fff;
     margin-right: 6px;
 
-    $alternative-group-colors: (
-      A: #1e88e5,
-      B: #fb8c00,
-      C: #43a047,
-      D: #8e24aa,
-      E: #d81b60,
-      F: #6d4c41,
-    );
-
     @each $letra, $color in $alternative-group-colors {
       &[data-grupo='#{$letra}'] {
         background-color: $color;
       }
+    }
+  }
+
+  @each $letra, $color in $alternative-group-colors {
+    &.filter-card--con-grupo[data-grupo='#{$letra}'] {
+      border-left-color: $color;
     }
   }
 
