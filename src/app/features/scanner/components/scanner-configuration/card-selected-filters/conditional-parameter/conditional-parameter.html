@@ -1,60 +1,76 @@
 <div class="conditional-container" appI18nRefresh>
-  <mat-form-field class="conditional-field" appearance="outline">
-    <mat-label>{{ 'SCANNER.CONDITION' | translate }}</mat-label>
-    <mat-select
-      [ngModel]="valorCondicional.enumCondicional"
-      (ngModelChange)="onCondicionalChange($event)"
-    >
-      @for (opcion of parametro().opciones; track $index) {
-        <mat-option [value]="getOpcionValue(opcion)">
-          {{opcion.etiqueta}}
-        </mat-option>
+  @if (isSimpleChoice()) {
+    <span class="choice-label">{{ parametro().etiqueta }}</span>
+    <mat-button-toggle-group
+      class="choice-group"
+      [value]="valorCondicional.valor1"
+      (change)="onValor1Selected($event.value)"
+      [aria-label]="parametro().etiqueta">
+      @for (opcion of valoresPermitidos(); track opcion.valor) {
+        <mat-button-toggle [value]="opcion.valor">{{ opcion.etiqueta }}</mat-button-toggle>
       }
-    </mat-select>
-  </mat-form-field>
-
-  <div class="values-container">
-    <mat-form-field class="value-field" appearance="outline">
-      <mat-label>{{ 'SCANNER.VALUE' | translate }}</mat-label>
-      @if (valoresPermitidos(); as opciones) {
-        <mat-select
-          [ngModel]="valorCondicional.valor1"
-          (ngModelChange)="onValor1Selected($event)"
-        >
-          @for (opcion of opciones; track opcion.valor) {
-            <mat-option [value]="opcion.valor">{{ opcion.etiqueta }}</mat-option>
-          }
-        </mat-select>
-      } @else {
-        <input
-          matInput
-          [type]="inputType()"
-          [step]="inputStep()"
-          [ngModel]="valorCondicional.valor1"
-          [errorStateMatcher]="errorStateMatcher"
-          (input)="onValor1Change($event)"
-        />
-      }
-      @if (errorMessage()) {
-        <mat-error>{{errorMessage()}}</mat-error>
-      }
+    </mat-button-toggle-group>
+    @if (errorMessage()) {
+      <span class="choice-error">{{ errorMessage() }}</span>
+    }
+  } @else {
+    <mat-form-field class="conditional-field" appearance="outline">
+      <mat-label>{{ 'SCANNER.CONDITION' | translate }}</mat-label>
+      <mat-select
+        [ngModel]="valorCondicional.enumCondicional"
+        (ngModelChange)="onCondicionalChange($event)"
+      >
+        @for (opcion of parametro().opciones; track $index) {
+          <mat-option [value]="getOpcionValue(opcion)">
+            {{opcion.etiqueta}}
+          </mat-option>
+        }
+      </mat-select>
     </mat-form-field>
 
-    @if (requiresValor2()) {
+    <div class="values-container">
       <mat-form-field class="value-field" appearance="outline">
-        <mat-label>{{ 'SCANNER.VALUE2' | translate }}</mat-label>
-        <input
-          matInput
-          [type]="inputType()"
-          [step]="inputStep()"
-          [ngModel]="valorCondicional.valor2"
-          [errorStateMatcher]="errorStateMatcher"
-          (input)="onValor2Change($event)"
-        />
+        <mat-label>{{ 'SCANNER.VALUE' | translate }}</mat-label>
+        @if (valoresPermitidos(); as opciones) {
+          <mat-select
+            [ngModel]="valorCondicional.valor1"
+            (ngModelChange)="onValor1Selected($event)"
+          >
+            @for (opcion of opciones; track opcion.valor) {
+              <mat-option [value]="opcion.valor">{{ opcion.etiqueta }}</mat-option>
+            }
+          </mat-select>
+        } @else {
+          <input
+            matInput
+            [type]="inputType()"
+            [step]="inputStep()"
+            [ngModel]="valorCondicional.valor1"
+            [errorStateMatcher]="errorStateMatcher"
+            (input)="onValor1Change($event)"
+          />
+        }
         @if (errorMessage()) {
           <mat-error>{{errorMessage()}}</mat-error>
         }
       </mat-form-field>
-    }
-  </div>
+
+      @if (requiresValor2()) {
+        <mat-form-field class="value-field" appearance="outline">
+          <mat-label>{{ 'SCANNER.VALUE2' | translate }}</mat-label>
+          <input
+            matInput
+            [type]="inputType()"
+            [step]="inputStep()"
+            [ngModel]="valorCondicional.valor2"
+            [errorStateMatcher]="errorStateMatcher"
+            (input)="onValor2Change($event)"
+          />
+          @if (errorMessage()) {
+            <mat-error>{{errorMessage()}}</mat-error>
+          }
+        </mat-form-field>
+      }
+    </div>
+  }
 </div>

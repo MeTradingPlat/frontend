@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -21,6 +22,7 @@ class CustomErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-conditional-parameter',
   imports: [
+    MatButtonToggleModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -70,6 +72,14 @@ export class ConditionalParameter {
     const valores = this.valorCondicional.valoresPermitidos;
     return valores && valores.length > 0 ? valores : null;
   });
+
+  /**
+   * Filtros de deteccion (Si/No): un unico operador "=" y un conjunto
+   * discreto de valores. Se muestra como una pregunta con botones
+   * Si/No en vez de dos selectores (Condicion "=" + Valor).
+   */
+  isSimpleChoice = computed(() =>
+    this.parametro().opciones.length === 1 && this.valoresPermitidos() !== null);
 
   /**
    * Obtiene el valor correcto de una opción
