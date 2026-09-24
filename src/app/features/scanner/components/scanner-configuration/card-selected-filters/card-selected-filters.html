@@ -8,98 +8,97 @@
   </mat-card-header>
   <mat-card-content class="scanner-card-content">
     @for (section of sections(); track section.key) {
-    <section class="filter-section">
-      <h3 class="filter-section-header">
-        <i class="bi" [class]="getFilterTypeIcon(section.tipo)"></i>
-        @switch (section.tipo) {
-          @case ('ESTATICO') { {{ 'SCANNER.FILTER_SECTION_STATIC' | translate }} }
-          @case ('DINAMICO') { {{ 'SCANNER.FILTER_SECTION_DYNAMIC' | translate }} }
-          @default { {{ 'SCANNER.FILTER_SECTION_TECHNICAL' | translate: { timeframe: section.timeframe } }} }
-        }
-        <span class="filter-section-count">{{ section.items.length }}</span>
-      </h3>
-    <div class="filters-grid">
-      @for (item of section.items; track item.index) {
-        @let filtro = item.filtro;
-        @let letra = alternativeGroupLetter(filtro.grupoAlternativo);
-        <mat-card class="filter-card" appearance="outlined" [class.filter-card--con-grupo]="!!letra" [class.filter-card--group-error]="isMisplacedInGroup(section.key, filtro.grupoAlternativo)" [attr.data-grupo]="letra">
-          <mat-card-header class="filter-card-header">
-            <div class="filter-card-header-left">
-              @if (letra) {
-                <span class="filter-card-group-badge"
-                  [attr.data-grupo]="letra"
-                  [matTooltip]="('SCANNER.ALTERNATIVE_GROUP_HINT' | translate: { letra })">{{letra}}</span>
-              }
-              <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
-            </div>
-            <i class="bi bi-x-circle-fill remove-filter-icon"
-              (click)="onRemoveFilter(item.index)"
-              [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
-          </mat-card-header>
-          <mat-card-content class="filter-card-content">
-            @for (parametro of filtro.parametros; track parametro.enumParametro) {
-              @switch (parametro.objValorSeleccionado.enumTipoValor) {
-                @case ('INTEGER') {
-                  <app-integer-parameter
-                    [(parametro)]="filtro.parametros[$index]"
-                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-                }
-                @case ('FLOAT') {
-                  <app-float-parameter
-                    [(parametro)]="filtro.parametros[$index]"
-                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-                }
-                @case ('STRING') {
-                  <app-options-parameter
-                    [(parametro)]="filtro.parametros[$index]"
-                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-                }
-                @case ('CONDICIONAL') {
-                  <app-conditional-parameter
-                    [(parametro)]="filtro.parametros[$index]"
-                    [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
-                }
-              }
-            }
-          </mat-card-content>
-
-          <mat-divider/>
-
-          <div class="filter-card-alternativo" [matTooltip]="'SCANNER.ALTERNATIVE_GROUP_TOOLTIP' | translate">
-            <span class="filter-card-alternativo__label">
-              <i class="bi bi-shuffle"></i>
-              {{ 'SCANNER.ALTERNATIVE_GROUP_LABEL' | translate }}
-            </span>
-            <mat-select class="filter-card-alternativo__select"
-              [value]="filtro.grupoAlternativo ?? null"
-              (selectionChange)="onAlternativeGroupChange(item.index, $event.value ?? undefined)"
-              [aria-label]="'SCANNER.ALTERNATIVE_GROUP_LABEL' | translate">
-              <mat-option [value]="null">{{ 'SCANNER.ALTERNATIVE_GROUP_NONE' | translate }}</mat-option>
-              @for (grupo of alternativeGroupOptions; track grupo.value) {
-                <mat-option [value]="grupo.value" [disabled]="isGroupTakenElsewhere(section.key, grupo.value)">
-                  {{ 'SCANNER.ALTERNATIVE_GROUP_OPTION' | translate: { letra: grupo.letter } }}
-                </mat-option>
-              }
-            </mat-select>
-          </div>
-          @if (isMisplacedInGroup(section.key, filtro.grupoAlternativo)) {
-            <div class="filter-card-alternativo__warning">
-              <i class="bi bi-exclamation-triangle-fill"></i>
-              {{ 'SCANNER.ALTERNATIVE_GROUP_MIXED_TIMEFRAMES' | translate }}
-            </div>
+      <section class="filter-section">
+        <h3 class="filter-section-header">
+          <i class="bi" [class]="getFilterTypeIcon(section.tipo)"></i>
+          @switch (section.tipo) {
+            @case ('ESTATICO') { {{ 'SCANNER.FILTER_SECTION_STATIC' | translate }} }
+            @case ('DINAMICO') { {{ 'SCANNER.FILTER_SECTION_DYNAMIC' | translate }} }
+            @default { {{ 'SCANNER.FILTER_SECTION_TECHNICAL' | translate: { timeframe: section.timeframe } }} }
           }
+          <span class="filter-section-count">{{ section.items.length }}</span>
+        </h3>
 
-          <mat-card-footer class="filter-card-footer">
-            <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
-            <span class="filter-card-tipo">
-              <i class="bi" [class]="getFilterTypeIcon(filtro.enumTipoFiltro)"></i>
-              {{filtro.etiquetaTipoFiltro}}
-            </span>
-          </mat-card-footer>
-        </mat-card>
-      }
-    </div>
-    </section>
+        @if (section.required.length) {
+          <div class="filters-grid">
+            @for (item of section.required; track item.index) {
+              <ng-container *ngTemplateOutlet="filterCard; context: { item: item, section: section }" />
+            }
+          </div>
+        }
+
+        @if (section.alternatives.length) {
+          <div class="alternatives-box">
+            <div class="alternatives-box-title">
+              <i class="bi bi-shuffle"></i>
+              {{ 'SCANNER.ALTERNATIVES_BOX_TITLE' | translate }}
+            </div>
+            <div class="filters-grid">
+              @for (item of section.alternatives; track item.index) {
+                <ng-container *ngTemplateOutlet="filterCard; context: { item: item, section: section }" />
+              }
+            </div>
+          </div>
+        }
+      </section>
     }
   </mat-card-content>
 </mat-card>
+
+<ng-template #filterCard let-item="item" let-section="section">
+  @let filtro = item.filtro;
+  <mat-card class="filter-card" appearance="outlined">
+    <mat-card-header class="filter-card-header">
+      <mat-card-title class="filter-card-title">{{filtro.etiquetaNombre}}</mat-card-title>
+      <i class="bi bi-x-circle-fill remove-filter-icon"
+        (click)="onRemoveFilter(item.index)"
+        [matTooltip]="'SCANNER.REMOVE_FILTER' | translate"></i>
+    </mat-card-header>
+    <mat-card-content class="filter-card-content">
+      @for (parametro of filtro.parametros; track parametro.enumParametro) {
+        @switch (parametro.objValorSeleccionado.enumTipoValor) {
+          @case ('INTEGER') {
+            <app-integer-parameter
+              [(parametro)]="filtro.parametros[$index]"
+              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+          }
+          @case ('FLOAT') {
+            <app-float-parameter
+              [(parametro)]="filtro.parametros[$index]"
+              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+          }
+          @case ('STRING') {
+            <app-options-parameter
+              [(parametro)]="filtro.parametros[$index]"
+              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+          }
+          @case ('CONDICIONAL') {
+            <app-conditional-parameter
+              [(parametro)]="filtro.parametros[$index]"
+              [errorMessage]="getFilterErrors(filtro.enumFiltro)?.[parametro.enumParametro]" />
+          }
+        }
+      }
+    </mat-card-content>
+
+    <mat-divider/>
+
+    <div class="filter-card-alternativo"
+      [matTooltip]="(section.items.length < 2 && filtro.grupoAlternativo == null ? 'SCANNER.ALTERNATIVE_NEEDS_ANOTHER' : 'SCANNER.ALTERNATIVE_TOGGLE_TOOLTIP') | translate">
+      <mat-slide-toggle
+        [checked]="filtro.grupoAlternativo != null"
+        [disabled]="section.items.length < 2 && filtro.grupoAlternativo == null"
+        (change)="onToggleAlternative(section, item.index, $event.checked)">
+        {{ 'SCANNER.ALTERNATIVE_TOGGLE_LABEL' | translate }}
+      </mat-slide-toggle>
+    </div>
+
+    <mat-card-footer class="filter-card-footer">
+      <span class="filter-card-category">{{filtro.objCategoria?.etiqueta}}</span>
+      <span class="filter-card-tipo">
+        <i class="bi" [class]="getFilterTypeIcon(filtro.enumTipoFiltro)"></i>
+        {{filtro.etiquetaTipoFiltro}}
+      </span>
+    </mat-card-footer>
+  </mat-card>
+</ng-template>

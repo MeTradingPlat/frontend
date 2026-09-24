@@ -1,9 +1,10 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Filtro } from '../../../models/filtro.interface';
@@ -13,8 +14,7 @@ import { IntegerParameter } from './integer-parameter/integer-parameter';
 import { OptionsParameter } from './options-parameter/options-parameter';
 import { I18nRefreshDirective } from '../../../../../shared/directives/i18n-refresh.directive';
 import { getFilterTypeIcon } from '../../../utils/filter-type-icon.util';
-import { ALTERNATIVE_GROUP_OPTIONS, alternativeGroupLetter } from '../../../utils/alternative-group.util';
-import { buildFilterSections, groupOwnerBySection } from '../../../utils/filter-sections.util';
+import { FilterSection, buildFilterSections, groupIdForSection } from '../../../utils/filter-sections.util';
 
 @Component({
   selector: 'app-card-selected-filters',
@@ -23,7 +23,8 @@ import { buildFilterSections, groupOwnerBySection } from '../../../utils/filter-
     MatButtonModule,
     MatDividerModule,
     MatIconModule,
-    MatSelectModule,
+    MatSlideToggleModule,
+    NgTemplateOutlet,
     MatTooltipModule,
     TranslatePipe,
     ConditionalParameter,
@@ -39,15 +40,12 @@ import { buildFilterSections, groupOwnerBySection } from '../../../utils/filter-
 export class CardSelectedFilters {
   filtros = input.required<Filtro[]>();
   sections = computed(() => buildFilterSections(this.filtros()));
-  private groupOwners = computed(() => groupOwnerBySection(this.sections()));
   validationErrors = input<Record<string, Record<string, string>>>({});
   openAddDialog = output<void>();
   removeFilter = output<number>();
   alternativeGroupChange = output<{ index: number; grupo: number | undefined }>();
 
   readonly getFilterTypeIcon = getFilterTypeIcon;
-  readonly alternativeGroupOptions = ALTERNATIVE_GROUP_OPTIONS;
-  readonly alternativeGroupLetter = alternativeGroupLetter;
 
   onAddFilter(): void {
     this.openAddDialog.emit();
@@ -57,17 +55,9 @@ export class CardSelectedFilters {
     this.removeFilter.emit(index);
   }
 
-  onAlternativeGroupChange(index: number, grupo: number | undefined): void {
+  onToggleAlternative(section: FilterSection, index: number, alternative: boolean): void {
+    const grupo = alternative ? groupIdForSection(section, this.sections()) : undefined;
     this.alternativeGroupChange.emit({ index, grupo });
-  }
-
-  isMisplacedInGroup(sectionKey: string, grupo: number | null | undefined): boolean {
-    return grupo != null && this.isGroupTakenElsewhere(sectionKey, grupo);
-  }
-
-  isGroupTakenElsewhere(sectionKey: string, grupo: number): boolean {
-    const owner = this.groupOwners().get(grupo);
-    return owner !== undefined && owner !== sectionKey;
   }
 
   getFilterErrors(filtroEnum: string): Record<string, string> | undefined {

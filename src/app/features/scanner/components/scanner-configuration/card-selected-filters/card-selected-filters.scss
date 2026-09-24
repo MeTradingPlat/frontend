@@ -1,12 +1,3 @@
-$alternative-group-colors: (
-  A: #1e88e5,
-  B: #fb8c00,
-  C: #43a047,
-  D: #8e24aa,
-  E: #d81b60,
-  F: #6d4c41,
-);
-
 :host {
   max-width: 1230px;
   min-width: 345px;
@@ -82,6 +73,23 @@ $alternative-group-colors: (
   }
 }
 
+.alternatives-box {
+  margin-top: 14px;
+  padding: 10px 12px 14px;
+  border: 2px dashed var(--mat-sys-tertiary);
+  border-radius: 12px;
+
+  .alternatives-box-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mat-sys-tertiary);
+  }
+}
+
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -98,12 +106,6 @@ $alternative-group-colors: (
     background-color: transparent;
     justify-content: space-between;
     padding: 10px 14px 6px;
-
-    .filter-card-header-left {
-      display: flex;
-      align-items: center;
-      min-width: 0;
-    }
 
     .filter-card-title {
       color: var(--mat-sys-on-surface);
@@ -162,89 +164,13 @@ $alternative-group-colors: (
     }
   }
 
-  // Fila compacta para el toggle de grupo alternativo -- separada del resto
-  // con un divisor, mismo lenguaje visual que el toggle de
-  // multiples-senales en card-time (icono + etiqueta corta + switch).
   .filter-card-alternativo {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 4px 14px;
+    padding: 4px 10px;
     background-color: transparent;
-
-    &__label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--mat-sys-on-surface-variant);
-
-      i {
-        font-size: 12px;
-        color: var(--mat-sys-tertiary);
-      }
-    }
-
-    &__select {
-      width: 108px;
-      font-size: 12px;
-
-      ::ng-deep .mat-mdc-text-field-wrapper {
-        padding: 0 8px;
-      }
-    }
-  }
-
-  // Insignia con la letra del grupo alternativo, en el encabezado de la
-  // tarjeta -- misma letra y color en TODAS las tarjetas que comparten
-  // grupoAlternativo, para que se note a simple vista cuales estan unidas
-  // (antes el toggle no dejaba ninguna marca visible entre tarjetas).
-  .filter-card-group-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
-    margin-right: 6px;
-
-    @each $letra, $color in $alternative-group-colors {
-      &[data-grupo='#{$letra}'] {
-        background-color: $color;
-      }
-    }
-  }
-
-  @each $letra, $color in $alternative-group-colors {
-    &.filter-card--con-grupo[data-grupo='#{$letra}'] {
-      border-left-color: $color;
-    }
-  }
-
-  .filter-card-alternativo__warning {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 2px 14px 6px;
-    font-size: 11px;
-    color: var(--mat-sys-error);
-
-    i {
-      margin-top: 1px;
-    }
-  }
-
-  .filter-card--group-error,
-  .filter-card--group-error.filter-card--con-grupo {
-    border: 2px solid var(--mat-sys-error);
-  }
-
-  .filter-card--con-grupo {
-    border-left: 3px solid var(--mat-sys-tertiary);
+    font-size: 12px;
+    color: var(--mat-sys-on-surface-variant);
   }
 
   .filter-card-footer {
