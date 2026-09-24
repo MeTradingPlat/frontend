@@ -1,5 +1,5 @@
 import { Filtro } from '../models/filtro.interface';
-import { filterTimeframeKey } from './mixed-timeframe-groups.util';
+import { filterTimeframeKey, filterTimeframeLabel } from './mixed-timeframe-groups.util';
 
 export interface FilterSectionItem {
   filtro: Filtro;
@@ -19,8 +19,8 @@ const SECTION_ORDER = ['ESTATICO', 'DINAMICO', TECHNICAL_TYPE];
 function sectionKeyOf(filtro: Filtro): { key: string; tipo: string; timeframe?: string } {
   const tipo = filtro.enumTipoFiltro ?? TECHNICAL_TYPE;
   if (tipo !== TECHNICAL_TYPE) return { key: tipo, tipo };
-  const timeframe = filterTimeframeKey(filtro);
-  return { key: `${tipo}|${timeframe}`, tipo, timeframe };
+  const timeframe = filterTimeframeLabel(filtro);
+  return { key: `${tipo}|${filterTimeframeKey(filtro)}`, tipo, timeframe };
 }
 
 export function buildFilterSections(filtros: Filtro[]): FilterSection[] {
